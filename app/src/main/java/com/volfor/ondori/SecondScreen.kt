@@ -1,4 +1,4 @@
-package com.volfor.kimochi
+package com.volfor.ondori
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FirstScreen(onNavigateToSecond: () -> Unit) {
+fun SecondScreen(onNavigateToFirst: () -> Unit) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -28,8 +28,8 @@ fun FirstScreen(onNavigateToSecond: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Button(onClick = onNavigateToSecond) {
-            Text(text = stringResource(R.string.next))
+        Button(onClick = onNavigateToFirst) {
+            Text(text = stringResource(R.string.previous))
         }
         Text(
             text = stringResource(R.string.lorem_ipsum)
@@ -39,6 +39,6 @@ fun FirstScreen(onNavigateToSecond: () -> Unit) {
 
 @Preview
 @Composable
-fun PreviewFirstScreen() {
-    FirstScreen(onNavigateToSecond = {})
+fun PreviewSecondScreen() {
+    SecondScreen(onNavigateToFirst = {})
 }

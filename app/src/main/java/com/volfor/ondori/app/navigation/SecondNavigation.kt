@@ -1,11 +1,10 @@
-package com.volfor.kimochi.app.navigation
+package com.volfor.ondori.app.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.volfor.kimochi.SecondScreen
+import com.volfor.ondori.SecondScreen
 import kotlinx.serialization.Serializable
-
 
 @Serializable
 object Second

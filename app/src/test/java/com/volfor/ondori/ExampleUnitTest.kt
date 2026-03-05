@@ -1,4 +1,4 @@
-package com.volfor.kimochi
+package com.volfor.ondori
 
 import org.junit.Test
 

@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Kimochi"
+rootProject.name = "Ondori"
 include(":app")

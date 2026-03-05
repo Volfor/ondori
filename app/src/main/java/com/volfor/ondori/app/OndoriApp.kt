@@ -1,4 +1,4 @@
-package com.volfor.kimochi.app
+package com.volfor.ondori.app
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -27,21 +27,20 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.volfor.kimochi.R
-import com.volfor.kimochi.app.navigation.First
-import com.volfor.kimochi.app.navigation.firstDestination
-import com.volfor.kimochi.app.navigation.navigateToFirst
-import com.volfor.kimochi.app.navigation.navigateToSecond
-import com.volfor.kimochi.app.navigation.secondDestination
-import com.volfor.kimochi.app.theme.KimochiTheme
 import kotlinx.coroutines.launch
-
+import com.volfor.ondori.R
+import com.volfor.ondori.app.navigation.First
+import com.volfor.ondori.app.navigation.firstDestination
+import com.volfor.ondori.app.navigation.navigateToFirst
+import com.volfor.ondori.app.navigation.navigateToSecond
+import com.volfor.ondori.app.navigation.secondDestination
+import com.volfor.ondori.app.theme.OndoriTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun KimochiApp() {
-    KimochiTheme {
+fun OndoriApp() {
+    OndoriTheme {
         val navController = rememberNavController()
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()

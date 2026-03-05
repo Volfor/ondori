@@ -1,4 +1,4 @@
-package com.volfor.kimochi.app.theme
+package com.volfor.ondori.app.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,24 +9,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.Yellow
 
-data class KimochiExtraColors(
+data class OndoriExtraColors(
     val header: Color = Color.Unspecified,
 )
 
 val LocalExtraColors = staticCompositionLocalOf {
-    KimochiExtraColors()
+    OndoriExtraColors()
 }
 
-private val LightExtraColors = KimochiExtraColors(
+private val LightExtraColors = OndoriExtraColors(
     header = Yellow,
 )
-private val DarkExtraColors = KimochiExtraColors(
+private val DarkExtraColors = OndoriExtraColors(
     header = Red,
 )
 
 @Composable
-fun KimochiTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val extraColors: KimochiExtraColors
+fun OndoriTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+    val extraColors: OndoriExtraColors
     if (isDarkTheme) {
         extraColors = DarkExtraColors
     } else {
@@ -40,7 +40,7 @@ fun KimochiTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composa
     }
 }
 
-object KimochiTheme {
-    val extraColors: KimochiExtraColors
+object OndoriTheme {
+    val extraColors: OndoriExtraColors
         @Composable get() = LocalExtraColors.current
 }
