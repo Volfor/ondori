@@ -75,13 +75,27 @@ fun AlarmItemCard(
 
 @Preview
 @Composable
-fun PreviewAlarmItemCard() {
+fun PreviewAlarmItemCardEnabled() {
     OndoriTheme {
         AlarmItemCard(
             Alarm(
                 id = 0,
-                label = "Test 1",
+                label = "Enabled alarm",
                 enabled = true,
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewAlarmItemCardDisabled() {
+    OndoriTheme {
+        AlarmItemCard(
+            Alarm(
+                id = 0,
+                label = "Disabled alarm",
+                enabled = false,
             )
         )
     }

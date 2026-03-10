@@ -7,18 +7,18 @@ import com.volfor.ondori.features.alarm.presentation.screens.AlarmsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
-object Second
+object Alarms
 
-fun NavGraphBuilder.secondDestination(
-    onNavigateToFirst: () -> Unit,
+fun NavGraphBuilder.alarmsDestination(
+    onNavigateToInfo: () -> Unit,
 ) {
-    composable<Second> {
+    composable<Alarms> {
         AlarmsScreen(
-            onNavigateToFirst
+            onNavigateToInfo
         )
     }
 }
 
-fun NavController.navigateToFirst() {
-    navigate(route = First)
+fun NavController.navigateToInfo() {
+    navigate(route = Info)
 }
