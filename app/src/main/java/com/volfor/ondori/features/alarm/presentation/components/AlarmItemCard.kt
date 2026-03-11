@@ -51,15 +51,14 @@ fun AlarmItemCard(
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
-                            text = "8:30",
+                            text = "%02d:%02d".format(alarm.hour, alarm.minute),
                             textAlign = TextAlign.Center,
                             fontSize = 30.sp,
                         )
-                        Text(
-                            text = "AM"
-                        )
                     }
-                    Text(alarm.label, fontSize = 12.sp)
+                    if (alarm.label != null) {
+                        Text(alarm.label, fontSize = 12.sp)
+                    }
                     Text("Mon, Tue, Wed", fontSize = 12.sp)
                 }
                 Switch(
@@ -80,8 +79,10 @@ fun PreviewAlarmItemCardEnabled() {
         AlarmItemCard(
             Alarm(
                 id = 0,
-                label = "Enabled alarm",
+                hour = 12,
+                minute = 15,
                 enabled = true,
+                label = "Enabled alarm",
             )
         )
     }
@@ -94,7 +95,8 @@ fun PreviewAlarmItemCardDisabled() {
         AlarmItemCard(
             Alarm(
                 id = 0,
-                label = "Disabled alarm",
+                hour = 1,
+                minute = 0,
                 enabled = false,
             )
         )

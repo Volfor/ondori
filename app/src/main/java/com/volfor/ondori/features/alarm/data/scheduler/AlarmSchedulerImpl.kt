@@ -1,4 +1,4 @@
-package com.volfor.ondori.features.alarm.data
+package com.volfor.ondori.features.alarm.data.scheduler
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -6,13 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.volfor.ondori.core.AlarmReceiver
-import com.volfor.ondori.features.alarm.domain.AlarmScheduler
+import com.volfor.ondori.features.alarm.domain.scheduler.AlarmScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class AlarmSchedulerImpl @Inject constructor(
     @ApplicationContext private val context: Context, private val alarmManager: AlarmManager
 ) : AlarmScheduler {
+
     override fun scheduleAlarm(alarmId: Int, triggerAtMillis: Long) {
         val pendingIntent = createPendingIntent(alarmId)
         val info = AlarmManager.AlarmClockInfo(triggerAtMillis, pendingIntent)
@@ -38,5 +39,3 @@ class AlarmSchedulerImpl @Inject constructor(
         )
     }
 }
-
-

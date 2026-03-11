@@ -1,11 +1,16 @@
 package com.volfor.ondori.features.alarm.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
-import com.volfor.ondori.features.alarm.domain.usecases.CancelAlarmUseCase
-import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmsUseCase
-import com.volfor.ondori.features.alarm.domain.usecases.ScheduleAlarmUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.CreateAlarmUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmsStreamUseCase
+import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -18,23 +23,27 @@ data class AlarmsUiState(
 
 @HiltViewModel
 class AlarmViewModel @Inject constructor(
-    private val scheduleAlarm: ScheduleAlarmUseCase,
-    private val cancelAlarm: CancelAlarmUseCase,
-    private val getAlarms: GetAlarmsUseCase,
+    getAlarmsStream: GetAlarmsStreamUseCase,
+    private val createAlarm: CreateAlarmUseCase,
 ) : ViewModel() {
 
-    private val _alarms = getAlarms()
-
-    val uiState = AlarmsUiState(
-        items = _alarms, isLoading = false
+    val uiState: StateFlow<AlarmsUiState> = getAlarmsStream().map { alarms ->
+        AlarmsUiState(
+            items = alarms, isLoading = false
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = WhileUiSubscribed,
+        initialValue = AlarmsUiState(isLoading = true)
     )
 
-    fun setAlarmInOneMinute() {
-        val time = System.currentTimeMillis() + 10_000
-        scheduleAlarm(0, time)
-    }
-
-    fun cancelAlarm() {
-        cancelAlarm(0)
+    fun createAlarm(hour: Int, minute: Int) = viewModelScope.launch {
+        createAlarm(
+            alarm = Alarm(
+                hour = hour,
+                minute = minute,
+                enabled = true,
+            )
+        )
     }
 }
