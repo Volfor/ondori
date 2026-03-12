@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.usecases.CreateAlarmUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.DeleteAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmsStreamUseCase
@@ -26,9 +27,10 @@ data class AlarmsUiState(
 @HiltViewModel
 class AlarmViewModel @Inject constructor(
     getAlarmsStream: GetAlarmsStreamUseCase,
-    private val createAlarm: CreateAlarmUseCase,
-    private val enableAlarm: EnableAlarmUseCase,
-    private val disableAlarm: DisableAlarmUseCase,
+    private val _createAlarm: CreateAlarmUseCase,
+    private val _deleteAlarm: DeleteAlarmUseCase,
+    private val _enableAlarm: EnableAlarmUseCase,
+    private val _disableAlarm: DisableAlarmUseCase,
 ) : ViewModel() {
 
     val uiState: StateFlow<AlarmsUiState> = getAlarmsStream().map { alarms ->
@@ -42,7 +44,7 @@ class AlarmViewModel @Inject constructor(
     )
 
     fun createAlarm(hour: Int, minute: Int) = viewModelScope.launch {
-        createAlarm(
+        _createAlarm(
             alarm = Alarm(
                 hour = hour,
                 minute = minute,
@@ -53,9 +55,13 @@ class AlarmViewModel @Inject constructor(
 
     fun setAlarmEnabled(alarm: Alarm, enabled: Boolean) = viewModelScope.launch {
         if (enabled) {
-            enableAlarm(alarm = alarm)
+            _enableAlarm(alarm = alarm)
         } else {
-            disableAlarm(alarm = alarm)
+            _disableAlarm(alarm = alarm)
         }
+    }
+
+    fun deleteAlarm(alarm: Alarm) = viewModelScope.launch {
+        _deleteAlarm(alarm)
     }
 }

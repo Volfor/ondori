@@ -98,6 +98,9 @@ fun AlarmsScreen(
             onAlarmToggle = { alarm, enabled ->
                 viewModel.setAlarmEnabled(alarm, enabled)
             },
+            onDelete = { alarm ->
+                viewModel.deleteAlarm(alarm)
+            },
             modifier = Modifier.padding(paddingValues),
         )
 
@@ -121,6 +124,7 @@ private fun AlarmsContent(
     loading: Boolean,
     alarms: List<Alarm>,
     onAlarmToggle: (alarm: Alarm, enabled: Boolean) -> Unit,
+    onDelete: (alarm: Alarm) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -134,11 +138,17 @@ private fun AlarmsContent(
             contentPadding = PaddingValues(vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(alarms) { alarm ->
+            items(
+                alarms,
+                key = { alarm -> alarm.id },
+            ) { alarm ->
                 AlarmItemCard(
                     alarm,
                     onCheckedChange = { enabled ->
                         onAlarmToggle(alarm, enabled)
+                    },
+                    onDelete = {
+                        onDelete(alarm)
                     },
                 )
             }
@@ -176,6 +186,7 @@ fun PreviewAlarmsContent() {
                     ),
                 ),
                 onAlarmToggle = { _, _ -> },
+                onDelete = {},
             )
         }
     }
@@ -190,6 +201,7 @@ fun PreviewAlarmsContentEmpty() {
                 loading = false,
                 alarms = emptyList(),
                 onAlarmToggle = { _, _ -> },
+                onDelete = {},
             )
         }
     }

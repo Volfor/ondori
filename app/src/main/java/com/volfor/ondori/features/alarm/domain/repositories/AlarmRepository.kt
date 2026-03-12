@@ -9,6 +9,8 @@ interface AlarmRepository {
 
     suspend fun createAlarm(alarm: Alarm): Long
 
+    suspend fun deleteAlarm(alarm: Alarm)
+
     suspend fun enableAlarm(alarmId: Long)
 
     suspend fun disableAlarm(alarmId: Long)

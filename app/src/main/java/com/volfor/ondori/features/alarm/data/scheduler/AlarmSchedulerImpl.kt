@@ -17,10 +17,11 @@ class AlarmSchedulerImpl @Inject constructor(
 ) : AlarmScheduler {
 
     override fun scheduleAlarm(alarmId: Int, triggerAtMillis: Long) {
+        Log.d("AlarmManager", "Alarm scheduled: $alarmId")
         val pendingIntent = createPendingIntent(alarmId)
         val info = AlarmManager.AlarmClockInfo(
             triggerAtMillis + ALARM_TRIGGER_SAFETY_OFFSET_MS,
-            pendingIntent
+            pendingIntent,
         )
         alarmManager.setAlarmClock(info, pendingIntent)
     }
