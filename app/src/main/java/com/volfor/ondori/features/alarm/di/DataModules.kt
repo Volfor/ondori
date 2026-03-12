@@ -2,13 +2,12 @@ package com.volfor.ondori.features.alarm.di
 
 import android.app.AlarmManager
 import android.content.Context
-import androidx.room.Room
 import com.volfor.ondori.data.local.db.OndoriDatabase
 import com.volfor.ondori.features.alarm.data.local.db.dao.AlarmDao
 import com.volfor.ondori.features.alarm.data.repositories.AlarmRepositoryImpl
 import com.volfor.ondori.features.alarm.data.scheduler.AlarmSchedulerImpl
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
-import com.volfor.ondori.features.alarm.domain.scheduler.AlarmScheduler
+import com.volfor.ondori.features.alarm.domain.services.AlarmScheduler
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -50,15 +49,7 @@ abstract class RepositoryModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DatabaseModule {
-
-    @Singleton
-    @Provides
-    fun provideDatabase(@ApplicationContext context: Context): OndoriDatabase {
-        return Room.databaseBuilder(
-            context.applicationContext, OndoriDatabase::class.java, "Ondori.db"
-        ).build()
-    }
+object DaoModule {
 
     @Provides
     fun provideAlarmDao(database: OndoriDatabase): AlarmDao = database.alarmDao()

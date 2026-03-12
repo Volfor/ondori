@@ -56,3 +56,4 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 google-devtools-kps = { id = "com.google.devtools.ksp", version.ref = "kps" }
+androidx-room = { id = "androidx.room", version.ref = "room" }

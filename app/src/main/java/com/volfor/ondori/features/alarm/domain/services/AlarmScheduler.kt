@@ -1,4 +1,4 @@
-package com.volfor.ondori.features.alarm.domain.scheduler
+package com.volfor.ondori.features.alarm.domain.services
 
 interface AlarmScheduler {
     fun scheduleAlarm(alarmId: Int, triggerAtMillis: Long)
