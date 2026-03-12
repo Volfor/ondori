@@ -12,10 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -27,10 +23,9 @@ import com.volfor.ondori.features.alarm.domain.entities.Alarm
 
 @Composable
 fun AlarmItemCard(
-    alarm: Alarm
+    alarm: Alarm,
+    onCheckedChange: (Boolean) -> Unit,
 ) {
-    var checked by remember { mutableStateOf(alarm.enabled) }
-
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -62,10 +57,8 @@ fun AlarmItemCard(
                     Text("Mon, Tue, Wed", fontSize = 12.sp)
                 }
                 Switch(
-                    checked = checked,
-                    onCheckedChange = {
-                        checked = it
-                    },
+                    checked = alarm.enabled,
+                    onCheckedChange = onCheckedChange,
                 )
             }
         }
@@ -83,7 +76,8 @@ fun PreviewAlarmItemCardEnabled() {
                 minute = 15,
                 enabled = true,
                 label = "Enabled alarm",
-            )
+            ),
+            onCheckedChange = {},
         )
     }
 }
@@ -98,7 +92,8 @@ fun PreviewAlarmItemCardDisabled() {
                 hour = 1,
                 minute = 0,
                 enabled = false,
-            )
+            ),
+            onCheckedChange = {},
         )
     }
 }

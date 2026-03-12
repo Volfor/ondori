@@ -8,4 +8,8 @@ interface AlarmRepository {
     fun getAlarmsStream(): Flow<List<Alarm>>
 
     suspend fun createAlarm(alarm: Alarm): Long
+
+    suspend fun enableAlarm(alarmId: Long)
+
+    suspend fun disableAlarm(alarmId: Long)
 }

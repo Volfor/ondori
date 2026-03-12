@@ -95,7 +95,10 @@ fun AlarmsScreen(
         AlarmsContent(
             loading = uiState.isLoading,
             alarms = uiState.items,
-            modifier = Modifier.padding(paddingValues)
+            onAlarmToggle = { alarm, enabled ->
+                viewModel.setAlarmEnabled(alarm, enabled)
+            },
+            modifier = Modifier.padding(paddingValues),
         )
 
         when {
@@ -115,7 +118,10 @@ fun AlarmsScreen(
 
 @Composable
 private fun AlarmsContent(
-    loading: Boolean, alarms: List<Alarm>, modifier: Modifier = Modifier
+    loading: Boolean,
+    alarms: List<Alarm>,
+    onAlarmToggle: (alarm: Alarm, enabled: Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -129,7 +135,12 @@ private fun AlarmsContent(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(alarms) { alarm ->
-                AlarmItemCard(alarm)
+                AlarmItemCard(
+                    alarm,
+                    onCheckedChange = { enabled ->
+                        onAlarmToggle(alarm, enabled)
+                    },
+                )
             }
         }
     }
@@ -164,6 +175,7 @@ fun PreviewAlarmsContent() {
                         label = "Test 3",
                     ),
                 ),
+                onAlarmToggle = { _, _ -> },
             )
         }
     }
@@ -177,6 +189,7 @@ fun PreviewAlarmsContentEmpty() {
             AlarmsContent(
                 loading = false,
                 alarms = emptyList(),
+                onAlarmToggle = { _, _ -> },
             )
         }
     }

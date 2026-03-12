@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.usecases.CreateAlarmUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmsStreamUseCase
 import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +27,8 @@ data class AlarmsUiState(
 class AlarmViewModel @Inject constructor(
     getAlarmsStream: GetAlarmsStreamUseCase,
     private val createAlarm: CreateAlarmUseCase,
+    private val enableAlarm: EnableAlarmUseCase,
+    private val disableAlarm: DisableAlarmUseCase,
 ) : ViewModel() {
 
     val uiState: StateFlow<AlarmsUiState> = getAlarmsStream().map { alarms ->
@@ -45,5 +49,13 @@ class AlarmViewModel @Inject constructor(
                 enabled = true,
             )
         )
+    }
+
+    fun setAlarmEnabled(alarm: Alarm, enabled: Boolean) = viewModelScope.launch {
+        if (enabled) {
+            enableAlarm(alarm = alarm)
+        } else {
+            disableAlarm(alarm = alarm)
+        }
     }
 }
