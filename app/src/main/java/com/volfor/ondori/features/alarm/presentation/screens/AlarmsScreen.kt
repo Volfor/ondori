@@ -40,12 +40,12 @@ import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.AlarmItemCard
 import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
-import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmViewModel
+import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmsViewModel
 
 @Composable
 fun AlarmsScreen(
     onNavigateToInfo: () -> Unit,
-    viewModel: AlarmViewModel = hiltViewModel(),
+    viewModel: AlarmsViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 //    val scope = rememberCoroutineScope()

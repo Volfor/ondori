@@ -15,6 +15,6 @@ class EnableAlarmUseCase @Inject constructor(
         repo.enableAlarm(alarm.id)
 
         val time = timeCalculator.computeNextTriggerTime(hour = alarm.hour, minute = alarm.minute)
-        scheduler.scheduleAlarm(alarm.id.toInt(), time)
+        scheduler.scheduleAlarm(alarm.id, time)
     }
 }

@@ -25,7 +25,7 @@ data class AlarmsUiState(
 )
 
 @HiltViewModel
-class AlarmViewModel @Inject constructor(
+class AlarmsViewModel @Inject constructor(
     getAlarmsStream: GetAlarmsStreamUseCase,
     private val _createAlarm: CreateAlarmUseCase,
     private val _deleteAlarm: DeleteAlarmUseCase,
@@ -57,11 +57,11 @@ class AlarmViewModel @Inject constructor(
         if (enabled) {
             _enableAlarm(alarm = alarm)
         } else {
-            _disableAlarm(alarm = alarm)
+            _disableAlarm(alarmId = alarm.id)
         }
     }
 
     fun deleteAlarm(alarm: Alarm) = viewModelScope.launch {
-        _deleteAlarm(alarm)
+        _deleteAlarm(alarmId = alarm.id)
     }
 }

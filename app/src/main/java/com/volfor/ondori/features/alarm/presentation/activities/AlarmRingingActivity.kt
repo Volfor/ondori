@@ -1,0 +1,38 @@
+package com.volfor.ondori.features.alarm.presentation.activities
+
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.volfor.ondori.features.alarm.presentation.screens.AlarmRingingScreen
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class AlarmRingingActivity : ComponentActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val alarmId = intent.getLongExtra("alarm_id", -1L)
+        Log.d("AlarmRingingActivity", "Alarm ringing: $alarmId")
+
+        //TODO:
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+        }
+
+        //TODO:
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setTurnScreenOn(true)
+        }
+
+        setContent {
+            AlarmRingingScreen(
+                onAlarmHandled = {
+                    finish()
+                },
+            )
+        }
+    }
+}

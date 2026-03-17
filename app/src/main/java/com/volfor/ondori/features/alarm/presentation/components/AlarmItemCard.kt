@@ -16,6 +16,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -38,9 +39,23 @@ fun AlarmItemCard(
     onDelete: () -> Unit,
 ) {
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
+    SwipeContent(
+        swipeToDismissBoxState,
+        alarm,
+        onCheckedChange,
+        onDelete,
+    )
+}
 
+@Composable
+private fun SwipeContent(
+    swipeState: SwipeToDismissBoxState,
+    alarm: Alarm,
+    onCheckedChange: (Boolean) -> Unit,
+    onDelete: () -> Unit
+) {
     SwipeToDismissBox(
-        state = swipeToDismissBoxState,
+        state = swipeState,
         onDismiss = { dismissValue ->
             when (dismissValue) {
                 SwipeToDismissBoxValue.StartToEnd -> {
@@ -57,76 +72,79 @@ fun AlarmItemCard(
             }
         },
         backgroundContent = {
-            when (swipeToDismissBoxState.dismissDirection) {
-                SwipeToDismissBoxValue.StartToEnd -> {
-                    Card {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Remove item",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Red)
-                                .wrapContentSize(Alignment.CenterStart)
-                                .padding(16.dp),
-                            tint = Color.White
-                        )
-                    }
-                }
-
-                SwipeToDismissBoxValue.EndToStart -> {
-                    Card {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Remove item",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Red)
-                                .wrapContentSize(Alignment.CenterEnd)
-                                .padding(16.dp),
-                            tint = Color.White
-                        )
-                    }
-                }
-
-                SwipeToDismissBoxValue.Settled -> {}
-            }
+            BackgroundContent(
+                dismissDirection = swipeState.dismissDirection
+            )
         },
     ) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ), modifier = Modifier.fillMaxWidth()
+        AlarmItemContent(alarm, onCheckedChange)
+    }
+}
+
+@Composable
+private fun BackgroundContent(dismissDirection: SwipeToDismissBoxValue) {
+    val color = when (dismissDirection) {
+        SwipeToDismissBoxValue.StartToEnd -> Color.Red
+        SwipeToDismissBoxValue.EndToStart -> Color.Red
+        SwipeToDismissBoxValue.Settled -> Color.Transparent
+    }
+
+    val alignment = when (dismissDirection) {
+        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+        SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+        SwipeToDismissBoxValue.Settled -> Alignment.Center
+    }
+
+    Card {
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = "Remove item",
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color)
+                .wrapContentSize(alignment)
+                .padding(16.dp),
+            tint = Color.White
+        )
+    }
+}
+
+@Composable
+private fun AlarmItemContent(alarm: Alarm, onCheckedChange: (Boolean) -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ), modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(all = 16.dp)
+                .fillMaxWidth(),
         ) {
-            Box(
-                modifier = Modifier
-                    .padding(all = 16.dp)
-                    .fillMaxWidth(),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.Bottom
-                        ) {
-                            Text(
-                                text = "%02d:%02d".format(alarm.hour, alarm.minute),
-                                textAlign = TextAlign.Center,
-                                fontSize = 30.sp,
-                            )
-                        }
-                        if (alarm.label != null) {
-                            Text(alarm.label, fontSize = 12.sp)
-                        }
-                        Text("Mon, Tue, Wed", fontSize = 12.sp)
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        Text(
+                            text = "%02d:%02d".format(alarm.hour, alarm.minute),
+                            textAlign = TextAlign.Center,
+                            fontSize = 30.sp,
+                        )
                     }
-                    Switch(
-                        checked = alarm.enabled,
-                        onCheckedChange = onCheckedChange,
-                    )
+                    if (alarm.label != null) {
+                        Text(alarm.label, fontSize = 12.sp)
+                    }
+                    Text("Mon, Tue, Wed", fontSize = 12.sp)
                 }
+                Switch(
+                    checked = alarm.enabled,
+                    onCheckedChange = onCheckedChange,
+                )
             }
         }
     }
@@ -155,6 +173,50 @@ fun PreviewAlarmItemCardEnabled() {
 fun PreviewAlarmItemCardDisabled() {
     OndoriTheme {
         AlarmItemCard(
+            Alarm(
+                id = 0,
+                hour = 1,
+                minute = 0,
+                enabled = false,
+            ),
+            onCheckedChange = {},
+            onDelete = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewAlarmItemSwipedRight() {
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
+        initialValue = SwipeToDismissBoxValue.StartToEnd,
+    )
+
+    OndoriTheme {
+        SwipeContent(
+            swipeToDismissBoxState,
+            Alarm(
+                id = 0,
+                hour = 1,
+                minute = 0,
+                enabled = false,
+            ),
+            onCheckedChange = {},
+            onDelete = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewAlarmItemSwipedLeft() {
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
+        initialValue = SwipeToDismissBoxValue.EndToStart,
+    )
+
+    OndoriTheme {
+        SwipeContent(
+            swipeToDismissBoxState,
             Alarm(
                 id = 0,
                 hour = 1,

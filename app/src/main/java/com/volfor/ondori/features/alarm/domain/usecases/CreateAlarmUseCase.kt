@@ -17,6 +17,6 @@ class CreateAlarmUseCase @Inject constructor(
         Log.d("AlarmManager", "Alarm created: $id")
 
         val time = timeCalculator.computeNextTriggerTime(hour = alarm.hour, minute = alarm.minute)
-        scheduler.scheduleAlarm(id.toInt(), time)
+        scheduler.scheduleAlarm(id, time)
     }
 }

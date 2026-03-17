@@ -13,10 +13,11 @@ import javax.inject.Inject
 private const val ALARM_TRIGGER_SAFETY_OFFSET_MS = 500
 
 class AlarmSchedulerImpl @Inject constructor(
-    @ApplicationContext private val context: Context, private val alarmManager: AlarmManager
+    @ApplicationContext private val context: Context,
+    private val alarmManager: AlarmManager,
 ) : AlarmScheduler {
 
-    override fun scheduleAlarm(alarmId: Int, triggerAtMillis: Long) {
+    override fun scheduleAlarm(alarmId: Long, triggerAtMillis: Long) {
         Log.d("AlarmManager", "Alarm scheduled: $alarmId")
         val pendingIntent = createPendingIntent(alarmId)
         val info = AlarmManager.AlarmClockInfo(
@@ -26,20 +27,20 @@ class AlarmSchedulerImpl @Inject constructor(
         alarmManager.setAlarmClock(info, pendingIntent)
     }
 
-    override fun cancelAlarm(alarmId: Int) {
+    override fun cancelAlarm(alarmId: Long) {
         Log.d("AlarmManager", "Alarm canceled: $alarmId")
         val pendingIntent = createPendingIntent(alarmId)
         alarmManager.cancel(pendingIntent)
     }
 
-    private fun createPendingIntent(alarmId: Int): PendingIntent {
-        val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
+    private fun createPendingIntent(alarmId: Long): PendingIntent {
+        val alarmIntent = Intent(context.applicationContext, AlarmReceiver::class.java).apply {
             putExtra("alarm_id", alarmId)
         }
 
         return PendingIntent.getBroadcast(
-            context,
-            alarmId,
+            context.applicationContext,
+            alarmId.toInt(),
             alarmIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

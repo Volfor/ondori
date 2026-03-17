@@ -1,15 +1,15 @@
 package com.volfor.ondori.features.alarm.domain.usecases
 
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
-import com.volfor.ondori.features.alarm.domain.services.AlarmScheduler
+import com.volfor.ondori.features.alarm.domain.services.AlarmRingingController
 import javax.inject.Inject
 
-class DeleteAlarmUseCase @Inject constructor(
+class DismissAlarmUseCase @Inject constructor(
     private val repo: AlarmRepository,
-    private val scheduler: AlarmScheduler,
+    private val ringingController: AlarmRingingController,
 ) {
     suspend operator fun invoke(alarmId: Long) {
-        scheduler.cancelAlarm(alarmId)
-        repo.deleteAlarm(alarmId)
+        repo.disableAlarm(alarmId)
+        ringingController.stopRinging()
     }
 }
