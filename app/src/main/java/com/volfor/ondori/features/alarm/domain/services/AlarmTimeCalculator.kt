@@ -4,11 +4,13 @@ import java.time.Clock
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
-private const val SNOOZE_MINUTES = 1 // TODO: allow to modify this value for each alarm
-
 class AlarmTimeCalculator @Inject constructor(
     private val clock: Clock
 ) {
+
+    companion object {
+        internal const val SNOOZE_MINUTES = 1 // TODO: allow to modify this value for each alarm
+    }
 
     fun computeNextTriggerTime(hour: Int, minute: Int): Long {
         val now = ZonedDateTime.now(clock)
@@ -32,7 +34,7 @@ class AlarmTimeCalculator @Inject constructor(
 
     fun computeSnoozeTriggerTime(): Long {
         val now = ZonedDateTime.now(clock)
-        val trigger = now.plusMinutes(SNOOZE_MINUTES.toLong())
+        val trigger = now.plusMinutes(SNOOZE_MINUTES.toLong()).withSecond(0).withNano(0)
         return trigger.toInstant().toEpochMilli()
     }
 }

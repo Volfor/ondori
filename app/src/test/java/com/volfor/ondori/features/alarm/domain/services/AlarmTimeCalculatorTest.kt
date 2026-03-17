@@ -5,6 +5,7 @@ import org.junit.Test
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 class AlarmTimeCalculatorTest {
 
@@ -86,6 +87,18 @@ class AlarmTimeCalculatorTest {
     }
 
     @Test
+    fun `respects non-UTC timezone for scheduling`() {
+        val zone = ZoneId.of("Asia/Tokyo") // UTC+9, no DST
+        val clock = Clock.fixed(Instant.parse("2026-03-11T02:00:00Z"), zone) // 11:00 JST
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeNextTriggerTime(12, 0)
+        val expected = Instant.parse("2026-03-11T03:00:00Z").toEpochMilli() // 12:00 JST
+
+        assertEquals(expected, result)
+    }
+
+    @Test
     fun `handles DST forward transition`() {
         val zone = ZoneId.of("Europe/Warsaw")
         val clock = Clock.fixed(Instant.parse("2026-03-29T00:30:00Z"), zone) // Local 01:30, UTC+1
@@ -136,6 +149,45 @@ class AlarmTimeCalculatorTest {
         val result = calculator.computeNextTriggerTime(2, 30) // Alarm for 02:30
         val expected =
             Instant.parse("2026-10-26T01:30:00Z").toEpochMilli() // Local 02:30 26.10, UTC+1
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `snooze adds one minute to current time`() {
+        val base = Instant.parse("2026-03-11T10:00:00Z")
+        val clock = Clock.fixed(base, zone)
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeSnoozeTriggerTime()
+        val expected = base.plus(AlarmTimeCalculator.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES).toEpochMilli()
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `snooze at 23_59 rolls to next day`() {
+        val base = Instant.parse("2026-03-11T23:59:00Z")
+        val clock = Clock.fixed(base, zone)
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeSnoozeTriggerTime()
+        val expected = base.plus(AlarmTimeCalculator.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES).toEpochMilli()
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `snooze rounds to next full minute`() {
+        val base = Instant.parse("2026-03-11T10:15:35Z")
+        val clock = Clock.fixed(base, zone)
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeSnoozeTriggerTime()
+        val expected = base
+            .plus(AlarmTimeCalculator.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES)
+            .truncatedTo(ChronoUnit.MINUTES)
+            .toEpochMilli()
 
         assertEquals(expected, result)
     }
