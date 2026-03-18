@@ -61,7 +61,9 @@ private fun AlarmTimePickerContent(
     onToggle: () -> Unit,
     showDial: Boolean,
 ) {
-    val currentTime = Calendar.getInstance()
+    val currentTime = Calendar.getInstance().apply {
+        add(Calendar.MINUTE, 1)
+    }
 
     val timePickerState = rememberTimePickerState(
         initialHour = currentTime.get(Calendar.HOUR_OF_DAY),

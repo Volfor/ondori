@@ -23,6 +23,9 @@ class OndoriApplication : Application() {
             NotificationManager.IMPORTANCE_HIGH,
         ).apply {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            setSound(null, null)
+            enableVibration(false)
+            setShowBadge(false)
         }
 
         val manager = getSystemService(NotificationManager::class.java)

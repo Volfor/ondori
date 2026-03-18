@@ -3,6 +3,7 @@ package com.volfor.ondori.features.alarm.presentation.activities
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.volfor.ondori.features.alarm.presentation.screens.AlarmRingingScreen
@@ -16,6 +17,8 @@ class AlarmRingingActivity : ComponentActivity() {
 
         val alarmId = intent.getLongExtra("alarm_id", -1L)
         Log.d("AlarmRingingActivity", "Alarm ringing: $alarmId")
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         //TODO:
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {

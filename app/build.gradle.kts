@@ -66,6 +66,7 @@ dependencies {
     // Window size utils
 //    implementation("androidx.compose.material3.adaptive:adaptive")
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.service)
 //    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
 //    implementation("androidx.compose.runtime:runtime-livedata")
 //    implementation("androidx.compose.runtime:runtime-rxjava2")
