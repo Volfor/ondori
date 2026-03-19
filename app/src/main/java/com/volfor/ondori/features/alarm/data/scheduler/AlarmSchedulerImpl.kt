@@ -7,6 +7,7 @@ import android.content.Intent
 import android.util.Log
 import com.volfor.ondori.core.AlarmReceiver
 import com.volfor.ondori.features.alarm.domain.services.AlarmScheduler
+import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -35,7 +36,7 @@ class AlarmSchedulerImpl @Inject constructor(
 
     private fun createPendingIntent(alarmId: Long): PendingIntent {
         val alarmIntent = Intent(context.applicationContext, AlarmReceiver::class.java).apply {
-            putExtra("alarm_id", alarmId)
+            putExtra(EXTRA_ALARM_ID, alarmId)
         }
 
         return PendingIntent.getBroadcast(

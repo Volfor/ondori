@@ -3,10 +3,12 @@ package com.volfor.ondori.features.alarm.presentation.viewmodels
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.usecases.DismissAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.SnoozeAlarmUseCase
+import com.volfor.ondori.features.alarm.presentation.models.AlarmUiModel
+import com.volfor.ondori.features.alarm.presentation.models.toUiModel
+import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +21,7 @@ import javax.inject.Inject
  * UiState for the alarm ringing screen.
  */
 data class AlarmRingingUiState(
-    val alarm: Alarm? = null,
+    val alarm: AlarmUiModel? = null,
     val isLoading: Boolean = false,
     val isAlarmHandled: Boolean = false,
 )
@@ -32,7 +34,7 @@ class AlarmRingingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val alarmId: Long? = savedStateHandle["alarm_id"]
+    private val alarmId: Long? = savedStateHandle[EXTRA_ALARM_ID]
 
     private val _uiState = MutableStateFlow(AlarmRingingUiState())
     val uiState: StateFlow<AlarmRingingUiState> = _uiState.asStateFlow()
@@ -65,7 +67,7 @@ class AlarmRingingViewModel @Inject constructor(
                 if (alarm != null) {
                     _uiState.update {
                         it.copy(
-                            alarm = alarm,
+                            alarm = alarm.toUiModel(),
                             isLoading = false,
                         )
                     }

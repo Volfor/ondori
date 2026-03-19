@@ -7,6 +7,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.volfor.ondori.features.alarm.presentation.screens.AlarmRingingScreen
+import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -15,7 +16,7 @@ class AlarmRingingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val alarmId = intent.getLongExtra("alarm_id", -1L)
+        val alarmId = intent.getLongExtra(EXTRA_ALARM_ID, -1L)
         Log.d("AlarmRingingActivity", "Alarm ringing: $alarmId")
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

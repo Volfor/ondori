@@ -4,9 +4,8 @@ import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import com.volfor.ondori.utils.Constants.Notifications
 import dagger.hilt.android.HiltAndroidApp
-
-const val FIRING_ALARMS_CHANNEL_ID = "firing_alarms_channel"
 
 @HiltAndroidApp
 class OndoriApplication : Application() {
@@ -18,7 +17,7 @@ class OndoriApplication : Application() {
 
     private fun createFiringAlarmsNotificationChannel() {
         val channel = NotificationChannel(
-            FIRING_ALARMS_CHANNEL_ID,
+            Notifications.FIRING_ALARMS_CHANNEL_ID,
             "Firing alarms",
             NotificationManager.IMPORTANCE_HIGH,
         ).apply {

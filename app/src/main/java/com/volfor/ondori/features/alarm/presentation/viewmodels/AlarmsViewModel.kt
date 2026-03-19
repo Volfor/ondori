@@ -8,6 +8,8 @@ import com.volfor.ondori.features.alarm.domain.usecases.DeleteAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmsStreamUseCase
+import com.volfor.ondori.features.alarm.presentation.models.AlarmUiModel
+import com.volfor.ondori.features.alarm.presentation.models.toUiModel
 import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +22,7 @@ import javax.inject.Inject
  * UiState for the alarm list screen.
  */
 data class AlarmsUiState(
-    val items: List<Alarm> = emptyList(),
+    val items: List<AlarmUiModel> = emptyList(),
     val isLoading: Boolean = false,
 )
 
@@ -35,7 +37,7 @@ class AlarmsViewModel @Inject constructor(
 
     val uiState: StateFlow<AlarmsUiState> = getAlarmsStream().map { alarms ->
         AlarmsUiState(
-            items = alarms, isLoading = false
+            items = alarms.map { it.toUiModel() }, isLoading = false
         )
     }.stateIn(
         scope = viewModelScope,
@@ -53,15 +55,15 @@ class AlarmsViewModel @Inject constructor(
         )
     }
 
-    fun setAlarmEnabled(alarm: Alarm, enabled: Boolean) = viewModelScope.launch {
+    fun setAlarmEnabled(alarm: AlarmUiModel, enabled: Boolean) = viewModelScope.launch {
         if (enabled) {
-            _enableAlarm(alarm = alarm)
+            _enableAlarm(alarmId = alarm.id)
         } else {
             _disableAlarm(alarmId = alarm.id)
         }
     }
 
-    fun deleteAlarm(alarm: Alarm) = viewModelScope.launch {
+    fun deleteAlarm(alarm: AlarmUiModel) = viewModelScope.launch {
         _deleteAlarm(alarmId = alarm.id)
     }
 }

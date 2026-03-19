@@ -40,6 +40,8 @@ import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.AlarmItemCard
 import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
+import com.volfor.ondori.features.alarm.presentation.models.AlarmUiModel
+import com.volfor.ondori.features.alarm.presentation.models.toUiModel
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmsViewModel
 
 @Composable
@@ -122,9 +124,9 @@ fun AlarmsScreen(
 @Composable
 private fun AlarmsContent(
     loading: Boolean,
-    alarms: List<Alarm>,
-    onAlarmToggle: (alarm: Alarm, enabled: Boolean) -> Unit,
-    onDelete: (alarm: Alarm) -> Unit,
+    alarms: List<AlarmUiModel>,
+    onAlarmToggle: (alarm: AlarmUiModel, enabled: Boolean) -> Unit,
+    onDelete: (alarm: AlarmUiModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -170,20 +172,20 @@ fun PreviewAlarmsContent() {
                         minute = 30,
                         enabled = true,
                         label = "Test 1",
-                    ),
+                    ).toUiModel(),
                     Alarm(
                         id = 2,
                         hour = 9,
                         minute = 0,
                         enabled = true,
-                    ),
+                    ).toUiModel(),
                     Alarm(
                         id = 3,
                         hour = 14,
                         minute = 45,
                         enabled = false,
                         label = "Test 3",
-                    ),
+                    ).toUiModel(),
                 ),
                 onAlarmToggle = { _, _ -> },
                 onDelete = {},

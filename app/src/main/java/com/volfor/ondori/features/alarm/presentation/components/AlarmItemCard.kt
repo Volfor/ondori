@@ -31,10 +31,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
+import com.volfor.ondori.features.alarm.presentation.models.AlarmUiModel
+import com.volfor.ondori.features.alarm.presentation.models.toUiModel
 
 @Composable
 fun AlarmItemCard(
-    alarm: Alarm,
+    alarm: AlarmUiModel,
     onCheckedChange: (Boolean) -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -50,7 +52,7 @@ fun AlarmItemCard(
 @Composable
 private fun SwipeContent(
     swipeState: SwipeToDismissBoxState,
-    alarm: Alarm,
+    alarm: AlarmUiModel,
     onCheckedChange: (Boolean) -> Unit,
     onDelete: () -> Unit
 ) {
@@ -110,7 +112,7 @@ private fun BackgroundContent(dismissDirection: SwipeToDismissBoxValue) {
 }
 
 @Composable
-private fun AlarmItemContent(alarm: Alarm, onCheckedChange: (Boolean) -> Unit) {
+private fun AlarmItemContent(alarm: AlarmUiModel, onCheckedChange: (Boolean) -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -131,13 +133,13 @@ private fun AlarmItemContent(alarm: Alarm, onCheckedChange: (Boolean) -> Unit) {
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
-                            text = "%02d:%02d".format(alarm.hour, alarm.minute),
+                            text = alarm.timeText,
                             textAlign = TextAlign.Center,
                             fontSize = 30.sp,
                         )
                     }
-                    if (alarm.label != null) {
-                        Text(alarm.label, fontSize = 12.sp)
+                    if (alarm.labelText != null) {
+                        Text(alarm.labelText, fontSize = 12.sp)
                     }
                     Text("Mon, Tue, Wed", fontSize = 12.sp)
                 }
@@ -161,7 +163,7 @@ fun PreviewAlarmItemCardEnabled() {
                 minute = 15,
                 enabled = true,
                 label = "Enabled alarm",
-            ),
+            ).toUiModel(),
             onCheckedChange = {},
             onDelete = {},
         )
@@ -178,7 +180,7 @@ fun PreviewAlarmItemCardDisabled() {
                 hour = 1,
                 minute = 0,
                 enabled = false,
-            ),
+            ).toUiModel(),
             onCheckedChange = {},
             onDelete = {},
         )
@@ -200,7 +202,7 @@ fun PreviewAlarmItemSwipedRight() {
                 hour = 1,
                 minute = 0,
                 enabled = false,
-            ),
+            ).toUiModel(),
             onCheckedChange = {},
             onDelete = {},
         )
@@ -222,7 +224,7 @@ fun PreviewAlarmItemSwipedLeft() {
                 hour = 1,
                 minute = 0,
                 enabled = false,
-            ),
+            ).toUiModel(),
             onCheckedChange = {},
             onDelete = {},
         )

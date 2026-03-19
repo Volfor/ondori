@@ -1,6 +1,5 @@
 package com.volfor.ondori.features.alarm.domain.usecases
 
-import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
 import com.volfor.ondori.features.alarm.domain.services.AlarmScheduler
 import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
@@ -11,10 +10,11 @@ class EnableAlarmUseCase @Inject constructor(
     private val scheduler: AlarmScheduler,
     private val timeCalculator: AlarmTimeCalculator,
 ) {
-    suspend operator fun invoke(alarm: Alarm) {
-        repo.enableAlarm(alarm.id)
+    suspend operator fun invoke(alarmId: Long) {
+        val alarm = repo.getAlarm(alarmId) ?: return
+        repo.enableAlarm(alarmId)
 
         val time = timeCalculator.computeNextTriggerTime(hour = alarm.hour, minute = alarm.minute)
-        scheduler.scheduleAlarm(alarm.id, time)
+        scheduler.scheduleAlarm(alarmId, time)
     }
 }

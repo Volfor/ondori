@@ -1,6 +1,6 @@
 package com.volfor.ondori.features.alarm.domain.services
 
-interface AlarmRingingController {
+interface AlarmRinger {
 
     fun startRinging(alarmId: Long)
 
