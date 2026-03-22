@@ -21,12 +21,11 @@ class AlarmRingerImpl @Inject constructor(
         ContextCompat.startForegroundService(context.applicationContext, serviceIntent)
     }
 
-    override fun stopRinging() {
-        context.applicationContext.stopService(
-            Intent(
-                context.applicationContext,
-                AlarmService::class.java,
-            )
-        )
+    override fun stopRinging(alarmId: Long) {
+        val stopIntent = Intent(context.applicationContext, AlarmService::class.java).apply {
+            action = AlarmService.ACTION_STOP_RINGING_FOR_ALARM
+            putExtra(EXTRA_ALARM_ID, alarmId)
+        }
+        context.applicationContext.startService(stopIntent)
     }
 }

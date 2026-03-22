@@ -7,9 +7,6 @@ import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.volfor.ondori.R
-import com.volfor.ondori.core.AlarmNotificationBuilder.Action.ACTION_DISMISS
-import com.volfor.ondori.core.AlarmNotificationBuilder.Action.ACTION_SNOOZE
-import com.volfor.ondori.core.AlarmNotificationBuilder.Action.ACTION_STOP
 import com.volfor.ondori.features.alarm.domain.usecases.DismissAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.SnoozeAlarmUseCase
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
@@ -20,6 +17,13 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AlarmService : LifecycleService() {
+
+    companion object Action {
+        const val ACTION_STOP_RINGING_FOR_ALARM = "com.volfor.ondori.ACTION_STOP_RINGING_FOR_ALARM"
+        const val ACTION_NOTIFICATION_SNOOZE = "com.volfor.ondori.ACTION_SNOOZE"
+        const val ACTION_NOTIFICATION_STOP = "com.volfor.ondori.ACTION_STOP"
+        const val ACTION_NOTIFICATION_DISMISS = "com.volfor.ondori.ACTION_DISMISS"
+    }
 
     @Inject
     lateinit var snoozeAlarm: SnoozeAlarmUseCase
@@ -36,6 +40,8 @@ class AlarmService : LifecycleService() {
     @Inject
     lateinit var notificationBuilder: AlarmNotificationBuilder
 
+    private var ringingAlarmId: Long? = null
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
@@ -49,14 +55,22 @@ class AlarmService : LifecycleService() {
         }
 
         when (intent?.action) {
-            ACTION_SNOOZE -> {
+            ACTION_STOP_RINGING_FOR_ALARM -> {
+                if (alarmId == ringingAlarmId || ringingAlarmId == null) {
+                    ringingAlarmId = null
+                    stopSelf()
+                }
+                return START_NOT_STICKY
+            }
+
+            ACTION_NOTIFICATION_SNOOZE -> {
                 lifecycleScope.launch {
                     snoozeAlarm(alarmId)
                 }
                 return START_NOT_STICKY
             }
 
-            ACTION_DISMISS, ACTION_STOP -> {
+            ACTION_NOTIFICATION_DISMISS, ACTION_NOTIFICATION_STOP -> {
                 lifecycleScope.launch {
                     dismissAlarm(alarmId)
                 }
@@ -64,6 +78,7 @@ class AlarmService : LifecycleService() {
             }
         }
 
+        ringingAlarmId = alarmId
         val notification = notificationBuilder.build(alarmId)
 
         //TODO:

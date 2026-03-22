@@ -27,6 +27,10 @@ class AlarmRepositoryImpl @Inject constructor(
         return localDataSource.insert(alarm.toLocal())
     }
 
+    override suspend fun updateAlarm(alarm: Alarm) {
+        localDataSource.upsert(alarm.toLocal())
+    }
+
     override suspend fun deleteAlarm(alarmId: Long) {
         localDataSource.deleteById(alarmId)
     }

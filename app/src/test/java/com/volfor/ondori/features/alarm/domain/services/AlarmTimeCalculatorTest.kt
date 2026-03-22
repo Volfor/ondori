@@ -3,6 +3,7 @@ package com.volfor.ondori.features.alarm.domain.services
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.Clock
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -16,7 +17,7 @@ class AlarmTimeCalculatorTest {
         val clock = Clock.fixed(Instant.parse("2026-03-11T10:00:00Z"), zone)
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(11, 0)
+        val result = calculator.computeNextTriggerTime(11, 0, emptySet())
         val expected = Instant.parse("2026-03-11T11:00:00Z").toEpochMilli()
 
         assertEquals(expected, result)
@@ -27,7 +28,7 @@ class AlarmTimeCalculatorTest {
         val clock = Clock.fixed(Instant.parse("2026-03-11T10:00:00Z"), zone)
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(9, 0)
+        val result = calculator.computeNextTriggerTime(9, 0, emptySet())
         val expected = Instant.parse("2026-03-12T09:00:00Z").toEpochMilli()
 
         assertEquals(expected, result)
@@ -38,7 +39,7 @@ class AlarmTimeCalculatorTest {
         val clock = Clock.fixed(Instant.parse("2026-03-11T10:00:00Z"), zone)
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(10, 0)
+        val result = calculator.computeNextTriggerTime(10, 0, emptySet())
         val expected = Instant.parse("2026-03-12T10:00:00Z").toEpochMilli()
 
         assertEquals(expected, result)
@@ -49,7 +50,7 @@ class AlarmTimeCalculatorTest {
         val clock = Clock.fixed(Instant.parse("2026-03-11T10:15:35Z"), zone)
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(10, 20)
+        val result = calculator.computeNextTriggerTime(10, 20, emptySet())
         val expected = Instant.parse("2026-03-11T10:20:00Z").toEpochMilli()
 
         assertEquals(expected, result)
@@ -60,7 +61,7 @@ class AlarmTimeCalculatorTest {
         val clock = Clock.fixed(Instant.parse("2026-03-11T23:58:59Z"), zone)
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(23, 59)
+        val result = calculator.computeNextTriggerTime(23, 59, emptySet())
         val expected = Instant.parse("2026-03-11T23:59:00Z").toEpochMilli()
 
         assertEquals(expected, result)
@@ -79,7 +80,7 @@ class AlarmTimeCalculatorTest {
             val clock = Clock.fixed(Instant.parse(it), zone)
             val calculator = AlarmTimeCalculator(clock)
 
-            val result = calculator.computeNextTriggerTime(0, 0)
+            val result = calculator.computeNextTriggerTime(0, 0, emptySet())
             val expected = Instant.parse("2026-03-12T00:00:00Z").toEpochMilli()
 
             assertEquals(expected, result)
@@ -92,7 +93,7 @@ class AlarmTimeCalculatorTest {
         val clock = Clock.fixed(Instant.parse("2026-03-11T02:00:00Z"), zone) // 11:00 JST
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(12, 0)
+        val result = calculator.computeNextTriggerTime(12, 0, emptySet())
         val expected = Instant.parse("2026-03-11T03:00:00Z").toEpochMilli() // 12:00 JST
 
         assertEquals(expected, result)
@@ -104,7 +105,7 @@ class AlarmTimeCalculatorTest {
         val clock = Clock.fixed(Instant.parse("2026-03-29T00:30:00Z"), zone) // Local 01:30, UTC+1
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(3, 30) // Alarm for 03:30
+        val result = calculator.computeNextTriggerTime(3, 30, emptySet()) // Alarm for 03:30
         val expected =
             Instant.parse("2026-03-29T01:30:00Z").toEpochMilli() // Local 03:30 after DST, UTC+2
 
@@ -117,7 +118,7 @@ class AlarmTimeCalculatorTest {
         val clock = Clock.fixed(Instant.parse("2026-03-29T00:30:00Z"), zone)  // Local 01:30, UTC+1
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(2, 30) // Alarm for 02:30
+        val result = calculator.computeNextTriggerTime(2, 30, emptySet()) // Alarm for 02:30
         val expected =
             Instant.parse("2026-03-29T01:30:00Z").toEpochMilli() // Local 03:30 after DST, UTC+2
 
@@ -130,7 +131,7 @@ class AlarmTimeCalculatorTest {
         val clock = Clock.fixed(Instant.parse("2026-10-25T00:30:00Z"), zone) // Local 02:30, UTC+2
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(3, 30) // Alarm for 03:30
+        val result = calculator.computeNextTriggerTime(3, 30, emptySet()) // Alarm for 03:30
         val expected =
             Instant.parse("2026-10-25T02:30:00Z").toEpochMilli() // Local 03:30 after DST, UTC+1
 
@@ -141,12 +142,11 @@ class AlarmTimeCalculatorTest {
     fun `schedules next day when repeated DST hour already passed`() {
         val zone = ZoneId.of("Europe/Warsaw")
         val clock = Clock.fixed(
-            Instant.parse("2026-10-25T02:30:00Z"),
-            zone
+            Instant.parse("2026-10-25T02:30:00Z"), zone
         ) // Local 03:30 25.10, after DST, UTC+1
         val calculator = AlarmTimeCalculator(clock)
 
-        val result = calculator.computeNextTriggerTime(2, 30) // Alarm for 02:30
+        val result = calculator.computeNextTriggerTime(2, 30, emptySet()) // Alarm for 02:30
         val expected =
             Instant.parse("2026-10-26T01:30:00Z").toEpochMilli() // Local 02:30 26.10, UTC+1
 
@@ -160,7 +160,8 @@ class AlarmTimeCalculatorTest {
         val calculator = AlarmTimeCalculator(clock)
 
         val result = calculator.computeSnoozeTriggerTime()
-        val expected = base.plus(AlarmTimeCalculator.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES).toEpochMilli()
+        val expected = base.plus(AlarmTimeCalculator.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES)
+            .toEpochMilli()
 
         assertEquals(expected, result)
     }
@@ -172,7 +173,8 @@ class AlarmTimeCalculatorTest {
         val calculator = AlarmTimeCalculator(clock)
 
         val result = calculator.computeSnoozeTriggerTime()
-        val expected = base.plus(AlarmTimeCalculator.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES).toEpochMilli()
+        val expected = base.plus(AlarmTimeCalculator.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES)
+            .toEpochMilli()
 
         assertEquals(expected, result)
     }
@@ -184,10 +186,113 @@ class AlarmTimeCalculatorTest {
         val calculator = AlarmTimeCalculator(clock)
 
         val result = calculator.computeSnoozeTriggerTime()
-        val expected = base
-            .plus(AlarmTimeCalculator.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES)
-            .truncatedTo(ChronoUnit.MINUTES)
-            .toEpochMilli()
+        val expected = base.plus(AlarmTimeCalculator.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES)
+            .truncatedTo(ChronoUnit.MINUTES).toEpochMilli()
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `repeat schedules same day when weekday matches and time is still ahead`() {
+        val clock = Clock.fixed(Instant.parse("2026-03-11T08:00:00Z"), zone) // Wed
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeNextTriggerTime(9, 0, setOf(DayOfWeek.WEDNESDAY))
+        val expected = Instant.parse("2026-03-11T09:00:00Z").toEpochMilli()
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `repeat rolls to next week when today's slot already passed`() {
+        val clock = Clock.fixed(Instant.parse("2026-03-11T15:00:00Z"), zone) // Wed
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeNextTriggerTime(9, 0, setOf(DayOfWeek.WEDNESDAY))
+        val expected = Instant.parse("2026-03-18T09:00:00Z").toEpochMilli() // next Wed
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `repeat skips to next selected weekday`() {
+        val clock = Clock.fixed(Instant.parse("2026-03-09T10:00:00Z"), zone) // Mon
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeNextTriggerTime(9, 0, setOf(DayOfWeek.WEDNESDAY))
+        val expected = Instant.parse("2026-03-11T09:00:00Z").toEpochMilli() // Wed
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `repeat picks earliest matching day when several weekdays selected`() {
+        val clock = Clock.fixed(Instant.parse("2026-03-09T10:00:00Z"), zone) // Mon
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeNextTriggerTime(
+            9,
+            0,
+            setOf(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY),
+        )
+        val expected = Instant.parse("2026-03-10T09:00:00Z").toEpochMilli() // Tue before Wed
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `repeat when now equals alarm time moves to next matching weekday`() {
+        val clock = Clock.fixed(Instant.parse("2026-03-11T09:00:00Z"), zone) // Wed 09:00
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeNextTriggerTime(
+            9,
+            0,
+            setOf(DayOfWeek.WEDNESDAY),
+        )
+        val expected = Instant.parse("2026-03-18T09:00:00Z").toEpochMilli()
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `empty repeatDays uses daily next today or tomorrow behavior`() {
+        val clock = Clock.fixed(Instant.parse("2026-03-11T10:00:00Z"), zone)
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeNextTriggerTime(11, 0, emptySet())
+        val expected = Instant.parse("2026-03-11T11:00:00Z").toEpochMilli()
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `repeat respects clock zone for weekday boundaries`() {
+        val tokyo = ZoneId.of("Asia/Tokyo")
+        val clock = Clock.fixed(Instant.parse("2026-03-09T02:00:00Z"), tokyo) // Mon 11:00 JST
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeNextTriggerTime(
+            9,
+            0,
+            setOf(DayOfWeek.WEDNESDAY),
+        )
+        val expected = Instant.parse("2026-03-11T00:00:00Z").toEpochMilli() // Wed 09:00 JST
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `repeat schedules next selected weekday when earlier weekday already passed`() {
+        val clock = Clock.fixed(Instant.parse("2026-03-10T15:00:00Z"), zone) // Tue 15:00
+        val calculator = AlarmTimeCalculator(clock)
+
+        val result = calculator.computeNextTriggerTime(
+            9,
+            0,
+            setOf(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY),
+        )
+        val expected = Instant.parse("2026-03-11T09:00:00Z").toEpochMilli() // Wed 09:00
 
         assertEquals(expected, result)
     }

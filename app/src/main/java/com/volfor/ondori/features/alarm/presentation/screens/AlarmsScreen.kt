@@ -40,8 +40,7 @@ import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.AlarmItemCard
 import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
-import com.volfor.ondori.features.alarm.presentation.models.AlarmUiModel
-import com.volfor.ondori.features.alarm.presentation.models.toUiModel
+import com.volfor.ondori.features.alarm.presentation.components.EditAlarmBottomSheet
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmsViewModel
 
 @Composable
@@ -93,10 +92,14 @@ fun AlarmsScreen(
         },
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val selectedAlarm = uiState.selectedAlarm
 
         AlarmsContent(
             loading = uiState.isLoading,
             alarms = uiState.items,
+            onAlarmClick = { alarm ->
+                viewModel.selectAlarm(alarm)
+            },
             onAlarmToggle = { alarm, enabled ->
                 viewModel.setAlarmEnabled(alarm, enabled)
             },
@@ -117,6 +120,19 @@ fun AlarmsScreen(
                     viewModel.createAlarm(time.hour, time.minute)
                 },
             )
+
+            selectedAlarm != null -> EditAlarmBottomSheet(
+                alarm = selectedAlarm,
+                onDismissRequest = {
+                    viewModel.clearSelection()
+                },
+                onSave = { updatedAlarm ->
+                    viewModel.updateAlarm(updatedAlarm)
+                },
+                onClose = {
+                    viewModel.clearSelection()
+                },
+            )
         }
     }
 }
@@ -124,9 +140,10 @@ fun AlarmsScreen(
 @Composable
 private fun AlarmsContent(
     loading: Boolean,
-    alarms: List<AlarmUiModel>,
-    onAlarmToggle: (alarm: AlarmUiModel, enabled: Boolean) -> Unit,
-    onDelete: (alarm: AlarmUiModel) -> Unit,
+    alarms: List<Alarm>,
+    onAlarmClick: (Alarm) -> Unit,
+    onAlarmToggle: (Alarm, Boolean) -> Unit,
+    onDelete: (Alarm) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -146,6 +163,9 @@ private fun AlarmsContent(
             ) { alarm ->
                 AlarmItemCard(
                     alarm,
+                    onClick = {
+                        onAlarmClick(alarm)
+                    },
                     onCheckedChange = { enabled ->
                         onAlarmToggle(alarm, enabled)
                     },
@@ -172,21 +192,22 @@ fun PreviewAlarmsContent() {
                         minute = 30,
                         enabled = true,
                         label = "Test 1",
-                    ).toUiModel(),
+                    ),
                     Alarm(
                         id = 2,
                         hour = 9,
                         minute = 0,
                         enabled = true,
-                    ).toUiModel(),
+                    ),
                     Alarm(
                         id = 3,
                         hour = 14,
                         minute = 45,
                         enabled = false,
                         label = "Test 3",
-                    ).toUiModel(),
+                    ),
                 ),
+                onAlarmClick = {},
                 onAlarmToggle = { _, _ -> },
                 onDelete = {},
             )
@@ -202,6 +223,7 @@ fun PreviewAlarmsContentEmpty() {
             AlarmsContent(
                 loading = false,
                 alarms = emptyList(),
+                onAlarmClick = {},
                 onAlarmToggle = { _, _ -> },
                 onDelete = {},
             )

@@ -29,8 +29,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
-import com.volfor.ondori.features.alarm.presentation.models.AlarmUiModel
-import com.volfor.ondori.features.alarm.presentation.models.toUiModel
+import com.volfor.ondori.features.alarm.presentation.formatters.formattedTime
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmRingingViewModel
 
 @Composable
@@ -59,7 +58,7 @@ fun AlarmRingingScreen(
 @Composable
 fun AlarmRingingContent(
     modifier: Modifier = Modifier,
-    alarm: AlarmUiModel?,
+    alarm: Alarm?,
     onSnooze: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -71,7 +70,7 @@ fun AlarmRingingContent(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = alarm?.timeText ?: "--:--",
+                text = alarm?.formattedTime() ?: "--:--",
                 fontSize = 64.sp,
             )
             Text(
@@ -120,7 +119,7 @@ fun PreviewAlarmRingingScreen() {
                     hour = 2,
                     minute = 30,
                     enabled = true,
-                ).toUiModel(),
+                ),
                 onSnooze = {},
                 onDismiss = {},
             )

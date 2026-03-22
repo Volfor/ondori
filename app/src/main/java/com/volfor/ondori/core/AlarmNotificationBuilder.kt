@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.volfor.ondori.R
+import com.volfor.ondori.core.AlarmService.Action.ACTION_NOTIFICATION_DISMISS
+import com.volfor.ondori.core.AlarmService.Action.ACTION_NOTIFICATION_SNOOZE
+import com.volfor.ondori.core.AlarmService.Action.ACTION_NOTIFICATION_STOP
 import com.volfor.ondori.features.alarm.presentation.activities.AlarmRingingActivity
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import com.volfor.ondori.utils.Constants.Notifications
@@ -16,12 +19,6 @@ import javax.inject.Inject
 class AlarmNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
-
-    companion object Action {
-        const val ACTION_SNOOZE = "com.volfor.ondori.ACTION_SNOOZE"
-        const val ACTION_STOP = "com.volfor.ondori.ACTION_STOP"
-        const val ACTION_DISMISS = "com.volfor.ondori.ACTION_DISMISS"
-    }
 
     fun build(alarmId: Long): Notification {
         return NotificationCompat.Builder(
@@ -65,7 +62,7 @@ class AlarmNotificationBuilder @Inject constructor(
 
     private fun createSnoozeIntent(alarmId: Long): PendingIntent {
         val intent = Intent(context.applicationContext, AlarmService::class.java).apply {
-            action = ACTION_SNOOZE
+            action = ACTION_NOTIFICATION_SNOOZE
             putExtra(EXTRA_ALARM_ID, alarmId)
         }
         return PendingIntent.getService(
@@ -78,7 +75,7 @@ class AlarmNotificationBuilder @Inject constructor(
 
     private fun createStopIntent(alarmId: Long): PendingIntent {
         val intent = Intent(context.applicationContext, AlarmService::class.java).apply {
-            action = ACTION_STOP
+            action = ACTION_NOTIFICATION_STOP
             putExtra(EXTRA_ALARM_ID, alarmId)
         }
         return PendingIntent.getService(
@@ -91,7 +88,7 @@ class AlarmNotificationBuilder @Inject constructor(
 
     private fun createDismissIntent(alarmId: Long): PendingIntent {
         val intent = Intent(context.applicationContext, AlarmService::class.java).apply {
-            action = ACTION_DISMISS
+            action = ACTION_NOTIFICATION_DISMISS
             putExtra(EXTRA_ALARM_ID, alarmId)
         }
         return PendingIntent.getService(

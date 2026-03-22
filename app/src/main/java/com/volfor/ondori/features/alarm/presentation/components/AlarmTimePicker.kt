@@ -41,12 +41,16 @@ import java.util.Calendar
 
 @Composable
 fun AlarmTimePicker(
+    initialHour: Int? = null,
+    initialMinute: Int? = null,
     onConfirm: (TimePickerState) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var showDial by remember { mutableStateOf(true) }
 
     AlarmTimePickerContent(
+        initialHour = initialHour,
+        initialMinute = initialMinute,
         onConfirm = onConfirm,
         onDismiss = onDismiss,
         onToggle = { showDial = !showDial },
@@ -56,6 +60,8 @@ fun AlarmTimePicker(
 
 @Composable
 private fun AlarmTimePickerContent(
+    initialHour: Int? = null,
+    initialMinute: Int? = null,
     onConfirm: (TimePickerState) -> Unit,
     onDismiss: () -> Unit,
     onToggle: () -> Unit,
@@ -66,8 +72,8 @@ private fun AlarmTimePickerContent(
     }
 
     val timePickerState = rememberTimePickerState(
-        initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
-        initialMinute = currentTime.get(Calendar.MINUTE),
+        initialHour = initialHour ?: currentTime.get(Calendar.HOUR_OF_DAY),
+        initialMinute = initialMinute ?: currentTime.get(Calendar.MINUTE),
         is24Hour = true,
     )
 

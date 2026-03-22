@@ -11,7 +11,7 @@ class DeleteAlarmUseCase @Inject constructor(
     private val ringer: AlarmRinger,
 ) {
     suspend operator fun invoke(alarmId: Long) {
-        ringer.stopRinging()
+        ringer.stopRinging(alarmId)
         scheduler.cancelAlarm(alarmId)
         repo.deleteAlarm(alarmId)
     }

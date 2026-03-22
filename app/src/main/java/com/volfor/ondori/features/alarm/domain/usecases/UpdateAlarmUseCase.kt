@@ -4,12 +4,17 @@ import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
 import javax.inject.Inject
 
-class CreateAlarmUseCase @Inject constructor(
+class UpdateAlarmUseCase @Inject constructor(
     private val repo: AlarmRepository,
     private val scheduleAlarm: ScheduleAlarmUseCase,
+    private val disableAlarm: DisableAlarmUseCase,
 ) {
     suspend operator fun invoke(alarm: Alarm) {
-        val id = repo.createAlarm(alarm)
-        scheduleAlarm(alarm.copy(id = id))
+        repo.updateAlarm(alarm)
+        if (alarm.enabled) {
+            scheduleAlarm(alarm)
+        } else {
+            disableAlarm(alarm.id)
+        }
     }
 }

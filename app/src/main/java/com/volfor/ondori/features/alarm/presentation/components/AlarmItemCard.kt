@@ -31,28 +31,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
-import com.volfor.ondori.features.alarm.presentation.models.AlarmUiModel
-import com.volfor.ondori.features.alarm.presentation.models.toUiModel
+import com.volfor.ondori.features.alarm.presentation.formatters.formattedRepeatDays
+import com.volfor.ondori.features.alarm.presentation.formatters.formattedTime
+import java.time.DayOfWeek
 
 @Composable
 fun AlarmItemCard(
-    alarm: AlarmUiModel,
+    alarm: Alarm,
+    onClick: () -> Unit,
     onCheckedChange: (Boolean) -> Unit,
     onDelete: () -> Unit,
 ) {
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
+
     SwipeContent(
-        swipeToDismissBoxState,
-        alarm,
-        onCheckedChange,
-        onDelete,
+        swipeState = swipeToDismissBoxState,
+        alarm = alarm,
+        onClick = onClick,
+        onCheckedChange = onCheckedChange,
+        onDelete = onDelete,
     )
 }
 
 @Composable
 private fun SwipeContent(
     swipeState: SwipeToDismissBoxState,
-    alarm: AlarmUiModel,
+    alarm: Alarm,
+    onClick: () -> Unit,
     onCheckedChange: (Boolean) -> Unit,
     onDelete: () -> Unit
 ) {
@@ -79,7 +84,7 @@ private fun SwipeContent(
             )
         },
     ) {
-        AlarmItemContent(alarm, onCheckedChange)
+        AlarmItemContent(alarm, onClick, onCheckedChange)
     }
 }
 
@@ -112,11 +117,17 @@ private fun BackgroundContent(dismissDirection: SwipeToDismissBoxValue) {
 }
 
 @Composable
-private fun AlarmItemContent(alarm: AlarmUiModel, onCheckedChange: (Boolean) -> Unit) {
+private fun AlarmItemContent(
+    alarm: Alarm,
+    onClick: () -> Unit,
+    onCheckedChange: (Boolean) -> Unit,
+) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ), modifier = Modifier.fillMaxWidth()
+        ),
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
     ) {
         Box(
             modifier = Modifier
@@ -133,15 +144,15 @@ private fun AlarmItemContent(alarm: AlarmUiModel, onCheckedChange: (Boolean) -> 
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
-                            text = alarm.timeText,
+                            text = alarm.formattedTime(),
                             textAlign = TextAlign.Center,
                             fontSize = 30.sp,
                         )
                     }
-                    if (alarm.labelText != null) {
-                        Text(alarm.labelText, fontSize = 12.sp)
+                    if (alarm.label != null) {
+                        Text(alarm.label, fontSize = 12.sp)
                     }
-                    Text("Mon, Tue, Wed", fontSize = 12.sp)
+                    Text(alarm.formattedRepeatDays(), fontSize = 12.sp)
                 }
                 Switch(
                     checked = alarm.enabled,
@@ -163,7 +174,8 @@ fun PreviewAlarmItemCardEnabled() {
                 minute = 15,
                 enabled = true,
                 label = "Enabled alarm",
-            ).toUiModel(),
+            ),
+            onClick = {},
             onCheckedChange = {},
             onDelete = {},
         )
@@ -180,7 +192,9 @@ fun PreviewAlarmItemCardDisabled() {
                 hour = 1,
                 minute = 0,
                 enabled = false,
-            ).toUiModel(),
+                repeatDays = setOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY)
+            ),
+            onClick = {},
             onCheckedChange = {},
             onDelete = {},
         )
@@ -202,7 +216,8 @@ fun PreviewAlarmItemSwipedRight() {
                 hour = 1,
                 minute = 0,
                 enabled = false,
-            ).toUiModel(),
+            ),
+            onClick = {},
             onCheckedChange = {},
             onDelete = {},
         )
@@ -224,7 +239,8 @@ fun PreviewAlarmItemSwipedLeft() {
                 hour = 1,
                 minute = 0,
                 enabled = false,
-            ).toUiModel(),
+            ),
+            onClick = {},
             onCheckedChange = {},
             onDelete = {},
         )

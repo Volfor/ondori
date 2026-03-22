@@ -4,5 +4,5 @@ interface AlarmRinger {
 
     fun startRinging(alarmId: Long)
 
-    fun stopRinging()
+    fun stopRinging(alarmId: Long)
 }
