@@ -1,14 +1,19 @@
 package com.volfor.ondori.features.alarm.presentation.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
@@ -22,10 +27,14 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,15 +74,11 @@ private fun SwipeContent(
         state = swipeState,
         onDismiss = { dismissValue ->
             when (dismissValue) {
-                SwipeToDismissBoxValue.StartToEnd -> {
+                SwipeToDismissBoxValue.StartToEnd, SwipeToDismissBoxValue.EndToStart -> {
                     onDelete()
                 }
 
-                SwipeToDismissBoxValue.EndToStart -> {
-                    onDelete()
-                }
-
-                SwipeToDismissBoxValue.Settled -> {
+                else -> {
                     // no action
                 }
             }
@@ -93,26 +98,33 @@ private fun BackgroundContent(dismissDirection: SwipeToDismissBoxValue) {
     val color = when (dismissDirection) {
         SwipeToDismissBoxValue.StartToEnd -> Color.Red
         SwipeToDismissBoxValue.EndToStart -> Color.Red
-        SwipeToDismissBoxValue.Settled -> Color.Transparent
+        else -> Color.Transparent
     }
 
     val alignment = when (dismissDirection) {
         SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
         SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
-        SwipeToDismissBoxValue.Settled -> Alignment.Center
+        else -> Alignment.CenterEnd
     }
 
-    Card {
-        Icon(
-            imageVector = Icons.Default.Delete,
-            contentDescription = "Remove item",
-            modifier = Modifier
+    Card(
+        modifier = Modifier.fillMaxSize(),
+        colors = CardDefaults.cardColors(
+            containerColor = color,
+        ),
+
+        ) {
+        Box(
+            contentAlignment = alignment, modifier = Modifier
                 .fillMaxSize()
-                .background(color)
-                .wrapContentSize(alignment)
-                .padding(16.dp),
-            tint = Color.White
-        )
+                .padding(all = 16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Remove item",
+                tint = Color.White
+            )
+        }
     }
 }
 
@@ -122,44 +134,85 @@ private fun AlarmItemContent(
     onClick: () -> Unit,
     onCheckedChange: (Boolean) -> Unit,
 ) {
+    val backgroundColor =
+        if (alarm.enabled) MaterialTheme.colorScheme.surfaceVariant else OndoriTheme.extraColors.alarmDisabledBackground
+
+    val animatedContainerColor by animateColorAsState(
+        targetValue = backgroundColor,
+        animationSpec = tween(durationMillis = 300),
+        label = "cardContainerColor"
+    )
+    val targetAlpha = if (alarm.enabled) 1f else 0.6f
+    val animatedContentAlpha by animateFloatAsState(
+        targetValue = targetAlpha,
+        animationSpec = tween(durationMillis = 300),
+        label = "contentAlpha"
+    )
+
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = animatedContainerColor,
         ),
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .padding(all = 16.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(all = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .weight(1.0f)
+                    .alpha(animatedContentAlpha),
             ) {
-                Column {
-                    Row(
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-                        Text(
-                            text = alarm.formattedTime(),
-                            textAlign = TextAlign.Center,
-                            fontSize = 30.sp,
-                        )
-                    }
-                    if (alarm.label != null) {
-                        Text(alarm.label, fontSize = 12.sp)
-                    }
-                    Text(alarm.formattedRepeatDays(), fontSize = 12.sp)
+                if (alarm.label != null && alarm.label.trim().isNotEmpty()) {
+                    Text(
+                        alarm.label.toUpperCase(Locale.current),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = OndoriTheme.extraColors.title,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 3,
+                    )
                 }
-                Switch(
-                    checked = alarm.enabled,
-                    onCheckedChange = onCheckedChange,
-                )
+                Row(
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Text(
+                        text = alarm.formattedTime(),
+                        style = MaterialTheme.typography.displayMedium,
+                    )
+                    // Text("AM")
+                }
+                RepeatDaysLabel(alarm)
             }
+            Spacer(modifier = Modifier.width(16.dp))
+            Switch(
+                checked = alarm.enabled,
+                onCheckedChange = onCheckedChange,
+            )
         }
+    }
+}
+
+@Composable
+private fun RepeatDaysLabel(alarm: Alarm) {
+    Box(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(24.dp),
+            )
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Text(
+            alarm.formattedRepeatDays().toUpperCase(Locale.current),
+            fontSize = 10.sp,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
     }
 }
 
@@ -169,11 +222,7 @@ fun PreviewAlarmItemCardEnabled() {
     OndoriTheme {
         AlarmItemCard(
             Alarm(
-                id = 0,
-                hour = 12,
-                minute = 15,
-                enabled = true,
-                label = "Enabled alarm",
+                id = 0, hour = 9, minute = 15, enabled = true, label = "Morning zazen"
             ),
             onClick = {},
             onCheckedChange = {},

@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.compose.material3)
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
@@ -71,6 +72,7 @@ dependencies {
 //    implementation("androidx.compose.runtime:runtime-livedata")
 //    implementation("androidx.compose.runtime:runtime-rxjava2")
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.ui.googlefonts)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.hilt.navigation.compose)
 

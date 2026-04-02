@@ -129,6 +129,9 @@ fun AlarmsScreen(
                 onSave = { updatedAlarm ->
                     viewModel.updateAlarm(updatedAlarm)
                 },
+                onDelete = {
+                    viewModel.deleteAlarm(selectedAlarm)
+                },
                 onClose = {
                     viewModel.clearSelection()
                 },
@@ -155,7 +158,7 @@ private fun AlarmsContent(
     ) {
         LazyColumn(
             contentPadding = PaddingValues(vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(
                 alarms,

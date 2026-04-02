@@ -2,7 +2,6 @@
 
 package com.volfor.ondori.features.alarm.presentation.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -23,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -98,10 +98,18 @@ private fun AlarmTimePickerContent(
         if (showDial) {
             TimePicker(
                 state = timePickerState,
+                colors = TimePickerDefaults.colors(
+                    timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ),
             )
         } else {
             TimeInput(
                 state = timePickerState,
+                colors = TimePickerDefaults.colors(
+                    timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ),
             )
         }
     }
@@ -122,14 +130,9 @@ private fun TimePickerDialog(
     ) {
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
-            tonalElevation = 6.dp,
             modifier = Modifier
                 .width(IntrinsicSize.Min)
                 .height(IntrinsicSize.Min)
-                .background(
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surface
-                ),
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
