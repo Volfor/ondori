@@ -105,7 +105,7 @@ fun EditAlarmBottomSheet(
             // Label
             Text(
                 "Label".toUpperCase(Locale.current),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = OndoriTheme.extraColors.title,
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -136,7 +136,7 @@ fun EditAlarmBottomSheet(
             // Repeat days
             Text(
                 "Repeat".toUpperCase(Locale.current),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = OndoriTheme.extraColors.title,
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -175,7 +175,7 @@ fun EditAlarmBottomSheet(
             //Sound
             Text(
                 "Sound".toUpperCase(Locale.current),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = OndoriTheme.extraColors.title,
             )
             Spacer(modifier = Modifier.height(8.dp))

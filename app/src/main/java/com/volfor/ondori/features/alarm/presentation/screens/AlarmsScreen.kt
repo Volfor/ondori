@@ -2,7 +2,11 @@
 
 package com.volfor.ondori.features.alarm.presentation.screens
 
+import android.Manifest
+import android.os.Build
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,17 +23,22 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,11 +46,18 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.volfor.ondori.R
 import com.volfor.ondori.app.theme.OndoriTheme
+import com.volfor.ondori.core.notifications.AlarmNotificationStatus
+import com.volfor.ondori.core.notifications.hasPostNotificationPermission
+import com.volfor.ondori.core.notifications.openAlarmChannelSettings
+import com.volfor.ondori.core.notifications.openAppNotificationSettings
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.AlarmItemCard
 import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
 import com.volfor.ondori.features.alarm.presentation.components.EditAlarmBottomSheet
+import com.volfor.ondori.features.alarm.presentation.components.NotificationPermissionCard
+import com.volfor.ondori.features.alarm.presentation.components.rememberAlarmNotificationStatus
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmsViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun AlarmsScreen(
@@ -49,9 +65,41 @@ fun AlarmsScreen(
     viewModel: AlarmsViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-//    val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+    val notifPermissionStatus = rememberAlarmNotificationStatus()
+    val requestNotifPermission = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        scope.launch {
+            val result = snackbarHostState.showSnackbar(
+                message = "Turn on notifications so alarms can go off.",
+                actionLabel = "Settings",
+                duration = SnackbarDuration.Short,
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                context.openAppNotificationSettings()
+            }
+        }
+    }
 
     var showTimePicker by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            viewModel.setNotifPermissionAsked()
+            return@LaunchedEffect
+        }
+        if (context.hasPostNotificationPermission()) {
+            viewModel.setNotifPermissionAsked()
+            return@LaunchedEffect
+        }
+        if (!viewModel.isNotifPermissionPromptShown()) {
+            requestNotifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            viewModel.setNotifPermissionAsked()
+        }
+    }
 
     Scaffold(
         snackbarHost = {
@@ -95,6 +143,18 @@ fun AlarmsScreen(
         val selectedAlarm = uiState.selectedAlarm
 
         AlarmsContent(
+            notifPermissionStatus = notifPermissionStatus,
+            onRequestNotifPermission = {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestNotifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            },
+            onOpenChannelSettings = {
+                context.openAlarmChannelSettings()
+            },
+            onOpenAppNotificationSettings = {
+                context.openAppNotificationSettings()
+            },
             loading = uiState.isLoading,
             alarms = uiState.items,
             onAlarmClick = { alarm ->
@@ -142,6 +202,10 @@ fun AlarmsScreen(
 
 @Composable
 private fun AlarmsContent(
+    notifPermissionStatus: AlarmNotificationStatus,
+    onRequestNotifPermission: () -> Unit,
+    onOpenChannelSettings: () -> Unit,
+    onOpenAppNotificationSettings: () -> Unit,
     loading: Boolean,
     alarms: List<Alarm>,
     onAlarmClick: (Alarm) -> Unit,
@@ -156,6 +220,14 @@ private fun AlarmsContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        if (notifPermissionStatus != AlarmNotificationStatus.Allowed) {
+            NotificationPermissionCard(
+                status = notifPermissionStatus,
+                onRequestPermission = onRequestNotifPermission,
+                onOpenNotificationSettings = onOpenAppNotificationSettings,
+                onOpenChannelSettings = onOpenChannelSettings,
+            )
+        }
         LazyColumn(
             contentPadding = PaddingValues(vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -187,6 +259,10 @@ fun PreviewAlarmsContent() {
     OndoriTheme {
         Surface {
             AlarmsContent(
+                notifPermissionStatus = AlarmNotificationStatus.Allowed,
+                onRequestNotifPermission = {},
+                onOpenChannelSettings = {},
+                onOpenAppNotificationSettings = {},
                 loading = false,
                 alarms = listOf(
                     Alarm(
@@ -224,6 +300,10 @@ fun PreviewAlarmsContentEmpty() {
     OndoriTheme {
         Surface {
             AlarmsContent(
+                notifPermissionStatus = AlarmNotificationStatus.NeedsPostNotificationPermission,
+                onRequestNotifPermission = {},
+                onOpenChannelSettings = {},
+                onOpenAppNotificationSettings = {},
                 loading = false,
                 alarms = emptyList(),
                 onAlarmClick = {},

@@ -20,21 +20,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AlarmManagerModule {
-
-    @Provides
-    @Singleton
-    fun provideAlarmManager(
-        @ApplicationContext context: Context
-    ): AlarmManager {
-        return context.applicationContext.getSystemService(AlarmManager::class.java)
-    }
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
 abstract class AlarmModule {
-
     @Singleton
     @Binds
     abstract fun bindAlarmScheduler(alarmScheduler: AlarmSchedulerImpl): AlarmScheduler
@@ -42,21 +28,22 @@ abstract class AlarmModule {
     @Singleton
     @Binds
     abstract fun bindAlarmRinger(alarmRinger: AlarmRingerImpl): AlarmRinger
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
 
     @Singleton
     @Binds
     abstract fun bindAlarmRepository(repository: AlarmRepositoryImpl): AlarmRepository
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object DaoModule {
+    companion object {
+        @Provides
+        @Singleton
+        fun provideAlarmManager(
+            @ApplicationContext context: Context
+        ): AlarmManager {
+            return context.applicationContext.getSystemService(AlarmManager::class.java)
+        }
 
-    @Provides
-    fun provideAlarmDao(database: OndoriDatabase): AlarmDao = database.alarmDao()
+        @Provides
+        @Singleton
+        fun provideAlarmDao(database: OndoriDatabase): AlarmDao = database.alarmDao()
+    }
 }

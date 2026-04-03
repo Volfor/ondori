@@ -171,7 +171,7 @@ private fun AlarmItemContent(
                 if (alarm.label != null && alarm.label.trim().isNotEmpty()) {
                     Text(
                         alarm.label.toUpperCase(Locale.current),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         color = OndoriTheme.extraColors.title,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 3,
@@ -210,7 +210,7 @@ private fun RepeatDaysLabel(alarm: Alarm) {
         Text(
             alarm.formattedRepeatDays().toUpperCase(Locale.current),
             fontSize = 10.sp,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSecondaryContainer,
         )
     }

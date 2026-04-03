@@ -9,6 +9,8 @@ import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmsStreamUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.UpdateAlarmUseCase
+import com.volfor.ondori.features.prefs.domain.usecases.IsNotifPermissionPromptShownUseCase
+import com.volfor.ondori.features.prefs.domain.usecases.SetNotifPermissionPromptShownUseCase
 import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +37,8 @@ class AlarmsViewModel @Inject constructor(
     private val _deleteAlarm: DeleteAlarmUseCase,
     private val _enableAlarm: EnableAlarmUseCase,
     private val _disableAlarm: DisableAlarmUseCase,
+    private val _isNotifPermissionPromptShown: IsNotifPermissionPromptShownUseCase,
+    private val _setNotifPermissionPromptShown: SetNotifPermissionPromptShownUseCase,
 ) : ViewModel() {
 
     private val _selectedAlarm = MutableStateFlow<Alarm?>(null)
@@ -84,5 +88,11 @@ class AlarmsViewModel @Inject constructor(
 
     fun deleteAlarm(alarm: Alarm) = viewModelScope.launch {
         _deleteAlarm(alarmId = alarm.id)
+    }
+
+    suspend fun isNotifPermissionPromptShown(): Boolean = _isNotifPermissionPromptShown()
+
+    fun setNotifPermissionAsked() = viewModelScope.launch {
+        _setNotifPermissionPromptShown(true)
     }
 }

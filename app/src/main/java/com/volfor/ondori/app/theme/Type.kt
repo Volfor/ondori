@@ -33,12 +33,12 @@ val bodyFontFamily = FontFamily(
 private val TitleSmallStyle = TextStyle(
     fontFamily = titleFontFamily,
     fontWeight = FontWeight.Bold,
+    letterSpacing = 1.1.sp,
     fontSize = 12.sp,
 )
 
 private val TitleMediumStyle = TextStyle(
-    fontSize = 12.sp,
-    letterSpacing = 1.1.sp,
+    fontSize = 16.sp,
     fontWeight = FontWeight.Bold,
     fontFamily = titleFontFamily,
 )
