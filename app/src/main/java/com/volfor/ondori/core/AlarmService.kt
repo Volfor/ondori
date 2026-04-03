@@ -82,12 +82,16 @@ class AlarmService : LifecycleService() {
         ringingAlarmId = alarmId
         val notification = notificationBuilder.build(alarmId)
 
-        //TODO:
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
                 Notifications.FIRING_ALARM_NOTIFICATION_ID,
                 notification,
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
+            )
+        } else {
+            startForeground(
+                Notifications.FIRING_ALARM_NOTIFICATION_ID,
+                notification,
             )
         }
 
