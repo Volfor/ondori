@@ -58,7 +58,7 @@ private val DisplayLargeStyle = TextStyle(
 
 private val LabelMediumStyle = TextStyle(
     fontFamily = bodyFontFamily,
-    fontSize = 12.sp,
+    fontSize = 16.sp,
 )
 
 private val BodyLargeStyle = TextStyle(

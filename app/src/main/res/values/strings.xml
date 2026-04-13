@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">Ondori</string>
     <string name="action_settings">Settings</string>
+    <string name="alarm_sound_dialog_title">Alarm sound</string>
+    <string name="alarm_sound_none">None</string>
+    <string name="alarm_sound_ondori_default">Ondori default</string>
+    <string name="alarm_sound_choose_system">System sounds</string>
+    <string name="alarm_sound_picker_title">Choose alarm sound</string>
+    <string name="alarm_sound_unknown">Custom sound</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

@@ -11,6 +11,7 @@ private const val APP_PREFS_NAME = "app_preferences"
 val Context.appDataStore: DataStore<Preferences> by preferencesDataStore(name = APP_PREFS_NAME)
 
 object AppPreferencesKeys {
-    val NOTIFICATION_PERMISSION_PROMPT_SHOWN =
-        booleanPreferencesKey("notification_permission_prompt_shown")
+
+    val HAS_REQUESTED_NOTIFICATION_PERMISSION =
+        booleanPreferencesKey("has_requested_notification_permission")
 }

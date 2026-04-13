@@ -68,11 +68,14 @@ fun AlarmsScreen(
     val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
-    val notifPermissionStatus = rememberAlarmNotificationStatus()
-    val requestNotifPermission = rememberLauncherForActivityResult(
+    val notificationPermissionStatus = rememberAlarmNotificationStatus()
+    val requestNotificationPermission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) {
+    ) { granted ->
+        viewModel.markNotificationPermissionAsRequested()
+        if (granted) return@rememberLauncherForActivityResult
         scope.launch {
+
             val result = snackbarHostState.showSnackbar(
                 message = "Turn on notifications so alarms can go off.",
                 actionLabel = "Settings",
@@ -84,20 +87,21 @@ fun AlarmsScreen(
         }
     }
 
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     var showTimePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            viewModel.setNotifPermissionAsked()
+            viewModel.markNotificationPermissionAsRequested()
             return@LaunchedEffect
         }
         if (context.hasPostNotificationPermission()) {
-            viewModel.setNotifPermissionAsked()
+            viewModel.markNotificationPermissionAsRequested()
             return@LaunchedEffect
         }
-        if (!viewModel.isNotifPermissionPromptShown()) {
-            requestNotifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-            viewModel.setNotifPermissionAsked()
+        if (!uiState.hasRequestedNotificationPermission) {
+            requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
@@ -139,14 +143,14 @@ fun AlarmsScreen(
             }
         },
     ) { paddingValues ->
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val selectedAlarm = uiState.selectedAlarm
 
         AlarmsContent(
-            notifPermissionStatus = notifPermissionStatus,
+            notificationPermissionStatus = notificationPermissionStatus,
+            hasRequestedNotificationPermission = uiState.hasRequestedNotificationPermission,
             onRequestNotifPermission = {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    requestNotifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
             },
             onOpenChannelSettings = {
@@ -202,7 +206,8 @@ fun AlarmsScreen(
 
 @Composable
 private fun AlarmsContent(
-    notifPermissionStatus: AlarmNotificationStatus,
+    notificationPermissionStatus: AlarmNotificationStatus,
+    hasRequestedNotificationPermission: Boolean,
     onRequestNotifPermission: () -> Unit,
     onOpenChannelSettings: () -> Unit,
     onOpenAppNotificationSettings: () -> Unit,
@@ -220,9 +225,9 @@ private fun AlarmsContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if (notifPermissionStatus != AlarmNotificationStatus.Allowed) {
+        if (hasRequestedNotificationPermission && notificationPermissionStatus != AlarmNotificationStatus.Allowed) {
             NotificationPermissionCard(
-                status = notifPermissionStatus,
+                status = notificationPermissionStatus,
                 onRequestPermission = onRequestNotifPermission,
                 onOpenNotificationSettings = onOpenAppNotificationSettings,
                 onOpenChannelSettings = onOpenChannelSettings,
@@ -259,7 +264,8 @@ fun PreviewAlarmsContent() {
     OndoriTheme {
         Surface {
             AlarmsContent(
-                notifPermissionStatus = AlarmNotificationStatus.Allowed,
+                notificationPermissionStatus = AlarmNotificationStatus.Allowed,
+                hasRequestedNotificationPermission = true,
                 onRequestNotifPermission = {},
                 onOpenChannelSettings = {},
                 onOpenAppNotificationSettings = {},
@@ -300,7 +306,8 @@ fun PreviewAlarmsContentEmpty() {
     OndoriTheme {
         Surface {
             AlarmsContent(
-                notifPermissionStatus = AlarmNotificationStatus.NeedsPostNotificationPermission,
+                notificationPermissionStatus = AlarmNotificationStatus.NeedsPostNotificationPermission,
+                hasRequestedNotificationPermission = true,
                 onRequestNotifPermission = {},
                 onOpenChannelSettings = {},
                 onOpenAppNotificationSettings = {},

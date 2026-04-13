@@ -6,9 +6,9 @@ import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.volfor.ondori.R
 import com.volfor.ondori.core.notifications.AlarmNotificationBuilder
 import com.volfor.ondori.features.alarm.domain.usecases.DismissAlarmUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.SnoozeAlarmUseCase
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import com.volfor.ondori.utils.Constants.Notifications
@@ -31,6 +31,9 @@ class AlarmService : LifecycleService() {
 
     @Inject
     lateinit var dismissAlarm: DismissAlarmUseCase
+
+    @Inject
+    lateinit var getAlarm: GetAlarmUseCase
 
     @Inject
     lateinit var alarmSoundPlayer: AlarmSoundPlayer
@@ -96,7 +99,10 @@ class AlarmService : LifecycleService() {
         }
 
         alarmVibrator.vibrate()
-        alarmSoundPlayer.play(R.raw.rooster)
+        lifecycleScope.launch {
+            val alarm = getAlarm(alarmId)
+            alarm?.let { alarmSoundPlayer.play(it.sound) }
+        }
 
         return START_NOT_STICKY
     }

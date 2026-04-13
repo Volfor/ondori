@@ -1,12 +1,13 @@
 package com.volfor.ondori.features.prefs.domain.usecases
 
 import com.volfor.ondori.features.prefs.domain.repositories.AppPreferencesRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SetNotifPermissionPromptShownUseCase @Inject constructor(
+class ObserveNotificationPermissionRequestedUseCase @Inject constructor(
     private val repo: AppPreferencesRepository
 ) {
-    suspend operator fun invoke(shown: Boolean) {
-        return repo.setNotifPermissionPromptShown(shown)
+    operator fun invoke(): Flow<Boolean> {
+        return repo.observeHasRequestedNotificationPermission()
     }
 }

@@ -58,7 +58,7 @@ class AlarmNotificationBuilder @Inject constructor(
 
     private fun createSnoozeIntent(alarmId: Long): PendingIntent {
         val intent = Intent(context.applicationContext, AlarmService::class.java).apply {
-            action = AlarmService.Action.ACTION_NOTIFICATION_SNOOZE
+            action = AlarmService.ACTION_NOTIFICATION_SNOOZE
             putExtra(Constants.EXTRA_ALARM_ID, alarmId)
         }
         return PendingIntent.getService(
@@ -71,7 +71,7 @@ class AlarmNotificationBuilder @Inject constructor(
 
     private fun createStopIntent(alarmId: Long): PendingIntent {
         val intent = Intent(context.applicationContext, AlarmService::class.java).apply {
-            action = AlarmService.Action.ACTION_NOTIFICATION_STOP
+            action = AlarmService.ACTION_NOTIFICATION_STOP
             putExtra(Constants.EXTRA_ALARM_ID, alarmId)
         }
         return PendingIntent.getService(
@@ -84,7 +84,7 @@ class AlarmNotificationBuilder @Inject constructor(
 
     private fun createDismissIntent(alarmId: Long): PendingIntent {
         val intent = Intent(context.applicationContext, AlarmService::class.java).apply {
-            action = AlarmService.Action.ACTION_NOTIFICATION_DISMISS
+            action = AlarmService.ACTION_NOTIFICATION_DISMISS
             putExtra(Constants.EXTRA_ALARM_ID, alarmId)
         }
         return PendingIntent.getService(

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e4bb9944a0f38f2dc25051439d485979",
+    "identityHash": "912fb758025ec9febaeeeecce499c5d1",
     "entities": [
       {
         "tableName": "alarm",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `hour` INTEGER NOT NULL, `minute` INTEGER NOT NULL, `repeatDays` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `label` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `hour` INTEGER NOT NULL, `minute` INTEGER NOT NULL, `repeatDays` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `label` TEXT, `soundMode` TEXT NOT NULL, `soundUri` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -42,6 +42,17 @@
             "fieldPath": "label",
             "columnName": "label",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "soundMode",
+            "columnName": "soundMode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "soundUri",
+            "columnName": "soundUri",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -54,7 +65,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e4bb9944a0f38f2dc25051439d485979')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '912fb758025ec9febaeeeecce499c5d1')"
     ]
   }
 }

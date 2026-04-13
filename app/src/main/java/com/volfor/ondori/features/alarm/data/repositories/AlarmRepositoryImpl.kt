@@ -13,7 +13,7 @@ class AlarmRepositoryImpl @Inject constructor(
     private val localDataSource: AlarmDao,
 ) : AlarmRepository {
 
-    override fun getAlarmsStream(): Flow<List<Alarm>> {
+    override fun observeAlarms(): Flow<List<Alarm>> {
         return localDataSource.observeAll().map { alarms ->
             alarms.toDomain()
         }

@@ -9,4 +9,5 @@ data class Alarm(
     val enabled: Boolean,
     val repeatDays: Set<DayOfWeek> = emptySet(),
     val label: String? = null,
+    val sound: AlarmSound = AlarmSound.Default,
 )

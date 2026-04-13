@@ -1,4 +1,4 @@
-package com.volfor.ondori.data.local.db.converters
+package com.volfor.ondori.features.alarm.data.local.db.converters
 
 import androidx.room.TypeConverter
 import java.time.DayOfWeek

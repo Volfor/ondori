@@ -7,10 +7,10 @@ import com.volfor.ondori.features.alarm.domain.usecases.CreateAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.DeleteAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
-import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmsStreamUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.ObserveAlarmsUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.UpdateAlarmUseCase
-import com.volfor.ondori.features.prefs.domain.usecases.IsNotifPermissionPromptShownUseCase
-import com.volfor.ondori.features.prefs.domain.usecases.SetNotifPermissionPromptShownUseCase
+import com.volfor.ondori.features.prefs.domain.usecases.MarkNotificationPermissionAsRequestedUseCase
+import com.volfor.ondori.features.prefs.domain.usecases.ObserveNotificationPermissionRequestedUseCase
 import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,34 +27,37 @@ data class AlarmsUiState(
     val items: List<Alarm> = emptyList(),
     val isLoading: Boolean = false,
     val selectedAlarm: Alarm? = null,
+    val hasRequestedNotificationPermission: Boolean = false,
 )
 
 @HiltViewModel
 class AlarmsViewModel @Inject constructor(
-    getAlarmsStream: GetAlarmsStreamUseCase,
+    observeAlarms: ObserveAlarmsUseCase,
     private val _createAlarm: CreateAlarmUseCase,
     private val _updateAlarm: UpdateAlarmUseCase,
     private val _deleteAlarm: DeleteAlarmUseCase,
     private val _enableAlarm: EnableAlarmUseCase,
     private val _disableAlarm: DisableAlarmUseCase,
-    private val _isNotifPermissionPromptShown: IsNotifPermissionPromptShownUseCase,
-    private val _setNotifPermissionPromptShown: SetNotifPermissionPromptShownUseCase,
+    observeNotificationPermissionRequested: ObserveNotificationPermissionRequestedUseCase,
+    private val _markNotificationPermissionAsRequested: MarkNotificationPermissionAsRequestedUseCase,
 ) : ViewModel() {
 
     private val _selectedAlarm = MutableStateFlow<Alarm?>(null)
 
-    val uiState: StateFlow<AlarmsUiState> =
-        combine(getAlarmsStream(), _selectedAlarm) { alarms, selectedAlarm ->
-            AlarmsUiState(
-                items = alarms.map { it },
-                isLoading = false,
-                selectedAlarm = selectedAlarm,
-            )
-        }.stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = AlarmsUiState(isLoading = true)
+    val uiState: StateFlow<AlarmsUiState> = combine(
+        observeAlarms(), _selectedAlarm, observeNotificationPermissionRequested(),
+    ) { alarms, selectedAlarm, hasRequestedNotificationPermission ->
+        AlarmsUiState(
+            items = alarms.map { it },
+            isLoading = false,
+            selectedAlarm = selectedAlarm,
+            hasRequestedNotificationPermission = hasRequestedNotificationPermission,
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = WhileUiSubscribed,
+        initialValue = AlarmsUiState(isLoading = true)
+    )
 
     fun selectAlarm(alarm: Alarm) {
         _selectedAlarm.value = alarm
@@ -90,9 +93,7 @@ class AlarmsViewModel @Inject constructor(
         _deleteAlarm(alarmId = alarm.id)
     }
 
-    suspend fun isNotifPermissionPromptShown(): Boolean = _isNotifPermissionPromptShown()
-
-    fun setNotifPermissionAsked() = viewModelScope.launch {
-        _setNotifPermissionPromptShown(true)
+    fun markNotificationPermissionAsRequested() = viewModelScope.launch {
+        _markNotificationPermissionAsRequested()
     }
 }
