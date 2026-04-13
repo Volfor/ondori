@@ -7,6 +7,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.presentation.screens.AlarmRingingScreen
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,11 +24,13 @@ class AlarmRingingActivity : ComponentActivity() {
 
         configureShowOverLockScreenAndWakeScreen()
         setContent {
-            AlarmRingingScreen(
-                onAlarmHandled = {
-                    finish()
-                },
-            )
+            OndoriTheme {
+                AlarmRingingScreen(
+                    onAlarmHandled = {
+                        finish()
+                    },
+                )
+            }
         }
     }
 

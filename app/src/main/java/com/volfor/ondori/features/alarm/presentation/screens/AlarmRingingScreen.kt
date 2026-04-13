@@ -1,19 +1,15 @@
 package com.volfor.ondori.features.alarm.presentation.screens
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AlarmOff
-import androidx.compose.material.icons.filled.Snooze
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,6 +25,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
+import com.volfor.ondori.features.alarm.presentation.components.SwipeToStopSlider
 import com.volfor.ondori.features.alarm.presentation.formatters.formattedTime
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmRingingViewModel
 
@@ -63,12 +60,15 @@ fun AlarmRingingContent(
     onDismiss: () -> Unit,
 ) {
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp)
     ) {
         Column(
             modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = alarm?.formattedTime() ?: "--:--",
                 fontSize = 64.sp,
@@ -76,33 +76,26 @@ fun AlarmRingingContent(
             Text(
                 "ALARM ALARM ALARM !!!",
             )
-            Spacer(modifier = Modifier.size(48.dp))
-            Row(
+            Spacer(modifier = Modifier.weight(2f))
+            Button(
+                onClick = onSnooze,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                    .height(72.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                )
             ) {
-                IconButton(
-                    onClick = onSnooze,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Snooze,
-                        contentDescription = "Snooze",
-                        modifier = Modifier.size(48.dp),
-                    )
-                }
-                IconButton(
-                    onClick = onDismiss,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.AlarmOff,
-                        contentDescription = "Dismiss",
-                        modifier = Modifier.size(48.dp),
-                    )
-                }
+                Text(
+                    text = "Snooze",
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
             }
-
+            Spacer(modifier = Modifier.height(16.dp))
+            SwipeToStopSlider(
+                onStop = onDismiss,
+            )
+            Spacer(modifier = Modifier.height(64.dp))
         }
     }
 
