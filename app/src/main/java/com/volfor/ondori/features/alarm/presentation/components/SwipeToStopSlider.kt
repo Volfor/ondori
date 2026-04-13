@@ -70,21 +70,32 @@ fun SwipeToStopSlider(
     var trackWidthPx by remember { mutableFloatStateOf(0f) }
     val thumbPx = remember(density) { with(density) { thumbSize.toPx() } }
     val paddingPx = remember(density) { with(density) { horizontalPadding.toPx() } }
-    val extraHalfWidthPx = if (thumbScale > 1f) thumbScale * thumbPx * 0.5f else 0f
-    val maxOffsetPx = remember(trackWidthPx, thumbPx, paddingPx, thumbScale) {
-        (trackWidthPx - thumbPx - 2f * paddingPx - extraHalfWidthPx).coerceAtLeast(0f)
+    val fullTravelPx = remember(trackWidthPx, thumbPx, paddingPx) {
+        (trackWidthPx - thumbPx - 2f * paddingPx).coerceAtLeast(0f)
     }
-    var thumbOffsetPx by remember { mutableFloatStateOf(0f) }
-    val maxOffsetUpdated by rememberUpdatedState(maxOffsetPx)
+    val pressedVisualOverhangPx = remember(thumbPx) {
+        THUMB_PRESSED_SCALE * thumbPx * 0.5f
+    }
 
-    LaunchedEffect(maxOffsetPx) {
-        thumbOffsetPx = thumbOffsetPx.coerceIn(0f, maxOffsetPx)
+    var thumbOffsetPx by remember { mutableFloatStateOf(0f) }
+    val fullTravelUpdated = rememberUpdatedState(fullTravelPx)
+    val isDraggedUpdated = rememberUpdatedState(isDragged)
+    val pressedOverhangUpdated = rememberUpdatedState(pressedVisualOverhangPx)
+
+    LaunchedEffect(fullTravelPx) {
+        thumbOffsetPx = thumbOffsetPx.coerceIn(0f, fullTravelPx)
     }
 
     val draggableState = rememberDraggableState { delta ->
-        val max = maxOffsetUpdated
-        if (max <= 0) return@rememberDraggableState
-        thumbOffsetPx = (thumbOffsetPx + delta).coerceIn(0f, max)
+        val travel = fullTravelUpdated.value
+        if (travel <= 0) return@rememberDraggableState
+        val dragMax =
+            if (isDraggedUpdated.value) {
+                (travel - pressedOverhangUpdated.value).coerceAtLeast(0f)
+            } else {
+                travel
+            }
+        thumbOffsetPx = (thumbOffsetPx + delta).coerceIn(0f, dragMax)
     }
 
     Box(
@@ -92,7 +103,7 @@ fun SwipeToStopSlider(
             .fillMaxWidth()
             .height(trackHeight)
             .semantics {
-                contentDescription = "Slide to the right to stop the alarm"
+                contentDescription = "Slide to stop the alarm"
             }
             .onSizeChanged { trackWidthPx = it.width.toFloat() }
             .clip(RoundedCornerShape(trackHeight / 2))
@@ -116,15 +127,16 @@ fun SwipeToStopSlider(
                 .draggable(
                     state = draggableState,
                     orientation = Orientation.Horizontal,
-                    enabled = maxOffsetPx > 0f,
+                    enabled = fullTravelPx > 0f,
                     interactionSource = interactionSource,
                     startDragImmediately = true,
                     onDragStopped = { _ ->
-                        val max = maxOffsetPx + extraHalfWidthPx
-                        if (max <= 0) return@draggable
+                        val travel = fullTravelUpdated.value
+                        if (travel <= 0) return@draggable
                         val start = thumbOffsetPx
-                        val threshold = max * COMPLETE_FRACTION
-                        val target = if (start >= threshold) max else 0f
+                        val threshold = travel * COMPLETE_FRACTION
+                        val shouldComplete = start >= threshold
+                        val target = if (shouldComplete) travel else 0f
                         val anim = Animatable(start)
 
                         anim.animateTo(
@@ -136,7 +148,7 @@ fun SwipeToStopSlider(
                         ) {
                             thumbOffsetPx = value
                         }
-                        if (target == max) {
+                        if (shouldComplete) {
                             onStop()
                         }
                     },
@@ -163,4 +175,3 @@ fun PreviewSwipeToStopSlider() {
         )
     }
 }
-
