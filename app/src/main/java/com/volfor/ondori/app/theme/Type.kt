@@ -43,6 +43,13 @@ private val TitleMediumStyle = TextStyle(
     fontFamily = titleFontFamily,
 )
 
+private val TitleLargeStyle = TextStyle(
+    fontFamily = titleFontFamily,
+    fontWeight = FontWeight.Bold,
+    letterSpacing = 1.6.sp,
+    fontSize = 18.sp,
+)
+
 private val DisplayMediumStyle = TextStyle(
     fontSize = 48.sp,
     fontWeight = FontWeight.ExtraBold,
@@ -74,6 +81,7 @@ val Typography = Typography(
     displayLarge = DisplayLargeStyle,
     titleSmall = TitleSmallStyle,
     titleMedium = TitleMediumStyle,
+    titleLarge = TitleLargeStyle,
     bodyLarge = BodyLargeStyle,
     labelMedium = LabelMediumStyle,
 )
