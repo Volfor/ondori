@@ -4,43 +4,53 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import com.volfor.ondori.R
-import com.volfor.ondori.core.AlarmService
+import com.volfor.ondori.core.receivers.AlarmNotificationActionReceiver
+import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.activities.AlarmRingingActivity
 import com.volfor.ondori.utils.Constants
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 
 class AlarmNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 
-    fun build(alarmId: Long): Notification {
+    fun build(alarm: Alarm): Notification {
+        val time =
+            ZonedDateTime.now().format(DateTimeFormatter.ofPattern("EEE H:m", Locale.getDefault()))
         return NotificationCompat.Builder(
             context.applicationContext,
             Constants.Notifications.FIRING_ALARMS_CHANNEL_ID,
         ).apply {
             setSmallIcon(R.drawable.ic_launcher_foreground)
-            setContentTitle("Alarm")
-            setContentText("Wake up")
+            setContentTitle(alarm.label ?: "Alarm")
+            setContentText("$time · Swipe to stop")
+            setColor(Color(0xFFFF8888).toArgb())
+            setColorized(true)
             setPriority(NotificationCompat.PRIORITY_MAX)
             setCategory(NotificationCompat.CATEGORY_ALARM)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            setFullScreenIntent(createFullScreenIntent(alarmId), true)
+            setFullScreenIntent(createFullScreenIntent(alarm.id), true)
             setAutoCancel(false)
             setOngoing(true)
             addAction(
                 R.drawable.ic_launcher_foreground,
                 "Snooze",
-                createSnoozeIntent(alarmId),
+                createSnoozeIntent(alarm.id),
             )
             addAction(
                 R.drawable.ic_launcher_foreground,
                 "Stop",
-                createStopIntent(alarmId),
+                createStopIntent(alarm.id),
             )
-            setDeleteIntent(createDismissIntent(alarmId))
+            setDeleteIntent(createDismissIntent(alarm.id))
         }.build()
     }
 
@@ -57,11 +67,12 @@ class AlarmNotificationBuilder @Inject constructor(
     }
 
     private fun createSnoozeIntent(alarmId: Long): PendingIntent {
-        val intent = Intent(context.applicationContext, AlarmService::class.java).apply {
-            action = AlarmService.ACTION_NOTIFICATION_SNOOZE
-            putExtra(Constants.EXTRA_ALARM_ID, alarmId)
-        }
-        return PendingIntent.getService(
+        val intent =
+            Intent(context.applicationContext, AlarmNotificationActionReceiver::class.java).apply {
+                action = AlarmNotificationActionReceiver.ACTION_NOTIFICATION_SNOOZE
+                putExtra(Constants.EXTRA_ALARM_ID, alarmId)
+            }
+        return PendingIntent.getBroadcast(
             context.applicationContext,
             Constants.RequestCodes.ALARM_NOTIFICATION_SNOOZE,
             intent,
@@ -70,11 +81,12 @@ class AlarmNotificationBuilder @Inject constructor(
     }
 
     private fun createStopIntent(alarmId: Long): PendingIntent {
-        val intent = Intent(context.applicationContext, AlarmService::class.java).apply {
-            action = AlarmService.ACTION_NOTIFICATION_STOP
-            putExtra(Constants.EXTRA_ALARM_ID, alarmId)
-        }
-        return PendingIntent.getService(
+        val intent =
+            Intent(context.applicationContext, AlarmNotificationActionReceiver::class.java).apply {
+                action = AlarmNotificationActionReceiver.ACTION_NOTIFICATION_STOP
+                putExtra(Constants.EXTRA_ALARM_ID, alarmId)
+            }
+        return PendingIntent.getBroadcast(
             context.applicationContext,
             Constants.RequestCodes.ALARM_NOTIFICATION_STOP,
             intent,
@@ -83,11 +95,12 @@ class AlarmNotificationBuilder @Inject constructor(
     }
 
     private fun createDismissIntent(alarmId: Long): PendingIntent {
-        val intent = Intent(context.applicationContext, AlarmService::class.java).apply {
-            action = AlarmService.ACTION_NOTIFICATION_DISMISS
-            putExtra(Constants.EXTRA_ALARM_ID, alarmId)
-        }
-        return PendingIntent.getService(
+        val intent =
+            Intent(context.applicationContext, AlarmNotificationActionReceiver::class.java).apply {
+                action = AlarmNotificationActionReceiver.ACTION_NOTIFICATION_DISMISS
+                putExtra(Constants.EXTRA_ALARM_ID, alarmId)
+            }
+        return PendingIntent.getBroadcast(
             context.applicationContext,
             Constants.RequestCodes.ALARM_NOTIFICATION_DISMISS,
             intent,

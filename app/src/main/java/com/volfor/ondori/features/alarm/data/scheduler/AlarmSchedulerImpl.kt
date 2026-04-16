@@ -5,7 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.volfor.ondori.core.AlarmReceiver
+import com.volfor.ondori.core.receivers.AlarmReceiver
 import com.volfor.ondori.features.alarm.domain.services.AlarmScheduler
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import dagger.hilt.android.qualifiers.ApplicationContext

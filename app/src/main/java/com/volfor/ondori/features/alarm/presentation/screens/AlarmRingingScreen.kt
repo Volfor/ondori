@@ -20,6 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.intl.Locale
@@ -33,8 +36,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.SwipeToStopSlider
-import com.volfor.ondori.features.alarm.presentation.formatters.formattedTime
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmRingingViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AlarmRingingScreen(
@@ -84,10 +90,7 @@ fun AlarmRingingContent(
 
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = alarm?.formattedTime() ?: "--:--",
-                fontSize = 84.sp,
-            )
+            Clock()
             if (alarm?.label != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -120,6 +123,27 @@ fun AlarmRingingContent(
         }
     }
 
+}
+
+@Composable
+private fun Clock() {
+    var now by remember { mutableStateOf(ZonedDateTime.now()) }
+
+    LaunchedEffect(Unit) {
+        while (isActive) {
+            now = ZonedDateTime.now()
+            delay(1_000L)
+        }
+    }
+
+    val time = remember(now) {
+        now.format(DateTimeFormatter.ofPattern("HH:mm", java.util.Locale.getDefault()))
+    }
+
+    Text(
+        text = time,
+        fontSize = 84.sp,
+    )
 }
 
 @Preview

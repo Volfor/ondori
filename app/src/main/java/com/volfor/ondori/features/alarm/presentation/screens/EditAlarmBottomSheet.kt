@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.volfor.ondori.features.alarm.presentation.components
+package com.volfor.ondori.features.alarm.presentation.screens
 
 import android.app.Activity
 import android.content.Intent
@@ -65,6 +65,8 @@ import com.volfor.ondori.R
 import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.entities.AlarmSound
+import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
+import com.volfor.ondori.features.alarm.presentation.components.OndoriAlertDialog
 import com.volfor.ondori.features.alarm.presentation.formatters.formattedTime
 import com.volfor.ondori.features.alarm.presentation.formatters.soundLabel
 import kotlinx.coroutines.launch
@@ -299,9 +301,13 @@ fun EditAlarmBottomSheet(
             onConfirm = { time ->
                 showTimePicker = false
 
+                val hasChanged = time.hour != editedAlarm.hour || time.minute != editedAlarm.minute
+                val enabled = editedAlarm.enabled || hasChanged
+
                 editedAlarm = editedAlarm.copy(
                     hour = time.hour,
                     minute = time.minute,
+                    enabled = enabled
                 )
             },
         )

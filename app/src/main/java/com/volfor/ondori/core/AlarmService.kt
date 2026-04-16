@@ -7,9 +7,7 @@ import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.volfor.ondori.core.notifications.AlarmNotificationBuilder
-import com.volfor.ondori.features.alarm.domain.usecases.DismissAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
-import com.volfor.ondori.features.alarm.domain.usecases.SnoozeAlarmUseCase
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import com.volfor.ondori.utils.Constants.Notifications
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,18 +17,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AlarmService : LifecycleService() {
 
-    companion object Action {
+    companion object {
         const val ACTION_STOP_RINGING_FOR_ALARM = "com.volfor.ondori.ACTION_STOP_RINGING_FOR_ALARM"
-        const val ACTION_NOTIFICATION_SNOOZE = "com.volfor.ondori.ACTION_SNOOZE"
-        const val ACTION_NOTIFICATION_STOP = "com.volfor.ondori.ACTION_STOP"
-        const val ACTION_NOTIFICATION_DISMISS = "com.volfor.ondori.ACTION_DISMISS"
     }
-
-    @Inject
-    lateinit var snoozeAlarm: SnoozeAlarmUseCase
-
-    @Inject
-    lateinit var dismissAlarm: DismissAlarmUseCase
 
     @Inject
     lateinit var getAlarm: GetAlarmUseCase
@@ -58,50 +47,39 @@ class AlarmService : LifecycleService() {
             return START_NOT_STICKY
         }
 
-        when (intent?.action) {
-            ACTION_STOP_RINGING_FOR_ALARM -> {
-                if (alarmId == ringingAlarmId || ringingAlarmId == null) {
-                    ringingAlarmId = null
-                    stopSelf()
-                }
-                return START_NOT_STICKY
+        if (intent?.action == ACTION_STOP_RINGING_FOR_ALARM) {
+            if (alarmId == ringingAlarmId || ringingAlarmId == null) {
+                ringingAlarmId = null
+                stopSelf()
             }
-
-            ACTION_NOTIFICATION_SNOOZE -> {
-                lifecycleScope.launch {
-                    snoozeAlarm(alarmId)
-                }
-                return START_NOT_STICKY
-            }
-
-            ACTION_NOTIFICATION_DISMISS, ACTION_NOTIFICATION_STOP -> {
-                lifecycleScope.launch {
-                    dismissAlarm(alarmId)
-                }
-                return START_NOT_STICKY
-            }
+            return START_NOT_STICKY
         }
 
-        ringingAlarmId = alarmId
-        val notification = notificationBuilder.build(alarmId)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            startForeground(
-                Notifications.FIRING_ALARM_NOTIFICATION_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
-            )
-        } else {
-            startForeground(
-                Notifications.FIRING_ALARM_NOTIFICATION_ID,
-                notification,
-            )
-        }
-
-        alarmVibrator.vibrate()
         lifecycleScope.launch {
             val alarm = getAlarm(alarmId)
-            alarm?.let { alarmSoundPlayer.play(it.sound) }
+            if (alarm == null) {
+                stopSelf()
+                return@launch
+            }
+
+            ringingAlarmId = alarmId
+            val notification = notificationBuilder.build(alarm)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                startForeground(
+                    Notifications.FIRING_ALARM_NOTIFICATION_ID,
+                    notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
+                )
+            } else {
+                startForeground(
+                    Notifications.FIRING_ALARM_NOTIFICATION_ID,
+                    notification,
+                )
+            }
+
+            alarmVibrator.vibrate()
+            alarmSoundPlayer.play(alarm.sound)
         }
 
         return START_NOT_STICKY

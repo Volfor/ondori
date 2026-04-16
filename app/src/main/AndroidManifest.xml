@@ -41,7 +41,11 @@
             tools:targetApi="27" />
 
         <receiver
-            android:name=".core.AlarmReceiver"
+            android:name=".core.receivers.AlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".core.receivers.AlarmNotificationActionReceiver"
             android:exported="false" />
 
         <service
