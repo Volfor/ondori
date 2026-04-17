@@ -36,7 +36,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.volfor.ondori.app.theme.OndoriTheme
+import com.volfor.ondori.app.LocalIs24HourFormat
+import com.volfor.ondori.utils.OndoriPreview
 import java.util.Calendar
 
 @Composable
@@ -71,10 +72,12 @@ private fun AlarmTimePickerContent(
         add(Calendar.MINUTE, 1)
     }
 
+    val is24Hour = LocalIs24HourFormat.current
+
     val timePickerState = rememberTimePickerState(
         initialHour = initialHour ?: currentTime.get(Calendar.HOUR_OF_DAY),
         initialMinute = initialMinute ?: currentTime.get(Calendar.MINUTE),
-        is24Hour = true,
+        is24Hour = is24Hour,
     )
 
     val toggleIcon = if (showDial) {
@@ -102,7 +105,8 @@ private fun AlarmTimePickerContent(
                     timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                     timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 ),
-            )
+
+                )
         } else {
             TimeInput(
                 state = timePickerState,
@@ -163,26 +167,64 @@ private fun TimePickerDialog(
 
 @Preview
 @Composable
-fun PreviewAlarmTimePickerDial() {
-    OndoriTheme {
+fun PreviewAlarmTimePickerDial(
+    showDial: Boolean = true,
+    is24HourFormat: Boolean = true,
+) {
+    OndoriPreview(is24HourFormat = is24HourFormat) {
         AlarmTimePickerContent(
             onConfirm = {},
             onDismiss = {},
             onToggle = {},
-            showDial = true,
+            showDial = showDial,
         )
     }
 }
 
 @Preview
 @Composable
-fun PreviewAlarmTimePickerInput() {
-    OndoriTheme {
+fun PreviewAlarmTimePickerInput(
+    showDial: Boolean = false,
+    is24HourFormat: Boolean = true,
+) {
+    OndoriPreview(is24HourFormat = is24HourFormat) {
         AlarmTimePickerContent(
             onConfirm = {},
             onDismiss = {},
             onToggle = {},
-            showDial = false,
+            showDial = showDial,
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewAlarmTimePickerAmPmDial(
+    showDial: Boolean = true,
+    is24HourFormat: Boolean = false,
+) {
+    OndoriPreview(is24HourFormat = is24HourFormat) {
+        AlarmTimePickerContent(
+            onConfirm = {},
+            onDismiss = {},
+            onToggle = {},
+            showDial = showDial,
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewAlarmTimePickerAmPmInput(
+    showDial: Boolean = false,
+    is24HourFormat: Boolean = false,
+) {
+    OndoriPreview(is24HourFormat = is24HourFormat) {
+        AlarmTimePickerContent(
+            onConfirm = {},
+            onDismiss = {},
+            onToggle = {},
+            showDial = showDial,
         )
     }
 }

@@ -11,8 +11,6 @@ import com.volfor.ondori.features.alarm.domain.entities.AlarmSound
 import java.time.format.TextStyle
 import java.util.Locale
 
-fun Alarm.formattedTime(): String = "%02d:%02d".format(hour, minute)
-
 fun Alarm.formattedRepeatDays(): String = if (repeatDays.isEmpty()) {
     "Not scheduled"
 } else repeatDays.sortedBy { it.value }.joinToString(", ") {

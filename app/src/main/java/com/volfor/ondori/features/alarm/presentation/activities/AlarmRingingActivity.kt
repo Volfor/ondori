@@ -7,13 +7,22 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.volfor.ondori.app.LocalIs24HourFormat
 import com.volfor.ondori.app.theme.OndoriTheme
+import com.volfor.ondori.core.time.TimeFormatStore
 import com.volfor.ondori.features.alarm.presentation.screens.AlarmRingingScreen
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AlarmRingingActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var timeFormatStore: TimeFormatStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -24,12 +33,15 @@ class AlarmRingingActivity : ComponentActivity() {
 
         configureShowOverLockScreenAndWakeScreen()
         setContent {
-            OndoriTheme {
-                AlarmRingingScreen(
-                    onAlarmHandled = {
-                        finish()
-                    },
-                )
+            val is24Hour by timeFormatStore.is24Hour.collectAsStateWithLifecycle()
+            CompositionLocalProvider(LocalIs24HourFormat provides is24Hour) {
+                OndoriTheme {
+                    AlarmRingingScreen(
+                        onAlarmHandled = {
+                            finish()
+                        },
+                    )
+                }
             }
         }
     }

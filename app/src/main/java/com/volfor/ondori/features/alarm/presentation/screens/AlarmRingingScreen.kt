@@ -33,10 +33,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.volfor.ondori.app.LocalIs24HourFormat
 import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.SwipeToStopSlider
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmRingingViewModel
+import com.volfor.ondori.utils.OndoriPreview
+import com.volfor.ondori.utils.previewAlarms
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import java.time.ZonedDateTime
@@ -129,6 +132,14 @@ fun AlarmRingingContent(
 private fun Clock() {
     var now by remember { mutableStateOf(ZonedDateTime.now()) }
 
+    val is24Hour = LocalIs24HourFormat.current
+    val formatter = remember(is24Hour) {
+        DateTimeFormatter.ofPattern(
+            if (is24Hour) "HH:mm" else "h:mm",
+            java.util.Locale.getDefault()
+        )
+    }
+
     LaunchedEffect(Unit) {
         while (isActive) {
             now = ZonedDateTime.now()
@@ -136,29 +147,22 @@ private fun Clock() {
         }
     }
 
-    val time = remember(now) {
-        now.format(DateTimeFormatter.ofPattern("HH:mm", java.util.Locale.getDefault()))
-    }
-
     Text(
-        text = time,
+        text = now.format(formatter),
+        style = MaterialTheme.typography.displayMedium,
         fontSize = 84.sp,
     )
 }
 
 @Preview
 @Composable
-fun PreviewAlarmRingingScreen() {
-    OndoriTheme {
+fun PreviewAlarmRingingScreen(
+    alarm: Alarm = previewAlarms[2],
+) {
+    OndoriPreview() {
         Surface {
             AlarmRingingContent(
-                alarm = Alarm(
-                    id = 10,
-                    hour = 2,
-                    minute = 30,
-                    enabled = true,
-                    label = "ALARM! ALARM! ALARM!",
-                ),
+                alarm = alarm,
                 onSnooze = {},
                 onDismiss = {},
             )

@@ -14,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.core.notifications.AlarmNotificationStatus
+import com.volfor.ondori.utils.OndoriPreview
 
 @Composable
 fun NotificationPermissionCard(
@@ -90,7 +90,7 @@ fun NotificationPermissionCard(
 @Preview
 @Composable
 fun PreviewNotificationPermissionCardPermissionMissing() {
-    OndoriTheme {
+    OndoriPreview {
         NotificationPermissionCard(
             status = AlarmNotificationStatus.NeedsPostNotificationPermission,
             onOpenNotificationSettings = {},
@@ -103,7 +103,7 @@ fun PreviewNotificationPermissionCardPermissionMissing() {
 @Preview
 @Composable
 fun PreviewNotificationPermissionCardDisabled() {
-    OndoriTheme {
+    OndoriPreview {
         NotificationPermissionCard(
             status = AlarmNotificationStatus.AppNotificationsDisabled,
             onOpenNotificationSettings = {},
@@ -116,7 +116,7 @@ fun PreviewNotificationPermissionCardDisabled() {
 @Preview
 @Composable
 fun PreviewNotificationPermissionCardChannelDisabled() {
-    OndoriTheme {
+    OndoriPreview {
         NotificationPermissionCard(
             status = AlarmNotificationStatus.AlarmChannelDisabled,
             onOpenNotificationSettings = {},
@@ -129,7 +129,7 @@ fun PreviewNotificationPermissionCardChannelDisabled() {
 @Preview
 @Composable
 fun PreviewNotificationPermissionCardFullScreenDisabled() {
-    OndoriTheme {
+    OndoriPreview {
         NotificationPermissionCard(
             status = AlarmNotificationStatus.FullScreenIntentsDisabled,
             onOpenNotificationSettings = {},

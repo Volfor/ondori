@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.volfor.ondori.R
-import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.core.notifications.AlarmNotificationStatus
 import com.volfor.ondori.core.notifications.hasPostNotificationPermission
 import com.volfor.ondori.core.notifications.openAlarmChannelSettings
@@ -56,6 +55,8 @@ import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
 import com.volfor.ondori.features.alarm.presentation.components.NotificationPermissionCard
 import com.volfor.ondori.features.alarm.presentation.components.rememberAlarmNotificationStatus
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmsViewModel
+import com.volfor.ondori.utils.OndoriPreview
+import com.volfor.ondori.utils.previewAlarms
 import kotlinx.coroutines.launch
 
 @Composable
@@ -259,8 +260,10 @@ private fun AlarmsContent(
 
 @Preview
 @Composable
-fun PreviewAlarmsContent() {
-    OndoriTheme {
+fun PreviewAlarmsContent(
+    alarms: List<Alarm> = previewAlarms,
+) {
+    OndoriPreview {
         Surface {
             AlarmsContent(
                 notificationPermissionStatus = AlarmNotificationStatus.Allowed,
@@ -269,28 +272,7 @@ fun PreviewAlarmsContent() {
                 onOpenChannelSettings = {},
                 onOpenAppNotificationSettings = {},
                 loading = false,
-                alarms = listOf(
-                    Alarm(
-                        id = 1,
-                        hour = 2,
-                        minute = 30,
-                        enabled = true,
-                        label = "Test 1",
-                    ),
-                    Alarm(
-                        id = 2,
-                        hour = 9,
-                        minute = 0,
-                        enabled = true,
-                    ),
-                    Alarm(
-                        id = 3,
-                        hour = 14,
-                        minute = 45,
-                        enabled = false,
-                        label = "Test 3",
-                    ),
-                ),
+                alarms = alarms,
                 onAlarmClick = {},
                 onAlarmToggle = { _, _ -> },
                 onDelete = {},
@@ -301,8 +283,10 @@ fun PreviewAlarmsContent() {
 
 @Preview
 @Composable
-fun PreviewAlarmsContentEmpty() {
-    OndoriTheme {
+fun PreviewAlarmsContentEmpty(
+    alarms: List<Alarm> = emptyList(),
+) {
+    OndoriPreview {
         Surface {
             AlarmsContent(
                 notificationPermissionStatus = AlarmNotificationStatus.NeedsPostNotificationPermission,
@@ -311,7 +295,7 @@ fun PreviewAlarmsContentEmpty() {
                 onOpenChannelSettings = {},
                 onOpenAppNotificationSettings = {},
                 loading = false,
-                alarms = emptyList(),
+                alarms = alarms,
                 onAlarmClick = {},
                 onAlarmToggle = { _, _ -> },
                 onDelete = {},

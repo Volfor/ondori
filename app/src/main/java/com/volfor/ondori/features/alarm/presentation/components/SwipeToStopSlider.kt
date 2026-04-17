@@ -41,7 +41,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.volfor.ondori.app.theme.OndoriTheme
+import com.volfor.ondori.utils.OndoriPreview
 import kotlin.math.roundToInt
 
 private const val COMPLETE_FRACTION = 0.75f
@@ -169,7 +169,7 @@ fun SwipeToStopSlider(
 @Preview
 @Composable
 fun PreviewSwipeToStopSlider() {
-    OndoriTheme {
+    OndoriPreview {
         SwipeToStopSlider(
             onStop = {},
         )

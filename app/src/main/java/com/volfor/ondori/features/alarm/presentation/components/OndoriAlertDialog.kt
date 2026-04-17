@@ -6,7 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.volfor.ondori.app.theme.OndoriTheme
+import com.volfor.ondori.utils.OndoriPreview
 
 @Composable
 fun OndoriAlertDialog(
@@ -32,7 +32,7 @@ fun OndoriAlertDialog(
 @Preview
 @Composable
 fun PreviewOndoriAlertDialog() {
-    OndoriTheme {
+    OndoriPreview {
         OndoriAlertDialog(
             onConfirm = {},
             onDismiss = {},

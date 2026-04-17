@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.text.format.DateFormat
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
@@ -14,8 +15,7 @@ import com.volfor.ondori.features.alarm.presentation.activities.AlarmRingingActi
 import com.volfor.ondori.utils.Constants
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.Date
 import javax.inject.Inject
 
 class AlarmNotificationBuilder @Inject constructor(
@@ -23,15 +23,17 @@ class AlarmNotificationBuilder @Inject constructor(
 ) {
 
     fun build(alarm: Alarm): Notification {
-        val time =
-            ZonedDateTime.now().format(DateTimeFormatter.ofPattern("EEE H:m", Locale.getDefault()))
+        val date = Date.from(ZonedDateTime.now().toInstant())
+        val weekday = DateFormat.format("EEE", date.time).toString()
+        val time = DateFormat.getTimeFormat(context.applicationContext).format(date)
+
         return NotificationCompat.Builder(
             context.applicationContext,
             Constants.Notifications.FIRING_ALARMS_CHANNEL_ID,
         ).apply {
             setSmallIcon(R.drawable.ic_launcher_foreground)
             setContentTitle(alarm.label ?: "Alarm")
-            setContentText("$time · Swipe to stop")
+            setContentText("$weekday $time · Swipe to stop")
             setColor(Color(0xFFFF8888).toArgb())
             setColorized(true)
             setPriority(NotificationCompat.PRIORITY_MAX)

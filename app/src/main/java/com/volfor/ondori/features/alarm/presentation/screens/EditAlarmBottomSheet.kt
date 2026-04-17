@@ -66,9 +66,11 @@ import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.entities.AlarmSound
 import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
+import com.volfor.ondori.features.alarm.presentation.components.AlarmTimeText
 import com.volfor.ondori.features.alarm.presentation.components.OndoriAlertDialog
-import com.volfor.ondori.features.alarm.presentation.formatters.formattedTime
 import com.volfor.ondori.features.alarm.presentation.formatters.soundLabel
+import com.volfor.ondori.utils.OndoriPreview
+import com.volfor.ondori.utils.previewAlarms
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.format.TextStyle
@@ -107,7 +109,7 @@ fun EditAlarmBottomSheet(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(editedAlarm.formattedTime(), style = MaterialTheme.typography.displayMedium)
+                AlarmTimeText(editedAlarm.hour, editedAlarm.minute)
                 TextButton(
                     onClick = {
                         showTimePicker = true
@@ -305,9 +307,7 @@ fun EditAlarmBottomSheet(
                 val enabled = editedAlarm.enabled || hasChanged
 
                 editedAlarm = editedAlarm.copy(
-                    hour = time.hour,
-                    minute = time.minute,
-                    enabled = enabled
+                    hour = time.hour, minute = time.minute, enabled = enabled
                 )
             },
         )
@@ -428,16 +428,12 @@ private fun SoundOption(
 
 @Preview
 @Composable
-fun PreviewEditAlarmBottomSheet() {
-    OndoriTheme {
+fun PreviewEditAlarmBottomSheet(
+    alarm: Alarm = previewAlarms[2]
+) {
+    OndoriPreview {
         EditAlarmBottomSheet(
-            alarm = Alarm(
-                id = 1,
-                hour = 12,
-                minute = 35,
-                enabled = true,
-                repeatDays = setOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY),
-            ),
+            alarm = alarm,
             onDismissRequest = {},
             onSave = {},
             onDelete = {},
@@ -449,7 +445,7 @@ fun PreviewEditAlarmBottomSheet() {
 @Preview
 @Composable
 fun PreviewAlarmSoundDialog() {
-    OndoriTheme {
+    OndoriPreview {
         AlarmSoundDialog(
             onConfirm = {},
             onDismiss = {},

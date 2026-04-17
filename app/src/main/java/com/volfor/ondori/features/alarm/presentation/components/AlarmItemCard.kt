@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.sp
 import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.formatters.formattedRepeatDays
-import com.volfor.ondori.features.alarm.presentation.formatters.formattedTime
-import java.time.DayOfWeek
+import com.volfor.ondori.utils.OndoriPreview
+import com.volfor.ondori.utils.previewAlarms
 
 @Composable
 fun AlarmItemCard(
@@ -177,15 +177,7 @@ private fun AlarmItemContent(
                         maxLines = 3,
                     )
                 }
-                Row(
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    Text(
-                        text = alarm.formattedTime(),
-                        style = MaterialTheme.typography.displayMedium,
-                    )
-                    // Text("AM")
-                }
+                AlarmTimeText(alarm.hour, alarm.minute)
                 RepeatDaysLabel(alarm)
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -218,12 +210,13 @@ private fun RepeatDaysLabel(alarm: Alarm) {
 
 @Preview
 @Composable
-fun PreviewAlarmItemCardEnabled() {
-    OndoriTheme {
+fun PreviewAlarmItemCardEnabled(
+    is24HourFormat: Boolean = true,
+    alarm: Alarm = previewAlarms[0],
+) {
+    OndoriPreview(is24HourFormat = is24HourFormat) {
         AlarmItemCard(
-            Alarm(
-                id = 0, hour = 9, minute = 15, enabled = true, label = "Morning zazen"
-            ),
+            alarm = alarm,
             onClick = {},
             onCheckedChange = {},
             onDelete = {},
@@ -233,16 +226,13 @@ fun PreviewAlarmItemCardEnabled() {
 
 @Preview
 @Composable
-fun PreviewAlarmItemCardDisabled() {
-    OndoriTheme {
+fun PreviewAlarmItemCardDisabled(
+    is24HourFormat: Boolean = true,
+    alarm: Alarm = previewAlarms[2],
+) {
+    OndoriPreview(is24HourFormat = is24HourFormat) {
         AlarmItemCard(
-            Alarm(
-                id = 0,
-                hour = 1,
-                minute = 0,
-                enabled = false,
-                repeatDays = setOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY)
-            ),
+            alarm = alarm,
             onClick = {},
             onCheckedChange = {},
             onDelete = {},
@@ -252,20 +242,17 @@ fun PreviewAlarmItemCardDisabled() {
 
 @Preview
 @Composable
-fun PreviewAlarmItemSwipedRight() {
+fun PreviewAlarmItemSwipedRight(
+    alarm: Alarm = previewAlarms[0],
+) {
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
         initialValue = SwipeToDismissBoxValue.StartToEnd,
     )
 
-    OndoriTheme {
+    OndoriPreview {
         SwipeContent(
             swipeToDismissBoxState,
-            Alarm(
-                id = 0,
-                hour = 1,
-                minute = 0,
-                enabled = false,
-            ),
+            alarm = alarm,
             onClick = {},
             onCheckedChange = {},
             onDelete = {},
@@ -275,20 +262,49 @@ fun PreviewAlarmItemSwipedRight() {
 
 @Preview
 @Composable
-fun PreviewAlarmItemSwipedLeft() {
+fun PreviewAlarmItemSwipedLeft(
+    alarm: Alarm = previewAlarms[0],
+) {
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
         initialValue = SwipeToDismissBoxValue.EndToStart,
     )
 
-    OndoriTheme {
+    OndoriPreview {
         SwipeContent(
             swipeToDismissBoxState,
-            Alarm(
-                id = 0,
-                hour = 1,
-                minute = 0,
-                enabled = false,
-            ),
+            alarm = alarm,
+            onClick = {},
+            onCheckedChange = {},
+            onDelete = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewAlarmItemCardAmPmEnabled(
+    is24HourFormat: Boolean = false,
+    alarm: Alarm = previewAlarms[0].copy(enabled = false),
+) {
+    OndoriPreview(is24HourFormat = is24HourFormat) {
+        AlarmItemCard(
+            alarm = alarm,
+            onClick = {},
+            onCheckedChange = {},
+            onDelete = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewAlarmItemCardAmPmDisabled(
+    is24HourFormat: Boolean = false,
+    alarm: Alarm = previewAlarms[2].copy(enabled = true),
+) {
+    OndoriPreview(is24HourFormat = is24HourFormat) {
+        AlarmItemCard(
+            alarm = alarm,
             onClick = {},
             onCheckedChange = {},
             onDelete = {},
