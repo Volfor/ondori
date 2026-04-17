@@ -8,16 +8,22 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -61,7 +67,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AlarmsScreen(
-    onNavigateToInfo: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     viewModel: AlarmsViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -90,6 +96,7 @@ fun AlarmsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var showTimePicker by remember { mutableStateOf(false) }
+    var moreMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
@@ -113,10 +120,20 @@ fun AlarmsScreen(
             CenterAlignedTopAppBar(
                 title = { Text(text = stringResource(R.string.app_name)) },
                 actions = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.action_settings)
+                    Box {
+                        IconButton(onClick = { moreMenuExpanded = true }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.action_more),
+                            )
+                        }
+                        MoreMenu(
+                            expanded = moreMenuExpanded,
+                            onDismissRequest = { moreMenuExpanded = false },
+                            onNavigateToSettings = {
+                                moreMenuExpanded = false
+                                onNavigateToSettings()
+                            },
                         )
                     }
                 })
@@ -255,6 +272,33 @@ private fun AlarmsContent(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun MoreMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        shape = RoundedCornerShape(24.dp),
+        modifier = Modifier.widthIn(min = 200.dp),
+    ) {
+        DropdownMenuItem(
+            text = {
+                Text(stringResource(R.string.action_settings))
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = stringResource(R.string.action_settings)
+                )
+            },
+            onClick = onNavigateToSettings,
+        )
     }
 }
 

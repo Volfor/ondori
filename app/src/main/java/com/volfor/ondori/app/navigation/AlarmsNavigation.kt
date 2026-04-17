@@ -10,15 +10,15 @@ import kotlinx.serialization.Serializable
 object Alarms
 
 fun NavGraphBuilder.alarmsDestination(
-    onNavigateToInfo: () -> Unit,
+    onNavigateToSettings: () -> Unit,
 ) {
     composable<Alarms> {
         AlarmsScreen(
-            onNavigateToInfo
+            onNavigateToSettings = onNavigateToSettings,
         )
     }
 }
 
-fun NavController.navigateToInfo() {
-    navigate(route = Info)
+fun NavController.navigateToSettings() {
+    navigate(route = Settings)
 }
