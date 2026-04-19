@@ -9,8 +9,8 @@ import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.ObserveAlarmsUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.UpdateAlarmUseCase
-import com.volfor.ondori.features.prefs.domain.usecases.MarkNotificationPermissionAsRequestedUseCase
-import com.volfor.ondori.features.prefs.domain.usecases.ObserveNotificationPermissionRequestedUseCase
+import com.volfor.ondori.features.settings.domain.usecases.MarkNotificationPermissionAsRequestedUseCase
+import com.volfor.ondori.features.settings.domain.usecases.ObserveNotificationPermissionRequestedUseCase
 import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

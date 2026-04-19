@@ -10,15 +10,12 @@ class DismissAlarmUseCase @Inject constructor(
     private val ringer: AlarmRinger,
 ) {
     suspend operator fun invoke(alarmId: Long) {
-        try {
-            val alarm = repo.getAlarm(alarmId) ?: return
-            if (alarm.repeatDays.isNotEmpty()) {
-                scheduleAlarm(alarm)
-            } else {
-                repo.disableAlarm(alarmId)
-            }
-        } finally {
-            ringer.stopRinging(alarmId)
+        ringer.stopRinging(alarmId)
+        val alarm = repo.getAlarm(alarmId) ?: return
+        if (alarm.repeatDays.isNotEmpty()) {
+            scheduleAlarm(alarm)
+        } else {
+            repo.disableAlarm(alarmId)
         }
     }
 }

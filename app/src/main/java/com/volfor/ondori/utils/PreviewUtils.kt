@@ -3,7 +3,7 @@ package com.volfor.ondori.utils
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.volfor.ondori.app.LocalIs24HourFormat
+import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import java.time.DayOfWeek

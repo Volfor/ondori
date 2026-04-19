@@ -10,8 +10,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.volfor.ondori.core.notifications.AlarmNotificationStatus
-import com.volfor.ondori.core.notifications.resolveAlarmNotificationStatus
+import com.volfor.ondori.app.notifications.AlarmNotificationStatus
+import com.volfor.ondori.app.notifications.resolveAlarmNotificationStatus
 
 @Composable
 fun rememberAlarmNotificationStatus(): AlarmNotificationStatus {

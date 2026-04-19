@@ -6,7 +6,7 @@ import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.volfor.ondori.core.notifications.AlarmNotificationBuilder
+import com.volfor.ondori.app.notifications.AlarmNotificationBuilder
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import com.volfor.ondori.utils.Constants.Notifications

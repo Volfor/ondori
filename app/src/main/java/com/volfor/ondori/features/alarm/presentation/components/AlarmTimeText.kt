@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.volfor.ondori.app.LocalIs24HourFormat
+import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.utils.OndoriPreview
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter

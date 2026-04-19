@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.volfor.ondori.app.LocalIs24HourFormat
+import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.utils.OndoriPreview
 import java.util.Calendar
 

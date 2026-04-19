@@ -10,9 +10,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.volfor.ondori.app.LocalIs24HourFormat
+import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.app.theme.OndoriTheme
-import com.volfor.ondori.core.time.TimeFormatStore
+import com.volfor.ondori.app.time.TimeFormatStore
 import com.volfor.ondori.features.alarm.presentation.screens.AlarmRingingScreen
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import dagger.hilt.android.AndroidEntryPoint

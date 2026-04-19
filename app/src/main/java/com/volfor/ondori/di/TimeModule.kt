@@ -1,7 +1,7 @@
 package com.volfor.ondori.di
 
-import com.volfor.ondori.core.time.SystemTimeFormatStore
-import com.volfor.ondori.core.time.TimeFormatStore
+import com.volfor.ondori.app.time.SystemTimeFormatStore
+import com.volfor.ondori.app.time.TimeFormatStore
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

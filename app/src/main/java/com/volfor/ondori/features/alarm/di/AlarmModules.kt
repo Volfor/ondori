@@ -5,11 +5,13 @@ import android.content.Context
 import com.volfor.ondori.data.local.db.OndoriDatabase
 import com.volfor.ondori.features.alarm.data.local.db.dao.AlarmDao
 import com.volfor.ondori.features.alarm.data.repositories.AlarmRepositoryImpl
-import com.volfor.ondori.features.alarm.data.ringer.AlarmRingerImpl
-import com.volfor.ondori.features.alarm.data.scheduler.AlarmSchedulerImpl
+import com.volfor.ondori.features.alarm.data.services.AlarmRingerImpl
+import com.volfor.ondori.features.alarm.data.services.AlarmSchedulerImpl
+import com.volfor.ondori.features.alarm.data.services.AlarmTimeCalculatorImpl
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
 import com.volfor.ondori.features.alarm.domain.services.AlarmRinger
 import com.volfor.ondori.features.alarm.domain.services.AlarmScheduler
+import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,6 +30,10 @@ abstract class AlarmModule {
     @Singleton
     @Binds
     abstract fun bindAlarmRinger(alarmRinger: AlarmRingerImpl): AlarmRinger
+
+    @Singleton
+    @Binds
+    abstract fun bindAlarmTimeCalculator(timeCalculator: AlarmTimeCalculatorImpl): AlarmTimeCalculator
 
     @Singleton
     @Binds

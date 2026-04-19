@@ -1,0 +1,31 @@
+package com.volfor.ondori.features.alarm.data.services
+
+import android.content.Context
+import android.content.Intent
+import androidx.core.content.ContextCompat
+import com.volfor.ondori.core.AlarmService
+import com.volfor.ondori.features.alarm.domain.services.AlarmRinger
+import com.volfor.ondori.utils.Constants
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+
+class AlarmRingerImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : AlarmRinger {
+
+    override fun startRinging(alarmId: Long) {
+        val serviceIntent = Intent(context.applicationContext, AlarmService::class.java).apply {
+            putExtra(Constants.EXTRA_ALARM_ID, alarmId)
+        }
+
+        ContextCompat.startForegroundService(context.applicationContext, serviceIntent)
+    }
+
+    override fun stopRinging(alarmId: Long) {
+        val stopIntent = Intent(context.applicationContext, AlarmService::class.java).apply {
+            action = AlarmService.ACTION_STOP_RINGING_FOR_ALARM
+            putExtra(Constants.EXTRA_ALARM_ID, alarmId)
+        }
+        context.applicationContext.startService(stopIntent)
+    }
+}

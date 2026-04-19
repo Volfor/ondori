@@ -7,14 +7,14 @@ import javax.inject.Inject
 class UpdateAlarmUseCase @Inject constructor(
     private val repo: AlarmRepository,
     private val scheduleAlarm: ScheduleAlarmUseCase,
-    private val disableAlarm: DisableAlarmUseCase,
+    private val cancelAlarm: CancelAlarmUseCase,
 ) {
     suspend operator fun invoke(alarm: Alarm) {
         repo.updateAlarm(alarm)
         if (alarm.enabled) {
             scheduleAlarm(alarm)
         } else {
-            disableAlarm(alarm.id)
+            cancelAlarm(alarm.id)
         }
     }
 }

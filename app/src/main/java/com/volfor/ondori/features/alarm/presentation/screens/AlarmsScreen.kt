@@ -51,10 +51,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.volfor.ondori.R
-import com.volfor.ondori.core.notifications.AlarmNotificationStatus
-import com.volfor.ondori.core.notifications.hasPostNotificationPermission
-import com.volfor.ondori.core.notifications.openAlarmChannelSettings
-import com.volfor.ondori.core.notifications.openAppNotificationSettings
+import com.volfor.ondori.app.notifications.AlarmNotificationStatus
+import com.volfor.ondori.app.notifications.hasPostNotificationPermission
+import com.volfor.ondori.app.notifications.openAlarmChannelSettings
+import com.volfor.ondori.app.notifications.openAppNotificationSettings
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.AlarmItemCard
 import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
