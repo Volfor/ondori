@@ -48,6 +48,14 @@
             android:name=".core.receivers.AlarmNotificationActionReceiver"
             android:exported="false" />
 
+        <receiver
+            android:name=".core.receivers.BootCompletedReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".core.AlarmService"
             android:exported="false"

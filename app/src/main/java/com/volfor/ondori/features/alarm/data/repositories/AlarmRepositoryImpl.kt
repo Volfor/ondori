@@ -19,6 +19,10 @@ class AlarmRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getEnabledAlarms(): List<Alarm> {
+        return localDataSource.getAllEnabled().toDomain()
+    }
+
     override suspend fun getAlarm(alarmId: Long): Alarm? {
         return localDataSource.getById(alarmId)?.toDomain()
     }

@@ -7,6 +7,8 @@ interface AlarmRepository {
 
     fun observeAlarms(): Flow<List<Alarm>>
 
+    suspend fun getEnabledAlarms(): List<Alarm>
+
     suspend fun getAlarm(alarmId: Long): Alarm?
 
     suspend fun createAlarm(alarm: Alarm): Long

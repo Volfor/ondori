@@ -36,6 +36,14 @@ interface AlarmDao {
     suspend fun getAll(): List<AlarmEntity>
 
     /**
+     * Select all enabled alarms from the alarms table.
+     *
+     * @return all enabled alarms.
+     */
+    @Query("SELECT * FROM alarm WHERE enabled = 1")
+    suspend fun getAllEnabled(): List<AlarmEntity>
+
+    /**
      * Select an alarm by id.
      *
      * @param alarmId the alarm id.
