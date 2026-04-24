@@ -7,11 +7,14 @@ import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.usecases.DismissAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.SnoozeAlarmUseCase
+import com.volfor.ondori.features.punisher.domain.usecases.ObserveScoreUseCase
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
+import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,12 +24,14 @@ import javax.inject.Inject
  */
 data class AlarmRingingUiState(
     val alarm: Alarm? = null,
+    val score: Int = 0,
     val isLoading: Boolean = false,
     val isAlarmHandled: Boolean = false,
 )
 
 @HiltViewModel
 class AlarmRingingViewModel @Inject constructor(
+    observeScore: ObserveScoreUseCase,
     private val getAlarm: GetAlarmUseCase,
     private val snoozeAlarm: SnoozeAlarmUseCase,
     private val dismissAlarm: DismissAlarmUseCase,
@@ -35,8 +40,22 @@ class AlarmRingingViewModel @Inject constructor(
 
     private val alarmId: Long? = savedStateHandle[EXTRA_ALARM_ID]
 
-    private val _uiState = MutableStateFlow(AlarmRingingUiState())
-    val uiState: StateFlow<AlarmRingingUiState> = _uiState.asStateFlow()
+    private val alarm = MutableStateFlow<Alarm?>(null)
+    private val isLoading = MutableStateFlow(false)
+    private val isAlarmHandled = MutableStateFlow(false)
+
+    val uiState: StateFlow<AlarmRingingUiState> = combine(
+        alarm, isLoading, isAlarmHandled, observeScore(),
+    ) { alarm, isLoading, isHandled, score ->
+        AlarmRingingUiState(
+            alarm = alarm,
+            score = score,
+            isLoading = isLoading,
+            isAlarmHandled = isHandled,
+        )
+    }.stateIn(
+        scope = viewModelScope, started = WhileUiSubscribed, initialValue = AlarmRingingUiState()
+    )
 
     init {
         if (alarmId != null) {
@@ -47,35 +66,20 @@ class AlarmRingingViewModel @Inject constructor(
     fun snooze() = viewModelScope.launch {
         alarmId ?: return@launch
         snoozeAlarm(alarmId)
-        _uiState.update { it.copy(isAlarmHandled = true) }
+        isAlarmHandled.update { true }
     }
-
 
     fun dismiss() = viewModelScope.launch {
         alarmId ?: return@launch
         dismissAlarm(alarmId)
-        _uiState.update { it.copy(isAlarmHandled = true) }
+        isAlarmHandled.update { true }
     }
 
     private fun loadAlarm(alarmId: Long) {
-        _uiState.update {
-            it.copy(isLoading = true)
-        }
+        isLoading.update { true }
         viewModelScope.launch {
-            getAlarm(alarmId).let { alarm ->
-                if (alarm != null) {
-                    _uiState.update {
-                        it.copy(
-                            alarm = alarm,
-                            isLoading = false,
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(isLoading = false)
-                    }
-                }
-            }
+            alarm.value = getAlarm(alarmId)
+            isLoading.update { false }
         }
     }
 }

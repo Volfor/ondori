@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
@@ -33,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.app.theme.OndoriTheme
+import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.SwipeToStopSlider
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmRingingViewModel
@@ -62,6 +63,7 @@ fun AlarmRingingScreen(
         AlarmRingingContent(
             modifier = Modifier.padding(paddingValues),
             alarm = uiState.alarm,
+            score = uiState.score,
             onSnooze = viewModel::snooze,
             onDismiss = viewModel::dismiss,
         )
@@ -72,6 +74,7 @@ fun AlarmRingingScreen(
 fun AlarmRingingContent(
     modifier: Modifier = Modifier,
     alarm: Alarm?,
+    score: Int,
     onSnooze: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -80,6 +83,14 @@ fun AlarmRingingContent(
             .fillMaxSize()
             .padding(24.dp)
     ) {
+
+        val tint = when (score) {
+            0 -> Color(0xFF000000)
+            -1 -> Color(0xFFFFFF00)
+            -2 -> Color(0xFFFF00FF)
+            else -> Color(0xFFFF0000)
+        }
+
         Column(
             modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -88,7 +99,7 @@ fun AlarmRingingContent(
             Icon(
                 imageVector = Icons.Outlined.Alarm,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = tint,
                 modifier = Modifier.size(64.dp)
 
             )
@@ -103,6 +114,7 @@ fun AlarmRingingContent(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+            Text("Score: $score")
             Spacer(modifier = Modifier.weight(2f))
             Button(
                 onClick = onSnooze,
@@ -135,8 +147,7 @@ private fun Clock() {
     val is24Hour = LocalIs24HourFormat.current
     val formatter = remember(is24Hour) {
         DateTimeFormatter.ofPattern(
-            if (is24Hour) "HH:mm" else "h:mm",
-            java.util.Locale.getDefault()
+            if (is24Hour) "HH:mm" else "h:mm", java.util.Locale.getDefault()
         )
     }
 
@@ -163,6 +174,7 @@ fun PreviewAlarmRingingScreen(
         Surface {
             AlarmRingingContent(
                 alarm = alarm,
+                score = 0,
                 onSnooze = {},
                 onDismiss = {},
             )
