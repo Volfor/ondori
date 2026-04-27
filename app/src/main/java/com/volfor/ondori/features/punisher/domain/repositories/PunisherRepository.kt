@@ -6,9 +6,9 @@ interface PunisherRepository {
 
     fun observeScore(): Flow<Int>
 
+    suspend fun getScore(): Int
+
     suspend fun applyPenalty()
 
     suspend fun applyReward()
-
-    suspend fun getPenaltyOffsetMillis(): Long
 }

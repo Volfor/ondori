@@ -1,6 +1,8 @@
 package com.volfor.ondori.features.punisher.domain
 
-object PunisherPolicy {
+import javax.inject.Inject
+
+class PunisherPolicy @Inject constructor() {
 
     fun nextScoreAfterPenalty(current: Int): Int {
         return if (current > 0) -1 else current - 1
@@ -22,5 +24,13 @@ object PunisherPolicy {
             else -> 60 // extreme level
         }
         return minutes * 60L * 1000L
+    }
+
+    /**
+     * Shifts [time] earlier by [penaltyOffsetMillis].
+     */
+    fun withPenaltyOffset(time: Long, penaltyOffsetMillis: Long): Long {
+        if (penaltyOffsetMillis <= 0) return time
+        return time - penaltyOffsetMillis
     }
 }

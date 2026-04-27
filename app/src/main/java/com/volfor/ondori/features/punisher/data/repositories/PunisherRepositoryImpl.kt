@@ -11,21 +11,22 @@ import javax.inject.Inject
 class PunisherRepositoryImpl @Inject constructor(
     private val db: OndoriDatabase,
     private val dao: UserProfileDao,
+    private val punisher: PunisherPolicy,
 ) : PunisherRepository {
 
     override fun observeScore(): Flow<Int> {
         return dao.observeScore()
     }
 
+    override suspend fun getScore(): Int {
+        return dao.getScore()
+    }
+
     override suspend fun applyPenalty() = db.withTransaction {
-        dao.updateScore(PunisherPolicy.nextScoreAfterPenalty(dao.getScore()))
+        dao.updateScore(punisher.nextScoreAfterPenalty(dao.getScore()))
     }
 
     override suspend fun applyReward() = db.withTransaction {
-        dao.updateScore(PunisherPolicy.nextScoreAfterReward(dao.getScore()))
-    }
-
-    override suspend fun getPenaltyOffsetMillis(): Long {
-        return PunisherPolicy.penaltyOffsetMillis(dao.getScore())
+        dao.updateScore(punisher.nextScoreAfterReward(dao.getScore()))
     }
 }

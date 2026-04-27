@@ -11,10 +11,12 @@ class SnoozeAlarmUseCase @Inject constructor(
     private val scheduler: AlarmScheduler,
     private val ringer: AlarmRinger,
     private val applyPenalty: ApplyPenaltyUseCase,
+    private val rescheduleEnabledAlarms: RescheduleEnabledAlarmsUseCase,
 ) {
     suspend operator fun invoke(alarmId: Long) {
         ringer.stopRinging(alarmId)
         applyPenalty()
+        rescheduleEnabledAlarms()
         val time = timeCalculator.computeSnoozeTriggerTime()
         scheduler.scheduleAlarm(alarmId, time)
     }

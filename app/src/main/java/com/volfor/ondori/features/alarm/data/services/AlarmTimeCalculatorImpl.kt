@@ -12,6 +12,7 @@ class AlarmTimeCalculatorImpl @Inject constructor(
 
     companion object {
         internal const val SNOOZE_MINUTES = 1 // TODO: allow to modify this value for each alarm
+        internal const val SAFETY_BUFFER_MINUTES = 30L
     }
 
     override fun computeNextTriggerTime(hour: Int, minute: Int, repeatDays: Set<DayOfWeek>): Long {
@@ -49,5 +50,14 @@ class AlarmTimeCalculatorImpl @Inject constructor(
         val now = ZonedDateTime.now(clock)
         val trigger = now.plusMinutes(SNOOZE_MINUTES.toLong()).withSecond(0).withNano(0)
         return trigger.toInstant().toEpochMilli()
+    }
+
+    override fun pickSafeTriggerTime(preferred: Long, fallback: Long): Long {
+        val earliestSafeTime = clock.millis() + SAFETY_BUFFER_MINUTES * 60L * 1000L
+        return if (preferred >= earliestSafeTime) {
+            preferred
+        } else {
+            fallback
+        }
     }
 }
