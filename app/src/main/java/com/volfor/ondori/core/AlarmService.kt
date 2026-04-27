@@ -7,10 +7,16 @@ import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.volfor.ondori.app.notifications.AlarmNotificationBuilder
+import com.volfor.ondori.di.ApplicationScope
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.MissAlarmUseCase
+import com.volfor.ondori.utils.Constants
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import com.volfor.ondori.utils.Constants.Notifications
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,6 +31,9 @@ class AlarmService : LifecycleService() {
     lateinit var getAlarm: GetAlarmUseCase
 
     @Inject
+    lateinit var missAlarm: MissAlarmUseCase
+
+    @Inject
     lateinit var alarmSoundPlayer: AlarmSoundPlayer
 
     @Inject
@@ -33,7 +42,12 @@ class AlarmService : LifecycleService() {
     @Inject
     lateinit var notificationBuilder: AlarmNotificationBuilder
 
+    @Inject
+    @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
+
     private var ringingAlarmId: Long? = null
+    private var missTimeoutJob: Job? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
@@ -50,6 +64,8 @@ class AlarmService : LifecycleService() {
         if (intent?.action == ACTION_STOP_RINGING_FOR_ALARM) {
             if (alarmId == ringingAlarmId || ringingAlarmId == null) {
                 ringingAlarmId = null
+                missTimeoutJob?.cancel()
+                missTimeoutJob = null
                 stopSelf()
             }
             return START_NOT_STICKY
@@ -80,12 +96,20 @@ class AlarmService : LifecycleService() {
 
             alarmVibrator.vibrate()
             alarmSoundPlayer.play(alarm.sound)
+
+            missTimeoutJob = launch {
+                delay(Constants.Alarm.MISSED_TIMEOUT_MILLIS)
+                Log.d("AlarmService", "Alarm missed after timeout: $alarmId")
+                applicationScope.launch { missAlarm(alarmId) }
+            }
         }
 
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
+        missTimeoutJob?.cancel()
+        missTimeoutJob = null
         alarmVibrator.stop()
         alarmSoundPlayer.stop()
         super.onDestroy()

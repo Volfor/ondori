@@ -12,11 +12,13 @@ class OndoriApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        createFiringAlarmsNotificationChannel()
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(buildFiringAlarmsChannel())
+        manager.createNotificationChannel(buildMissedAlarmsChannel())
     }
 
-    private fun createFiringAlarmsNotificationChannel() {
-        val channel = NotificationChannel(
+    private fun buildFiringAlarmsChannel(): NotificationChannel {
+        return NotificationChannel(
             Notifications.FIRING_ALARMS_CHANNEL_ID,
             "Firing alarms",
             NotificationManager.IMPORTANCE_HIGH,
@@ -26,8 +28,16 @@ class OndoriApplication : Application() {
             enableVibration(false)
             setShowBadge(false)
         }
+    }
 
-        val manager = getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(channel)
+    private fun buildMissedAlarmsChannel(): NotificationChannel {
+        return NotificationChannel(
+            Notifications.MISSED_ALARMS_CHANNEL_ID,
+            "Missed alarms",
+            NotificationManager.IMPORTANCE_DEFAULT,
+        ).apply {
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            setShowBadge(true)
+        }
     }
 }
