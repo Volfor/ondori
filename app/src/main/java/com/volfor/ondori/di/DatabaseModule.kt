@@ -25,7 +25,7 @@ object DatabaseModule {
         ).addCallback(object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "INSERT OR IGNORE INTO user_profile (id, score) VALUES (${UserProfileEntity.SINGLETON_ID}, 0)"
+                    "INSERT OR IGNORE INTO user_profile (id, score, lastDismissedAlarmTime) VALUES (${UserProfileEntity.SINGLETON_ID}, 0, NULL)"
                 )
             }
         }).build()

@@ -22,4 +22,10 @@ interface UserProfileDao {
 
     @Query("UPDATE user_profile SET score = :score WHERE id = ${UserProfileEntity.SINGLETON_ID}")
     suspend fun updateScore(score: Int)
+
+    @Query("SELECT lastDismissedAlarmTime FROM user_profile WHERE id = ${UserProfileEntity.SINGLETON_ID}")
+    suspend fun getLastDismissedAlarmTime(): Long?
+
+    @Query("UPDATE user_profile SET lastDismissedAlarmTime = :time WHERE id = ${UserProfileEntity.SINGLETON_ID}")
+    suspend fun updateLastDismissedAlarmTime(time: Long?)
 }

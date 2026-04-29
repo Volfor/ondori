@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b90d2c59375fcfac3db84d83cab685f0",
+    "identityHash": "271d7239a91953116ba56d66831fd8e7",
     "entities": [
       {
         "tableName": "alarm",
@@ -64,7 +64,7 @@
       },
       {
         "tableName": "user_profile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `score` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `score` INTEGER NOT NULL, `lastDismissedAlarmTime` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -77,6 +77,11 @@
             "columnName": "score",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "lastDismissedAlarmTime",
+            "columnName": "lastDismissedAlarmTime",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -89,7 +94,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b90d2c59375fcfac3db84d83cab685f0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '271d7239a91953116ba56d66831fd8e7')"
     ]
   }
 }

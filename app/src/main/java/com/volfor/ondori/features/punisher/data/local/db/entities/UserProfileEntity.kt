@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class UserProfileEntity(
     @PrimaryKey val id: Int = SINGLETON_ID,
     val score: Int = 0,
+    val lastDismissedAlarmTime: Long? = null,
 ) {
     companion object {
         const val SINGLETON_ID = 1

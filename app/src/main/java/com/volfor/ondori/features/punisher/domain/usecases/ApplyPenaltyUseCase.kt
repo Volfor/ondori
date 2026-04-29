@@ -8,5 +8,6 @@ class ApplyPenaltyUseCase @Inject constructor(
 ) {
     suspend operator fun invoke() {
         repo.applyPenalty()
+        repo.setLastDismissedAlarmTime(null)
     }
 }
