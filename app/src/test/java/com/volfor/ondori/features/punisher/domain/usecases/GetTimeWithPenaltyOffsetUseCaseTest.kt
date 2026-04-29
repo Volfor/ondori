@@ -20,6 +20,8 @@ class GetTimeWithPenaltyOffsetUseCaseTest {
         policy = PunisherPolicy()
     }
 
+    private fun useCase() = GetTimeWithPenaltyOffsetUseCase(repo, policy)
+
     @Test
     fun `composes score, policy offset, and policy time shift`() = runBlocking {
         coEvery { repo.getScore() } returns -3
@@ -27,8 +29,7 @@ class GetTimeWithPenaltyOffsetUseCaseTest {
         val time = 10_000_000L
         val offset = 15 * 60 * 1000L
 
-        val useCase = GetTimeWithPenaltyOffsetUseCase(repo, policy)
-        val result = useCase(time)
+        val result = useCase()(time)
 
         assertEquals(time - offset, result)
     }
@@ -39,8 +40,7 @@ class GetTimeWithPenaltyOffsetUseCaseTest {
 
         val time = 10_000_000L
 
-        val useCase = GetTimeWithPenaltyOffsetUseCase(repo, policy)
-        val result = useCase(time)
+        val result = useCase()(time)
 
         assertEquals(time, result)
     }
@@ -51,8 +51,7 @@ class GetTimeWithPenaltyOffsetUseCaseTest {
 
         val time = 10_000_000L
 
-        val useCase = GetTimeWithPenaltyOffsetUseCase(repo, policy)
-        val result = useCase(time)
+        val result = useCase()(time)
 
         assertEquals(time, result)
     }

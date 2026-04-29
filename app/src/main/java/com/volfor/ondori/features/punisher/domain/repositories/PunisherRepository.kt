@@ -14,6 +14,8 @@ interface PunisherRepository {
 
     suspend fun applyRecreationPenalty()
 
+    suspend fun applyReschedulePenalty()
+
     suspend fun getLastDismissedAlarmTime(): Long?
 
     suspend fun setLastDismissedAlarmTime(time: Long?)

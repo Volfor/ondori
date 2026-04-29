@@ -30,12 +30,14 @@ class DismissAlarmUseCaseTest {
         rescheduleEnabledAlarms = mockk(relaxed = true)
     }
 
+    private fun useCase() =
+        DismissAlarmUseCase(repo, ringer, recordCleanDismiss, rescheduleEnabledAlarms)
+
     @Test
     fun `missing alarm only stops ringing`() = runBlocking {
         coEvery { repo.getAlarm(-1L) } returns null
 
-        val useCase = DismissAlarmUseCase(repo, ringer, recordCleanDismiss, rescheduleEnabledAlarms)
-        useCase(-1L)
+        useCase()(-1L)
 
         verify { ringer.stopRinging(-1L) }
         coVerify(exactly = 0) { recordCleanDismiss() }
@@ -55,8 +57,7 @@ class DismissAlarmUseCaseTest {
         coEvery { repo.getAlarm(1L) } returns alarm
         coEvery { repo.disableAlarm(1L) } just runs
 
-        val useCase = DismissAlarmUseCase(repo, ringer, recordCleanDismiss, rescheduleEnabledAlarms)
-        useCase(1L)
+        useCase()(1L)
 
         verify { ringer.stopRinging(1L) }
         coVerify(exactly = 1) { recordCleanDismiss() }
@@ -75,8 +76,7 @@ class DismissAlarmUseCaseTest {
         )
         coEvery { repo.getAlarm(2L) } returns alarm
 
-        val useCase = DismissAlarmUseCase(repo, ringer, recordCleanDismiss, rescheduleEnabledAlarms)
-        useCase(2L)
+        useCase()(2L)
 
         verify { ringer.stopRinging(2L) }
         coVerify(exactly = 1) { recordCleanDismiss() }

@@ -32,13 +32,14 @@ class MissAlarmUseCaseTest {
         rescheduleEnabledAlarms = mockk(relaxed = true)
     }
 
+    private fun useCase() =
+        MissAlarmUseCase(ringer, repo, missedNotifier, applyPenalty, rescheduleEnabledAlarms)
+
     @Test
     fun `invalid alarm only stops ringing`() = runBlocking {
         coEvery { repo.getAlarm(-1L) } returns null
 
-        val useCase =
-            MissAlarmUseCase(ringer, repo, missedNotifier, applyPenalty, rescheduleEnabledAlarms)
-        useCase(-1L)
+        useCase()(-1L)
 
         verify { ringer.stopRinging(-1L) }
         verify(exactly = 0) { missedNotifier.notifyMissed(any()) }
@@ -58,14 +59,7 @@ class MissAlarmUseCaseTest {
             )
             coEvery { repo.getAlarm(1L) } returns alarm
 
-            val useCase = MissAlarmUseCase(
-                ringer,
-                repo,
-                missedNotifier,
-                applyPenalty,
-                rescheduleEnabledAlarms
-            )
-            useCase(1L)
+            useCase()(1L)
 
             verify { ringer.stopRinging(1L) }
             verify(exactly = 1) { missedNotifier.notifyMissed(alarm) }
@@ -85,9 +79,7 @@ class MissAlarmUseCaseTest {
         )
         coEvery { repo.getAlarm(2L) } returns alarm
 
-        val useCase =
-            MissAlarmUseCase(ringer, repo, missedNotifier, applyPenalty, rescheduleEnabledAlarms)
-        useCase(2L)
+        useCase()(2L)
 
         coVerifyOrder {
             ringer.stopRinging(2L)

@@ -27,6 +27,9 @@ class ScheduleAlarmUseCaseTest {
         getTimeWithPenaltyOffset = mockk()
     }
 
+    private fun useCase() =
+        ScheduleAlarmUseCase(scheduler, timeCalculator, getTimeWithPenaltyOffset)
+
     @Test
     fun `schedules at the time picked by calculator from penalized and base times`() = runBlocking {
         val baseTime = 10_000_000L
@@ -39,7 +42,7 @@ class ScheduleAlarmUseCaseTest {
         coEvery { getTimeWithPenaltyOffset(baseTime) } returns penalizedTime
         every { timeCalculator.pickSafeTriggerTime(penalizedTime, baseTime) } returns pickedTime
 
-        scheduleUseCase().invoke(alarm)
+        useCase()(alarm)
 
         coVerify(exactly = 1) { scheduler.scheduleAlarm(alarm.id, pickedTime) }
     }
@@ -55,14 +58,8 @@ class ScheduleAlarmUseCaseTest {
         coEvery { getTimeWithPenaltyOffset(baseTime) } returns penalizedTime
         every { timeCalculator.pickSafeTriggerTime(penalizedTime, baseTime) } returns baseTime
 
-        scheduleUseCase().invoke(alarm)
+        useCase()(alarm)
 
         coVerify(exactly = 1) { scheduler.scheduleAlarm(alarm.id, baseTime) }
     }
-
-    private fun scheduleUseCase() = ScheduleAlarmUseCase(
-        scheduler = scheduler,
-        timeCalculator = timeCalculator,
-        getTimeWithPenaltyOffset = getTimeWithPenaltyOffset,
-    )
 }

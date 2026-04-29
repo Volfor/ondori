@@ -30,6 +30,9 @@ class SnoozeAlarmUseCaseTest {
         rescheduleEnabledAlarms = mockk(relaxed = true)
     }
 
+    private fun useCase() =
+        SnoozeAlarmUseCase(timeCalculator, scheduler, ringer, applyPenalty, rescheduleEnabledAlarms)
+
     @Test
     fun `stops ringing, applies penalty, reschedules, and schedules snooze`() = runBlocking {
         val id = 3L
@@ -37,10 +40,7 @@ class SnoozeAlarmUseCaseTest {
 
         every { timeCalculator.computeSnoozeTriggerTime() } returns trigger
 
-        val useCase = SnoozeAlarmUseCase(
-            timeCalculator, scheduler, ringer, applyPenalty, rescheduleEnabledAlarms
-        )
-        useCase(id)
+        useCase()(id)
 
         verify(exactly = 1) { ringer.stopRinging(id) }
         coVerify(exactly = 1) { applyPenalty() }
@@ -55,10 +55,7 @@ class SnoozeAlarmUseCaseTest {
 
         every { timeCalculator.computeSnoozeTriggerTime() } returns trigger
 
-        val useCase = SnoozeAlarmUseCase(
-            timeCalculator, scheduler, ringer, applyPenalty, rescheduleEnabledAlarms
-        )
-        useCase(id)
+        useCase()(id)
 
         coVerifyOrder {
             rescheduleEnabledAlarms()

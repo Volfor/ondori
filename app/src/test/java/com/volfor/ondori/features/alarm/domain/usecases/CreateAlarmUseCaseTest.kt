@@ -33,6 +33,9 @@ class CreateAlarmUseCaseTest {
         every { timeCalculator.computeNextTriggerTime(any(), any(), any()) } returns 0L
     }
 
+    private fun useCase() =
+        CreateAlarmUseCase(repo, scheduleAlarm, timeCalculator, detectRecreatedAlarm)
+
     @Test
     fun `creates alarm in repository, detects recreation, then schedules`() = runBlocking {
         val alarm = Alarm(
@@ -49,8 +52,7 @@ class CreateAlarmUseCaseTest {
         } returns triggerTime
         coEvery { scheduleAlarm(any()) } just runs
 
-        val useCase = CreateAlarmUseCase(repo, scheduleAlarm, timeCalculator, detectRecreatedAlarm)
-        useCase(alarm)
+        useCase()(alarm)
 
         coVerifyOrder {
             repo.createAlarm(alarm)
@@ -72,8 +74,7 @@ class CreateAlarmUseCaseTest {
         val scheduled = slot<Alarm>()
         coEvery { scheduleAlarm(capture(scheduled)) } just runs
 
-        val useCase = CreateAlarmUseCase(repo, scheduleAlarm, timeCalculator, detectRecreatedAlarm)
-        useCase(alarm)
+        useCase()(alarm)
 
         assertEquals(alarm.copy(id = assignedId), scheduled.captured)
         coVerify(exactly = 1) { scheduleAlarm(any()) }

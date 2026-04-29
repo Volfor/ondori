@@ -23,13 +23,14 @@ class EnableAlarmUseCaseTest {
         scheduleAlarm = mockk()
     }
 
+    private fun useCase() = EnableAlarmUseCase(repo, scheduleAlarm)
+
     @Test
     fun `does nothing when alarm is missing`() = runBlocking {
         val id = -1L
         coEvery { repo.getAlarm(id) } returns null
 
-        val useCase = EnableAlarmUseCase(repo, scheduleAlarm)
-        useCase(id)
+        useCase()(id)
 
         coVerify(exactly = 0) { repo.enableAlarm(any()) }
         coVerify(exactly = 0) { scheduleAlarm(any()) }
@@ -50,8 +51,7 @@ class EnableAlarmUseCaseTest {
         coEvery { repo.enableAlarm(id) } just runs
         coEvery { scheduleAlarm(any()) } just runs
 
-        val useCase = EnableAlarmUseCase(repo, scheduleAlarm)
-        useCase(id)
+        useCase()(id)
 
         coVerify(exactly = 1) { repo.getAlarm(id) }
         coVerify(exactly = 1) { repo.enableAlarm(fromRepo.id) }

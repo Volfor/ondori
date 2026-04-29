@@ -23,13 +23,14 @@ class RescheduleEnabledAlarmsUseCaseTest {
         scheduleAlarm = mockk()
     }
 
+    private fun useCase() = RescheduleEnabledAlarmsUseCase(repo, scheduleAlarm)
+
     @Test
     fun `schedules nothing when no enabled alarms`() = runBlocking {
         coEvery { repo.getEnabledAlarms() } returns emptyList()
         coEvery { scheduleAlarm(any()) } just runs
 
-        val useCase = RescheduleEnabledAlarmsUseCase(repo, scheduleAlarm)
-        useCase()
+        useCase()()
 
         coVerify(exactly = 1) { repo.getEnabledAlarms() }
         coVerify(exactly = 0) { scheduleAlarm(any()) }
@@ -56,8 +57,7 @@ class RescheduleEnabledAlarmsUseCaseTest {
         coEvery { repo.getEnabledAlarms() } returns listOf(a, b)
         coEvery { scheduleAlarm(any()) } just runs
 
-        val useCase = RescheduleEnabledAlarmsUseCase(repo, scheduleAlarm)
-        useCase()
+        useCase()()
 
         coVerify(exactly = 1) { repo.getEnabledAlarms() }
         coVerify(exactly = 1) { scheduleAlarm(a) }

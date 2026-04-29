@@ -23,12 +23,13 @@ class DeleteAlarmUseCaseTest {
         ringer = mockk(relaxed = true)
     }
 
+    private fun useCase() = DeleteAlarmUseCase(repo, scheduler, ringer)
+
     @Test
     fun `stops ringing, cancels schedule and deletes alarm`() = runBlocking {
         val id = 9L
 
-        val useCase = DeleteAlarmUseCase(repo, scheduler, ringer)
-        useCase(id)
+        useCase()(id)
 
         verify(exactly = 1) { ringer.stopRinging(id) }
         verify(exactly = 1) { scheduler.cancelAlarm(id) }
