@@ -5,7 +5,7 @@ import com.volfor.ondori.features.punisher.domain.repositories.PunisherRepositor
 import java.time.Clock
 import javax.inject.Inject
 
-class DetectRecreatedAlarmUseCase @Inject constructor(
+class DetectDismissReversalUseCase @Inject constructor(
     private val repo: PunisherRepository,
     private val policy: PunisherPolicy,
     private val clock: Clock,
@@ -13,9 +13,9 @@ class DetectRecreatedAlarmUseCase @Inject constructor(
     suspend operator fun invoke(newAlarmTriggerTime: Long) {
         val lastDismissedAt = repo.getLastDismissedAlarmTime() ?: return
         val now = clock.millis()
-        if (!policy.isRecreatedAlarm(lastDismissedAt, now, newAlarmTriggerTime)) return
+        if (!policy.isDismissReversal(lastDismissedAt, now, newAlarmTriggerTime)) return
 
-        repo.applyRecreationPenalty()
+        repo.applyDismissReversalPenalty()
         repo.setLastDismissedAlarmTime(null)
     }
 }

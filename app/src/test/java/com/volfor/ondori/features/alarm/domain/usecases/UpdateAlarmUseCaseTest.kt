@@ -3,7 +3,7 @@ package com.volfor.ondori.features.alarm.domain.usecases
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
 import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
-import com.volfor.ondori.features.punisher.domain.usecases.DetectRescheduledAlarmUseCase
+import com.volfor.ondori.features.punisher.domain.usecases.DetectDismissReversalUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.coVerifyOrder
@@ -22,7 +22,7 @@ class UpdateAlarmUseCaseTest {
     private lateinit var scheduleAlarm: ScheduleAlarmUseCase
     private lateinit var cancelAlarm: CancelAlarmUseCase
     private lateinit var timeCalculator: AlarmTimeCalculator
-    private lateinit var detectRescheduledAlarm: DetectRescheduledAlarmUseCase
+    private lateinit var detectDismissReversal: DetectDismissReversalUseCase
 
     @Before
     fun setup() {
@@ -30,7 +30,7 @@ class UpdateAlarmUseCaseTest {
         scheduleAlarm = mockk()
         cancelAlarm = mockk()
         timeCalculator = mockk()
-        detectRescheduledAlarm = mockk(relaxed = true)
+        detectDismissReversal = mockk(relaxed = true)
         coEvery { repo.updateAlarm(any()) } just runs
         coEvery { repo.getAlarm(any()) } returns null
         coEvery { scheduleAlarm(any()) } just runs
@@ -39,7 +39,7 @@ class UpdateAlarmUseCaseTest {
     }
 
     private fun useCase() =
-        UpdateAlarmUseCase(repo, scheduleAlarm, cancelAlarm, timeCalculator, detectRescheduledAlarm)
+        UpdateAlarmUseCase(repo, scheduleAlarm, cancelAlarm, timeCalculator, detectDismissReversal)
 
     @Test
     fun `persists then schedules when alarm is enabled`() = runBlocking {
@@ -59,7 +59,7 @@ class UpdateAlarmUseCaseTest {
             scheduleAlarm(alarm)
         }
         coVerify(exactly = 0) { cancelAlarm(any()) }
-        coVerify(exactly = 0) { detectRescheduledAlarm(any()) }
+        coVerify(exactly = 0) { detectDismissReversal(any()) }
     }
 
     @Test
@@ -80,7 +80,7 @@ class UpdateAlarmUseCaseTest {
             cancelAlarm(8L)
         }
         coVerify(exactly = 0) { scheduleAlarm(any()) }
-        coVerify(exactly = 0) { detectRescheduledAlarm(any()) }
+        coVerify(exactly = 0) { detectDismissReversal(any()) }
     }
 
     @Test
@@ -97,7 +97,7 @@ class UpdateAlarmUseCaseTest {
 
         coVerifyOrder {
             repo.updateAlarm(updated)
-            detectRescheduledAlarm(triggerTime)
+            detectDismissReversal(triggerTime)
             scheduleAlarm(updated)
         }
     }
@@ -120,7 +120,7 @@ class UpdateAlarmUseCaseTest {
 
         useCase()(updated)
 
-        coVerify(exactly = 1) { detectRescheduledAlarm(triggerTime) }
+        coVerify(exactly = 1) { detectDismissReversal(triggerTime) }
     }
 
     @Test
@@ -131,7 +131,7 @@ class UpdateAlarmUseCaseTest {
 
         useCase()(updated)
 
-        coVerify(exactly = 0) { detectRescheduledAlarm(any()) }
+        coVerify(exactly = 0) { detectDismissReversal(any()) }
         coVerify(exactly = 1) { scheduleAlarm(updated) }
     }
 
@@ -143,7 +143,7 @@ class UpdateAlarmUseCaseTest {
 
         useCase()(updated)
 
-        coVerify(exactly = 0) { detectRescheduledAlarm(any()) }
+        coVerify(exactly = 0) { detectDismissReversal(any()) }
         coVerify(exactly = 1) { cancelAlarm(5L) }
     }
 
@@ -154,7 +154,7 @@ class UpdateAlarmUseCaseTest {
 
         useCase()(updated)
 
-        coVerify(exactly = 0) { detectRescheduledAlarm(any()) }
+        coVerify(exactly = 0) { detectDismissReversal(any()) }
         coVerify(exactly = 1) { scheduleAlarm(updated) }
     }
 }

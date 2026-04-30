@@ -30,12 +30,8 @@ class PunisherRepositoryImpl @Inject constructor(
         dao.updateScore(punisher.nextScoreAfterReward(dao.getScore()))
     }
 
-    override suspend fun applyRecreationPenalty() = db.withTransaction {
-        dao.updateScore(punisher.nextScoreAfterRecreation(dao.getScore()))
-    }
-
-    override suspend fun applyReschedulePenalty() = db.withTransaction {
-        dao.updateScore(punisher.nextScoreAfterRecreation(dao.getScore()))
+    override suspend fun applyDismissReversalPenalty() = db.withTransaction {
+        dao.updateScore(punisher.nextScoreAfterDismissReversal(dao.getScore()))
     }
 
     override suspend fun getLastDismissedAlarmTime(): Long? {

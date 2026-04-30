@@ -13,7 +13,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
-class DetectRescheduledAlarmUseCaseTest {
+class DetectDismissReversalUseCaseTest {
 
     private lateinit var repo: PunisherRepository
     private lateinit var policy: PunisherPolicy
@@ -31,25 +31,25 @@ class DetectRescheduledAlarmUseCaseTest {
     fun `does nothing when no last dismiss time stored`() = runBlocking {
         coEvery { repo.getLastDismissedAlarmTime() } returns null
 
-        val useCase = DetectRescheduledAlarmUseCase(repo, policy, fixedClockAt(1_000L))
+        val useCase = DetectDismissReversalUseCase(repo, policy, fixedClockAt(1_000L))
         useCase(newAlarmTriggerTime = 2_000L)
 
-        coVerify(exactly = 0) { repo.applyReschedulePenalty() }
+        coVerify(exactly = 0) { repo.applyDismissReversalPenalty() }
         coVerify(exactly = 0) { repo.setLastDismissedAlarmTime(any()) }
     }
 
     @Test
-    fun `applies reschedule penalty and clears timestamp when match`() = runBlocking {
+    fun `applies dismiss reversal penalty and clears timestamp when match`() = runBlocking {
         val dismissed = 1_000_000L
         val now = dismissed + 5 * 60 * 1000L
         val newTrigger = dismissed + 10 * 60 * 1000L
         coEvery { repo.getLastDismissedAlarmTime() } returns dismissed
 
-        val useCase = DetectRescheduledAlarmUseCase(repo, policy, fixedClockAt(now))
+        val useCase = DetectDismissReversalUseCase(repo, policy, fixedClockAt(now))
         useCase(newTrigger)
 
         coVerifyOrder {
-            repo.applyReschedulePenalty()
+            repo.applyDismissReversalPenalty()
             repo.setLastDismissedAlarmTime(null)
         }
     }
@@ -61,10 +61,10 @@ class DetectRescheduledAlarmUseCaseTest {
         val newTrigger = dismissed + 10 * 60 * 1000L
         coEvery { repo.getLastDismissedAlarmTime() } returns dismissed
 
-        val useCase = DetectRescheduledAlarmUseCase(repo, policy, fixedClockAt(now))
+        val useCase = DetectDismissReversalUseCase(repo, policy, fixedClockAt(now))
         useCase(newTrigger)
 
-        coVerify(exactly = 0) { repo.applyReschedulePenalty() }
+        coVerify(exactly = 0) { repo.applyDismissReversalPenalty() }
         coVerify(exactly = 0) { repo.setLastDismissedAlarmTime(any()) }
     }
 
@@ -75,10 +75,10 @@ class DetectRescheduledAlarmUseCaseTest {
         val newTrigger = dismissed + 31 * 60 * 1000L
         coEvery { repo.getLastDismissedAlarmTime() } returns dismissed
 
-        val useCase = DetectRescheduledAlarmUseCase(repo, policy, fixedClockAt(now))
+        val useCase = DetectDismissReversalUseCase(repo, policy, fixedClockAt(now))
         useCase(newTrigger)
 
-        coVerify(exactly = 0) { repo.applyReschedulePenalty() }
+        coVerify(exactly = 0) { repo.applyDismissReversalPenalty() }
         coVerify(exactly = 0) { repo.setLastDismissedAlarmTime(any()) }
     }
 }

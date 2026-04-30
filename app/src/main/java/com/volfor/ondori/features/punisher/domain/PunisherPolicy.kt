@@ -26,11 +26,14 @@ class PunisherPolicy @Inject constructor() {
         return current + 1
     }
 
-    fun nextScoreAfterRecreation(current: Int): Int {
+    /**
+     * Dismiss was rewarded, reverse that reward and add a penalty on top.
+     */
+    fun nextScoreAfterDismissReversal(current: Int): Int {
         return nextScoreAfterPenalty(current - 1)
     }
 
-    fun isRecreatedAlarm(
+    fun isDismissReversal(
         lastDismissedAlarmTime: Long,
         now: Long,
         newAlarmTriggerTime: Long,

@@ -3,7 +3,7 @@ package com.volfor.ondori.features.alarm.domain.usecases
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
 import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
-import com.volfor.ondori.features.punisher.domain.usecases.DetectRescheduledAlarmUseCase
+import com.volfor.ondori.features.punisher.domain.usecases.DetectDismissReversalUseCase
 import javax.inject.Inject
 
 class UpdateAlarmUseCase @Inject constructor(
@@ -11,7 +11,7 @@ class UpdateAlarmUseCase @Inject constructor(
     private val scheduleAlarm: ScheduleAlarmUseCase,
     private val cancelAlarm: CancelAlarmUseCase,
     private val timeCalculator: AlarmTimeCalculator,
-    private val detectRescheduledAlarm: DetectRescheduledAlarmUseCase,
+    private val detectDismissReversal: DetectDismissReversalUseCase,
 ) {
     suspend operator fun invoke(alarm: Alarm) {
         val previous = repo.getAlarm(alarm.id)
@@ -23,7 +23,7 @@ class UpdateAlarmUseCase @Inject constructor(
                     minute = alarm.minute,
                     repeatDays = alarm.repeatDays,
                 )
-                detectRescheduledAlarm(triggerTime)
+                detectDismissReversal(triggerTime)
             }
             scheduleAlarm(alarm)
         } else {

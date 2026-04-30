@@ -3,7 +3,7 @@ package com.volfor.ondori.features.alarm.domain.usecases
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
 import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
-import com.volfor.ondori.features.punisher.domain.usecases.DetectRecreatedAlarmUseCase
+import com.volfor.ondori.features.punisher.domain.usecases.DetectDismissReversalUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.coVerifyOrder
@@ -22,19 +22,19 @@ class CreateAlarmUseCaseTest {
     private lateinit var repo: AlarmRepository
     private lateinit var scheduleAlarm: ScheduleAlarmUseCase
     private lateinit var timeCalculator: AlarmTimeCalculator
-    private lateinit var detectRecreatedAlarm: DetectRecreatedAlarmUseCase
+    private lateinit var detectDismissReversal: DetectDismissReversalUseCase
 
     @Before
     fun setup() {
         repo = mockk()
         scheduleAlarm = mockk()
         timeCalculator = mockk()
-        detectRecreatedAlarm = mockk(relaxed = true)
+        detectDismissReversal = mockk(relaxed = true)
         every { timeCalculator.computeNextTriggerTime(any(), any(), any()) } returns 0L
     }
 
     private fun useCase() =
-        CreateAlarmUseCase(repo, scheduleAlarm, timeCalculator, detectRecreatedAlarm)
+        CreateAlarmUseCase(repo, scheduleAlarm, timeCalculator, detectDismissReversal)
 
     @Test
     fun `creates alarm in repository, detects recreation, then schedules`() = runBlocking {
@@ -56,7 +56,7 @@ class CreateAlarmUseCaseTest {
 
         coVerifyOrder {
             repo.createAlarm(alarm)
-            detectRecreatedAlarm(triggerTime)
+            detectDismissReversal(triggerTime)
             scheduleAlarm(any())
         }
     }

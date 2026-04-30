@@ -8,6 +8,8 @@ class ApplyPenaltyUseCase @Inject constructor(
 ) {
     suspend operator fun invoke() {
         repo.applyPenalty()
+        // Penalty invalidates any open clean-dismiss window so a later
+        // create/update isn't double-penalized as a recreation/rescheduling.
         repo.setLastDismissedAlarmTime(null)
     }
 }
