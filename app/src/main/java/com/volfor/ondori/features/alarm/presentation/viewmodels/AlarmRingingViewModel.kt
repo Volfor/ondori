@@ -7,7 +7,7 @@ import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.usecases.DismissAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.SnoozeAlarmUseCase
-import com.volfor.ondori.features.punisher.domain.usecases.ObserveScoreUseCase
+import com.volfor.ondori.features.punisher.domain.usecases.GetScoreUseCase
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,8 +31,8 @@ data class AlarmRingingUiState(
 
 @HiltViewModel
 class AlarmRingingViewModel @Inject constructor(
-    observeScore: ObserveScoreUseCase,
     private val getAlarm: GetAlarmUseCase,
+    private val getScore: GetScoreUseCase,
     private val snoozeAlarm: SnoozeAlarmUseCase,
     private val dismissAlarm: DismissAlarmUseCase,
     savedStateHandle: SavedStateHandle,
@@ -41,12 +41,13 @@ class AlarmRingingViewModel @Inject constructor(
     private val alarmId: Long? = savedStateHandle[EXTRA_ALARM_ID]
 
     private val alarm = MutableStateFlow<Alarm?>(null)
+    private val score = MutableStateFlow(0)
     private val isLoading = MutableStateFlow(false)
     private val isAlarmHandled = MutableStateFlow(false)
 
     val uiState: StateFlow<AlarmRingingUiState> = combine(
-        alarm, isLoading, isAlarmHandled, observeScore(),
-    ) { alarm, isLoading, isHandled, score ->
+        alarm, score, isLoading, isAlarmHandled,
+    ) { alarm, score, isLoading, isHandled ->
         AlarmRingingUiState(
             alarm = alarm,
             score = score,
@@ -58,6 +59,7 @@ class AlarmRingingViewModel @Inject constructor(
     )
 
     init {
+        loadScore()
         if (alarmId != null) {
             loadAlarm(alarmId)
         }
@@ -81,5 +83,9 @@ class AlarmRingingViewModel @Inject constructor(
             alarm.value = getAlarm(alarmId)
             isLoading.update { false }
         }
+    }
+
+    private fun loadScore() = viewModelScope.launch {
+        score.value = getScore()
     }
 }

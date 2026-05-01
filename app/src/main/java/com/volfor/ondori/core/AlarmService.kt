@@ -10,6 +10,7 @@ import com.volfor.ondori.app.notifications.AlarmNotificationBuilder
 import com.volfor.ondori.di.ApplicationScope
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.MissAlarmUseCase
+import com.volfor.ondori.features.punisher.domain.usecases.GetScoreUseCase
 import com.volfor.ondori.utils.Constants
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import com.volfor.ondori.utils.Constants.Notifications
@@ -29,6 +30,9 @@ class AlarmService : LifecycleService() {
 
     @Inject
     lateinit var getAlarm: GetAlarmUseCase
+
+    @Inject
+    lateinit var getScore: GetScoreUseCase
 
     @Inject
     lateinit var missAlarm: MissAlarmUseCase
@@ -73,13 +77,14 @@ class AlarmService : LifecycleService() {
 
         lifecycleScope.launch {
             val alarm = getAlarm(alarmId)
+            val score = getScore()
             if (alarm == null) {
                 stopSelf()
                 return@launch
             }
 
             ringingAlarmId = alarmId
-            val notification = notificationBuilder.build(alarm)
+            val notification = notificationBuilder.build(alarm, score)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 startForeground(

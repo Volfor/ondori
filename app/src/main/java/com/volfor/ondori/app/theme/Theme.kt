@@ -55,6 +55,8 @@ val LocalExtraColors = staticCompositionLocalOf {
     OndoriExtraColors()
 }
 
+val LocalOndoriDarkTheme = staticCompositionLocalOf { false }
+
 private val LightExtraColors = OndoriExtraColors(
     header = Red,
     title = MutedBrown,
@@ -85,13 +87,15 @@ fun OndoriTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composab
         extraColors = LightExtraColors
     }
 
-    CompositionLocalProvider(LocalExtraColors provides extraColors) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = Typography,
-            shapes = shapes,
-            content = content,
-        )
+    CompositionLocalProvider(LocalOndoriDarkTheme provides isDarkTheme) {
+        CompositionLocalProvider(LocalExtraColors provides extraColors) {
+            MaterialTheme(
+                colorScheme = colorScheme,
+                typography = Typography,
+                shapes = shapes,
+                content = content,
+            )
+        }
     }
 }
 

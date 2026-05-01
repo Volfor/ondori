@@ -1,5 +1,6 @@
 package com.volfor.ondori.features.punisher.domain
 
+import com.volfor.ondori.features.punisher.domain.entities.PenaltyLevel
 import javax.inject.Inject
 
 class PunisherPolicy @Inject constructor() {
@@ -46,17 +47,7 @@ class PunisherPolicy @Inject constructor() {
     }
 
     fun penaltyOffsetMillis(score: Int): Long {
-        if (score >= 0) return 0L
-        val minutes = when (score) {
-            -1 -> 5 // low level
-            -2 -> 10 // low+ level
-            in -4..-3 -> 15 // medium level
-            in -6..-5 -> 20 // medium+ level
-            in -8..-7 -> 30 // high level
-            in -12..-9 -> 45 // critical level
-            else -> 60 // extreme level
-        }
-        return minutes * 60L * 1000L
+        return PenaltyLevel.fromScore(score).penaltyOffsetMillis
     }
 
     /**
