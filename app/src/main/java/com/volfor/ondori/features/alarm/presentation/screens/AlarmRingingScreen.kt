@@ -121,7 +121,7 @@ fun AlarmRingingContent(
                 )
             ) {
                 Text(
-                    text = "Snooze",
+                    text = "SNOOZE",
                     color = MaterialTheme.colorScheme.onSurface,
                 )
             }

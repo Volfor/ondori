@@ -16,11 +16,11 @@ object PenaltyLevelColors {
     private val ExtremeLight = MutedRed
 
     private val ZeroDark = Unknown
-    private val LowDark = Unknown
-    private val MediumDark = Unknown
-    private val HighDark = Unknown
-    private val CriticalDark = Unknown
-    private val ExtremeDark = Unknown
+    private val LowDark = AmberYellow
+    private val MediumDark = VividOrange
+    private val HighDark = DeepOrange
+    private val CriticalDark = WarningRed
+    private val ExtremeDark = DeepRed
 
     fun color(level: PenaltyLevel, isDark: Boolean): Color = when (level) {
         PenaltyLevel.Zero -> if (isDark) ZeroDark else ZeroLight
