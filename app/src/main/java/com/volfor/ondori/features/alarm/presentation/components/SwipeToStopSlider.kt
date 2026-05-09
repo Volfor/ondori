@@ -5,6 +5,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -38,9 +39,11 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.volfor.ondori.utils.OndoriPreview
 import kotlin.math.roundToInt
 
@@ -97,6 +100,8 @@ fun SwipeToStopSlider(
         thumbOffsetPx = (thumbOffsetPx + delta).coerceIn(0f, dragMax)
     }
 
+    val shape = RoundedCornerShape(trackHeight / 2)
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -106,13 +111,15 @@ fun SwipeToStopSlider(
             }
             .onSizeChanged { trackWidthPx = it.width.toFloat() }
             .clip(RoundedCornerShape(trackHeight / 2))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.secondary, shape = shape),
     ) {
         Text(
             text = "SLIDE TO STOP",
             modifier = Modifier.align(Alignment.Center),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
         )
         Box(
             modifier = Modifier
@@ -153,13 +160,13 @@ fun SwipeToStopSlider(
                     },
                 )
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
+                .background(MaterialTheme.colorScheme.onSecondaryContainer),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = MaterialTheme.colorScheme.secondaryContainer,
             )
         }
     }
@@ -167,8 +174,18 @@ fun SwipeToStopSlider(
 
 @Preview
 @Composable
-fun PreviewSwipeToStopSlider() {
+fun PreviewSwipeToStopSliderLight() {
     OndoriPreview {
+        SwipeToStopSlider(
+            onStop = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewSwipeToStopSliderDark() {
+    OndoriPreview(darkTheme = true) {
         SwipeToStopSlider(
             onStop = {},
         )

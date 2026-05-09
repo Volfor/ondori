@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -24,7 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.volfor.ondori.app.theme.OndoriTheme
 import com.volfor.ondori.app.time.LocalIs24HourFormat
+import com.volfor.ondori.features.alarm.data.services.AlarmTimeCalculatorImpl.Companion.SNOOZE_MINUTES
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.SwipeToStopSlider
 import com.volfor.ondori.features.alarm.presentation.components.penaltyLevelTint
@@ -95,8 +96,8 @@ fun AlarmRingingContent(
             Icon(
                 imageVector = Icons.Outlined.Alarm,
                 contentDescription = null,
-                modifier = Modifier.size(64.dp)
-
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Clock()
@@ -104,32 +105,42 @@ fun AlarmRingingContent(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = alarm.label.toUpperCase(Locale.current),
+                    textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
-                    color = OndoriTheme.extraColors.title,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     overflow = TextOverflow.Ellipsis,
+                    maxLines = 3,
                 )
             }
-            Text("Score: $score")
             Spacer(modifier = Modifier.weight(2f))
             Button(
                 onClick = onSnooze,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(72.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                )
             ) {
-                Text(
-                    text = "SNOOZE",
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = "SNOOZE",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = "$SNOOZE_MINUTES min",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             SwipeToStopSlider(
                 onStop = onDismiss,
             )
             Spacer(modifier = Modifier.height(64.dp))
+            Text("Score: $score", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 
@@ -155,18 +166,41 @@ private fun Clock() {
 
     Text(
         text = now.format(formatter),
-        style = MaterialTheme.typography.displayMedium,
+        style = MaterialTheme.typography.displayLarge,
+        color = MaterialTheme.colorScheme.onSurface,
         fontSize = 84.sp,
+        fontWeight = FontWeight.ExtraBold,
     )
 }
 
-@Preview
+@Preview(group = "Light")
 @Composable
-fun PreviewAlarmRingingScreen(
+fun PreviewAlarmRingingScreenLight(
+    alarm: Alarm = previewAlarms[1],
+    score: Int = -2,
+) {
+    OndoriPreview {
+        Scaffold(
+            containerColor = penaltyLevelTint(PenaltyLevel.fromScore(score)),
+        ) { paddingValues ->
+            AlarmRingingContent(
+                modifier = Modifier.padding(paddingValues),
+                alarm = alarm,
+                score = score,
+                onSnooze = {},
+                onDismiss = {},
+            )
+        }
+    }
+}
+
+@Preview(group = "Dark")
+@Composable
+fun PreviewAlarmRingingScreenDark(
     alarm: Alarm = previewAlarms[2],
     score: Int = -2,
 ) {
-    OndoriPreview() {
+    OndoriPreview(darkTheme = true) {
         Scaffold(
             containerColor = penaltyLevelTint(PenaltyLevel.fromScore(score)),
         ) { paddingValues ->

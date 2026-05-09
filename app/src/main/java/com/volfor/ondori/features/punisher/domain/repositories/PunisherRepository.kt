@@ -8,6 +8,8 @@ interface PunisherRepository {
 
     suspend fun getScore(): Int
 
+    suspend fun updateScore(score: Int)
+
     suspend fun applyPenalty()
 
     suspend fun applyReward()

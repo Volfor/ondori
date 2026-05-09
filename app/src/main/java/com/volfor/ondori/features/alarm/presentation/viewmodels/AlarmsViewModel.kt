@@ -10,6 +10,7 @@ import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.ObserveAlarmsUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.UpdateAlarmUseCase
 import com.volfor.ondori.features.punisher.domain.usecases.ObserveScoreUseCase
+import com.volfor.ondori.features.punisher.domain.usecases.UpdateScoreUseCase
 import com.volfor.ondori.features.settings.domain.usecases.MarkNotificationPermissionAsRequestedUseCase
 import com.volfor.ondori.features.settings.domain.usecases.ObserveNotificationPermissionRequestedUseCase
 import com.volfor.ondori.utils.WhileUiSubscribed
@@ -43,6 +44,7 @@ class AlarmsViewModel @Inject constructor(
     private val _disableAlarm: DisableAlarmUseCase,
     observeNotificationPermissionRequested: ObserveNotificationPermissionRequestedUseCase,
     private val _markNotificationPermissionAsRequested: MarkNotificationPermissionAsRequestedUseCase,
+    private val _updateScore: UpdateScoreUseCase,
 ) : ViewModel() {
 
     private val _selectedAlarm = MutableStateFlow<Alarm?>(null)
@@ -99,5 +101,9 @@ class AlarmsViewModel @Inject constructor(
 
     fun markNotificationPermissionAsRequested() = viewModelScope.launch {
         _markNotificationPermissionAsRequested()
+    }
+
+    fun updateScore(score: Int) = viewModelScope.launch {
+        _updateScore(score)
     }
 }

@@ -13,42 +13,84 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 private val LightColorScheme = lightColorScheme(
-    primary = Red,
-    secondary = Yellow,
-    tertiary = Teal,
-    primaryContainer = Red,
-    secondaryContainer = SoftPink.copy(alpha = 0.3f),
-    onSecondaryContainer = Red,
-    tertiaryContainer = Yellow.copy(alpha = 0.4f),
-    surface = BackgroundGray,
-    onSurface = Charcoal,
-    surfaceVariant = White,
-    onSurfaceVariant = Charcoal,
-    surfaceContainerHighest = LightGray,
-    background = BackgroundGray,
+    primary = primaryLight,
+    onPrimary = onPrimaryLight,
+    primaryContainer = primaryContainerLight,
+    onPrimaryContainer = onPrimaryContainerLight,
+    secondary = secondaryLight,
+    onSecondary = onSecondaryLight,
+    secondaryContainer = secondaryContainerLight,
+    onSecondaryContainer = onSecondaryContainerLight,
+    tertiary = tertiaryLight,
+    onTertiary = onTertiaryLight,
+    tertiaryContainer = tertiaryContainerLight,
+    onTertiaryContainer = onTertiaryContainerLight,
+    error = errorLight,
+    onError = onErrorLight,
+    errorContainer = errorContainerLight,
+    onErrorContainer = onErrorContainerLight,
+    background = backgroundLight,
+    onBackground = onBackgroundLight,
+    surface = surfaceLight,
+    onSurface = onSurfaceLight,
+    surfaceVariant = surfaceVariantLight,
+    onSurfaceVariant = onSurfaceVariantLight,
+    outline = outlineLight,
+    outlineVariant = outlineVariantLight,
+    scrim = scrimLight,
+    inverseSurface = inverseSurfaceLight,
+    inverseOnSurface = inverseOnSurfaceLight,
+    inversePrimary = inversePrimaryLight,
+    surfaceDim = surfaceDimLight,
+    surfaceBright = surfaceBrightLight,
+    surfaceContainerLowest = surfaceContainerLowestLight,
+    surfaceContainerLow = surfaceContainerLowLight,
+    surfaceContainer = surfaceContainerLight,
+    surfaceContainerHigh = surfaceContainerHighLight,
+    surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
+
 private val DarkColorScheme = darkColorScheme(
-    primary = Unknown,
-    secondary = Unknown,
-    tertiary = Unknown,
-    primaryContainer = Unknown,
-    secondaryContainer = Unknown,
-    onSecondaryContainer = Unknown,
-    tertiaryContainer = Unknown,
-    surface = Unknown,
-    onSurface = Unknown,
-    surfaceVariant = Unknown,
-    onSurfaceVariant = Unknown,
-    surfaceContainerHighest = Unknown,
-    background = Unknown,
+    primary = primaryDark,
+    onPrimary = onPrimaryDark,
+    primaryContainer = primaryContainerDark,
+    onPrimaryContainer = onPrimaryContainerDark,
+    secondary = secondaryDark,
+    onSecondary = onSecondaryDark,
+    secondaryContainer = secondaryContainerDark,
+    onSecondaryContainer = onSecondaryContainerDark,
+    tertiary = tertiaryDark,
+    onTertiary = onTertiaryDark,
+    tertiaryContainer = tertiaryContainerDark,
+    onTertiaryContainer = onTertiaryContainerDark,
+    error = errorDark,
+    onError = onErrorDark,
+    errorContainer = errorContainerDark,
+    onErrorContainer = onErrorContainerDark,
+    background = backgroundDark,
+    onBackground = onBackgroundDark,
+    surface = surfaceDark,
+    onSurface = onSurfaceDark,
+    surfaceVariant = surfaceVariantDark,
+    onSurfaceVariant = onSurfaceVariantDark,
+    outline = outlineDark,
+    outlineVariant = outlineVariantDark,
+    scrim = scrimDark,
+    inverseSurface = inverseSurfaceDark,
+    inverseOnSurface = inverseOnSurfaceDark,
+    inversePrimary = inversePrimaryDark,
+    surfaceDim = surfaceDimDark,
+    surfaceBright = surfaceBrightDark,
+    surfaceContainerLowest = surfaceContainerLowestDark,
+    surfaceContainerLow = surfaceContainerLowDark,
+    surfaceContainer = surfaceContainerDark,
+    surfaceContainerHigh = surfaceContainerHighDark,
+    surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
 data class OndoriExtraColors(
-    val header: Color = Color.Unspecified,
-    val title: Color = Color.Unspecified,
-    val alarmDisabledBackground: Color = Color.Unspecified,
-    val secondaryIconTint: Color = Color.Unspecified,
+    val extraColor: Color = Color.Unspecified,
 )
 
 val LocalExtraColors = staticCompositionLocalOf {
@@ -57,18 +99,8 @@ val LocalExtraColors = staticCompositionLocalOf {
 
 val LocalOndoriDarkTheme = staticCompositionLocalOf { false }
 
-private val LightExtraColors = OndoriExtraColors(
-    header = Red,
-    title = MutedBrown,
-    alarmDisabledBackground = LightGray,
-    secondaryIconTint = DarkAmber,
-)
-private val DarkExtraColors = OndoriExtraColors(
-    header = Unknown,
-    title = Unknown,
-    alarmDisabledBackground = Unknown,
-    secondaryIconTint = Unknown,
-)
+private val LightExtraColors = OndoriExtraColors()
+private val DarkExtraColors = OndoriExtraColors()
 
 private val shapes: Shapes
     @Composable get() = MaterialTheme.shapes.copy(
@@ -91,7 +123,7 @@ fun OndoriTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composab
         CompositionLocalProvider(LocalExtraColors provides extraColors) {
             MaterialTheme(
                 colorScheme = colorScheme,
-                typography = Typography,
+                typography = AppTypography,
                 shapes = shapes,
                 content = content,
             )
