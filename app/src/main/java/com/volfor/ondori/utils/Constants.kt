@@ -13,6 +13,12 @@ object Constants {
     object Notifications {
         const val FIRING_ALARMS_CHANNEL_ID = "firing_alarms_channel"
         const val FIRING_ALARM_NOTIFICATION_ID = 1
+
+        const val MISSED_ALARMS_CHANNEL_ID = "missed_alarms_channel"
+        const val MISSED_ALARM_NOTIFICATION_TAG = "missed_alarm"
     }
 
+    object Alarm {
+        const val MISSED_TIMEOUT_MILLIS: Long = 15 * 60 * 1000
+    }
 }

@@ -178,6 +178,7 @@ fun AlarmsScreen(
             },
             loading = uiState.isLoading,
             alarms = uiState.items,
+            score = uiState.score,
             onAlarmClick = { alarm ->
                 viewModel.selectAlarm(alarm)
             },
@@ -230,6 +231,7 @@ private fun AlarmsContent(
     onOpenAppNotificationSettings: () -> Unit,
     loading: Boolean,
     alarms: List<Alarm>,
+    score: Int,
     onAlarmClick: (Alarm) -> Unit,
     onAlarmToggle: (Alarm, Boolean) -> Unit,
     onDelete: (Alarm) -> Unit,
@@ -250,6 +252,7 @@ private fun AlarmsContent(
                 onOpenChannelSettings = onOpenChannelSettings,
             )
         }
+        Text("Score: $score")
         LazyColumn(
             contentPadding = PaddingValues(vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -317,6 +320,7 @@ fun PreviewAlarmsContent(
                 onOpenAppNotificationSettings = {},
                 loading = false,
                 alarms = alarms,
+                score = 0,
                 onAlarmClick = {},
                 onAlarmToggle = { _, _ -> },
                 onDelete = {},
@@ -340,6 +344,7 @@ fun PreviewAlarmsContentEmpty(
                 onOpenAppNotificationSettings = {},
                 loading = false,
                 alarms = alarms,
+                score = 0,
                 onAlarmClick = {},
                 onAlarmToggle = { _, _ -> },
                 onDelete = {},

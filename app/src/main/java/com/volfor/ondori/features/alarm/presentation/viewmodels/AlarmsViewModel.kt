@@ -9,6 +9,7 @@ import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.ObserveAlarmsUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.UpdateAlarmUseCase
+import com.volfor.ondori.features.punisher.domain.usecases.ObserveScoreUseCase
 import com.volfor.ondori.features.settings.domain.usecases.MarkNotificationPermissionAsRequestedUseCase
 import com.volfor.ondori.features.settings.domain.usecases.ObserveNotificationPermissionRequestedUseCase
 import com.volfor.ondori.utils.WhileUiSubscribed
@@ -25,6 +26,7 @@ import javax.inject.Inject
  */
 data class AlarmsUiState(
     val items: List<Alarm> = emptyList(),
+    val score: Int = 0,
     val isLoading: Boolean = false,
     val selectedAlarm: Alarm? = null,
     val hasRequestedNotificationPermission: Boolean = false,
@@ -33,6 +35,7 @@ data class AlarmsUiState(
 @HiltViewModel
 class AlarmsViewModel @Inject constructor(
     observeAlarms: ObserveAlarmsUseCase,
+    observeScore: ObserveScoreUseCase,
     private val _createAlarm: CreateAlarmUseCase,
     private val _updateAlarm: UpdateAlarmUseCase,
     private val _deleteAlarm: DeleteAlarmUseCase,
@@ -45,10 +48,11 @@ class AlarmsViewModel @Inject constructor(
     private val _selectedAlarm = MutableStateFlow<Alarm?>(null)
 
     val uiState: StateFlow<AlarmsUiState> = combine(
-        observeAlarms(), _selectedAlarm, observeNotificationPermissionRequested(),
-    ) { alarms, selectedAlarm, hasRequestedNotificationPermission ->
+        observeAlarms(), observeScore(), _selectedAlarm, observeNotificationPermissionRequested(),
+    ) { alarms, score, selectedAlarm, hasRequestedNotificationPermission ->
         AlarmsUiState(
             items = alarms.map { it },
+            score = score,
             isLoading = false,
             selectedAlarm = selectedAlarm,
             hasRequestedNotificationPermission = hasRequestedNotificationPermission,

@@ -15,7 +15,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,11 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.app.theme.OndoriTheme
+import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.SwipeToStopSlider
+import com.volfor.ondori.features.alarm.presentation.components.penaltyLevelTint
 import com.volfor.ondori.features.alarm.presentation.viewmodels.AlarmRingingViewModel
+import com.volfor.ondori.features.punisher.domain.entities.PenaltyLevel
 import com.volfor.ondori.utils.OndoriPreview
 import com.volfor.ondori.utils.previewAlarms
 import kotlinx.coroutines.delay
@@ -52,7 +53,11 @@ fun AlarmRingingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold { paddingValues ->
+    val tint = penaltyLevelTint(PenaltyLevel.fromScore(uiState.score))
+
+    Scaffold(
+        containerColor = tint,
+    ) { paddingValues ->
         LaunchedEffect(uiState.isAlarmHandled) {
             if (uiState.isAlarmHandled) {
                 onAlarmHandled()
@@ -62,6 +67,7 @@ fun AlarmRingingScreen(
         AlarmRingingContent(
             modifier = Modifier.padding(paddingValues),
             alarm = uiState.alarm,
+            score = uiState.score,
             onSnooze = viewModel::snooze,
             onDismiss = viewModel::dismiss,
         )
@@ -72,6 +78,7 @@ fun AlarmRingingScreen(
 fun AlarmRingingContent(
     modifier: Modifier = Modifier,
     alarm: Alarm?,
+    score: Int,
     onSnooze: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -88,7 +95,6 @@ fun AlarmRingingContent(
             Icon(
                 imageVector = Icons.Outlined.Alarm,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(64.dp)
 
             )
@@ -103,6 +109,7 @@ fun AlarmRingingContent(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+            Text("Score: $score")
             Spacer(modifier = Modifier.weight(2f))
             Button(
                 onClick = onSnooze,
@@ -114,7 +121,7 @@ fun AlarmRingingContent(
                 )
             ) {
                 Text(
-                    text = "Snooze",
+                    text = "SNOOZE",
                     color = MaterialTheme.colorScheme.onSurface,
                 )
             }
@@ -135,8 +142,7 @@ private fun Clock() {
     val is24Hour = LocalIs24HourFormat.current
     val formatter = remember(is24Hour) {
         DateTimeFormatter.ofPattern(
-            if (is24Hour) "HH:mm" else "h:mm",
-            java.util.Locale.getDefault()
+            if (is24Hour) "HH:mm" else "h:mm", java.util.Locale.getDefault()
         )
     }
 
@@ -158,11 +164,16 @@ private fun Clock() {
 @Composable
 fun PreviewAlarmRingingScreen(
     alarm: Alarm = previewAlarms[2],
+    score: Int = -2,
 ) {
     OndoriPreview() {
-        Surface {
+        Scaffold(
+            containerColor = penaltyLevelTint(PenaltyLevel.fromScore(score)),
+        ) { paddingValues ->
             AlarmRingingContent(
+                modifier = Modifier.padding(paddingValues),
                 alarm = alarm,
+                score = score,
                 onSnooze = {},
                 onDismiss = {},
             )

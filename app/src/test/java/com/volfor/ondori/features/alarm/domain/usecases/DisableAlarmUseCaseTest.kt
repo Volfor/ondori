@@ -18,12 +18,13 @@ class DisableAlarmUseCaseTest {
         cancelAlarm = mockk(relaxed = true)
     }
 
+    private fun useCase() = DisableAlarmUseCase(repo, cancelAlarm)
+
     @Test
     fun `cancels alarm and persists disabled flag`() = runBlocking {
         val id = 44L
 
-        val useCase = DisableAlarmUseCase(repo, cancelAlarm)
-        useCase(id)
+        useCase()(id)
 
         coVerify(exactly = 1) { cancelAlarm(id) }
         coVerify(exactly = 1) { repo.disableAlarm(id) }

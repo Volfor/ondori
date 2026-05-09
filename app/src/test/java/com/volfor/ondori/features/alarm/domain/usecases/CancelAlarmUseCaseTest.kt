@@ -19,12 +19,13 @@ class CancelAlarmUseCaseTest {
         ringer = mockk(relaxed = true)
     }
 
+    private fun useCase() = CancelAlarmUseCase(scheduler, ringer)
+
     @Test
     fun `stops ringing and cancels scheduled alarm`() = runBlocking {
         val id = 12L
 
-        val useCase = CancelAlarmUseCase(scheduler, ringer)
-        useCase(id)
+        useCase()(id)
 
         verify(exactly = 1) { ringer.stopRinging(id) }
         verify(exactly = 1) { scheduler.cancelAlarm(id) }

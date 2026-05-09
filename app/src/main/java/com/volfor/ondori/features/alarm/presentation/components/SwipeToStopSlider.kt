@@ -89,12 +89,11 @@ fun SwipeToStopSlider(
     val draggableState = rememberDraggableState { delta ->
         val travel = fullTravelUpdated.value
         if (travel <= 0) return@rememberDraggableState
-        val dragMax =
-            if (isDraggedUpdated.value) {
-                (travel - pressedOverhangUpdated.value).coerceAtLeast(0f)
-            } else {
-                travel
-            }
+        val dragMax = if (isDraggedUpdated.value) {
+            (travel - pressedOverhangUpdated.value).coerceAtLeast(0f)
+        } else {
+            travel
+        }
         thumbOffsetPx = (thumbOffsetPx + delta).coerceIn(0f, dragMax)
     }
 
@@ -110,7 +109,7 @@ fun SwipeToStopSlider(
             .background(MaterialTheme.colorScheme.surfaceVariant),
     ) {
         Text(
-            text = "Slide to stop",
+            text = "SLIDE TO STOP",
             modifier = Modifier.align(Alignment.Center),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

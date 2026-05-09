@@ -4,13 +4,14 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.text.format.DateFormat
 import androidx.core.app.NotificationCompat
 import com.volfor.ondori.R
+import com.volfor.ondori.app.theme.PenaltyLevelColors
 import com.volfor.ondori.core.receivers.AlarmNotificationActionReceiver
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.activities.AlarmRingingActivity
+import com.volfor.ondori.features.punisher.domain.entities.PenaltyLevel
 import com.volfor.ondori.utils.Constants
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Clock
@@ -23,10 +24,13 @@ class AlarmNotificationBuilder @Inject constructor(
     private val clock: Clock,
 ) {
 
-    fun build(alarm: Alarm): Notification {
+    fun build(alarm: Alarm, score: Int): Notification {
         val date = Date.from(ZonedDateTime.now(clock).toInstant())
         val weekday = DateFormat.format("EEE", date.time).toString()
         val time = DateFormat.getTimeFormat(context.applicationContext).format(date)
+
+        val tint =
+            PenaltyLevelColors.argb(PenaltyLevel.fromScore(score), context.applicationContext)
 
         return NotificationCompat.Builder(
             context.applicationContext,
@@ -35,7 +39,7 @@ class AlarmNotificationBuilder @Inject constructor(
             setSmallIcon(R.drawable.ic_launcher_foreground)
             setContentTitle(alarm.label ?: "Alarm")
             setContentText("$weekday $time · Swipe to stop")
-            setColor(Color.argb(0xFF, 0xFF, 0x88, 0x88))
+            setColor(tint)
             setColorized(true)
             setPriority(NotificationCompat.PRIORITY_MAX)
             setCategory(NotificationCompat.CATEGORY_ALARM)

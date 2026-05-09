@@ -297,4 +297,66 @@ class AlarmTimeCalculatorImplTest {
 
         assertEquals(expected, result)
     }
+
+    @Test
+    fun `pickSafeTriggerTime returns preferred when it is beyond the safety buffer`() {
+        val now = Instant.parse("2026-03-11T10:00:00Z")
+        val clock = Clock.fixed(now, zone)
+        val calculator = AlarmTimeCalculatorImpl(clock)
+
+        val preferred = now.plus(1, ChronoUnit.HOURS).toEpochMilli()
+        val fallback = now.plus(2, ChronoUnit.HOURS).toEpochMilli()
+
+        val result = calculator.pickSafeTriggerTime(preferred, fallback)
+
+        assertEquals(preferred, result)
+    }
+
+    @Test
+    fun `pickSafeTriggerTime returns preferred when it equals the safety buffer boundary`() {
+        val now = Instant.parse("2026-03-11T10:00:00Z")
+        val clock = Clock.fixed(now, zone)
+        val calculator = AlarmTimeCalculatorImpl(clock)
+
+        val preferred = now.plus(
+            AlarmTimeCalculatorImpl.SAFETY_BUFFER_MINUTES,
+            ChronoUnit.MINUTES,
+        ).toEpochMilli()
+        val fallback = now.plus(5, ChronoUnit.HOURS).toEpochMilli()
+
+        val result = calculator.pickSafeTriggerTime(preferred, fallback)
+
+        assertEquals(preferred, result)
+    }
+
+    @Test
+    fun `pickSafeTriggerTime returns fallback when preferred is inside the safety buffer`() {
+        val now = Instant.parse("2026-03-11T10:00:00Z")
+        val clock = Clock.fixed(now, zone)
+        val calculator = AlarmTimeCalculatorImpl(clock)
+
+        val preferred = now.plus(
+            AlarmTimeCalculatorImpl.SAFETY_BUFFER_MINUTES - 1,
+            ChronoUnit.MINUTES,
+        ).toEpochMilli()
+        val fallback = now.plus(5, ChronoUnit.HOURS).toEpochMilli()
+
+        val result = calculator.pickSafeTriggerTime(preferred, fallback)
+
+        assertEquals(fallback, result)
+    }
+
+    @Test
+    fun `pickSafeTriggerTime returns fallback when preferred is in the past`() {
+        val now = Instant.parse("2026-03-11T10:00:00Z")
+        val clock = Clock.fixed(now, zone)
+        val calculator = AlarmTimeCalculatorImpl(clock)
+
+        val preferred = now.minus(10, ChronoUnit.MINUTES).toEpochMilli()
+        val fallback = now.plus(5, ChronoUnit.HOURS).toEpochMilli()
+
+        val result = calculator.pickSafeTriggerTime(preferred, fallback)
+
+        assertEquals(fallback, result)
+    }
 }
