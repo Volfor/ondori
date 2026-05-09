@@ -22,6 +22,10 @@ class PunisherRepositoryImpl @Inject constructor(
         return dao.getScore()
     }
 
+    override suspend fun updateScore(score: Int) {
+        return dao.updateScore(score)
+    }
+
     override suspend fun applyPenalty() = db.withTransaction {
         dao.updateScore(punisher.nextScoreAfterPenalty(dao.getScore()))
     }

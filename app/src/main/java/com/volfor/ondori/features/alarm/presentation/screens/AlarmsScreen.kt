@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 
 package com.volfor.ondori.features.alarm.presentation.screens
 
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -20,14 +21,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumFloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -35,6 +38,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,17 +50,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.volfor.ondori.BuildConfig
 import com.volfor.ondori.R
 import com.volfor.ondori.app.notifications.AlarmNotificationStatus
 import com.volfor.ondori.app.notifications.hasPostNotificationPermission
 import com.volfor.ondori.app.notifications.openAlarmChannelSettings
 import com.volfor.ondori.app.notifications.openAppNotificationSettings
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
-import com.volfor.ondori.features.alarm.presentation.components.AlarmItemCard
+import com.volfor.ondori.features.alarm.presentation.components.AlarmListItem
 import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
 import com.volfor.ondori.features.alarm.presentation.components.NotificationPermissionCard
 import com.volfor.ondori.features.alarm.presentation.components.rememberAlarmNotificationStatus
@@ -96,7 +102,6 @@ fun AlarmsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var showTimePicker by remember { mutableStateOf(false) }
-    var moreMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
@@ -117,29 +122,12 @@ fun AlarmsScreen(
             SnackbarHost(hostState = snackbarHostState)
         },
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(text = stringResource(R.string.app_name)) },
-                actions = {
-                    Box {
-                        IconButton(onClick = { moreMenuExpanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.action_more),
-                            )
-                        }
-                        MoreMenu(
-                            expanded = moreMenuExpanded,
-                            onDismissRequest = { moreMenuExpanded = false },
-                            onNavigateToSettings = {
-                                moreMenuExpanded = false
-                                onNavigateToSettings()
-                            },
-                        )
-                    }
-                })
+            OndoriAppBar(
+                onNavigateToSettings = onNavigateToSettings,
+            )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            MediumFloatingActionButton(
                 onClick = {
                     showTimePicker = true
 
@@ -153,7 +141,10 @@ fun AlarmsScreen(
 //                            // handle action click
 //                        }
 //                    }
-                }) {
+                },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary,
+            ) {
                 Icon(
                     imageVector = Icons.Filled.Add, contentDescription = "Add"
                 )
@@ -187,6 +178,12 @@ fun AlarmsScreen(
             },
             onDelete = { alarm ->
                 viewModel.deleteAlarm(alarm)
+            },
+            onAddScore = {
+                viewModel.updateScore(uiState.score + 1)
+            },
+            onSubtractScore = {
+                viewModel.updateScore(uiState.score - 1)
             },
             modifier = Modifier.padding(paddingValues),
         )
@@ -223,6 +220,41 @@ fun AlarmsScreen(
 }
 
 @Composable
+private fun OndoriAppBar(
+    onNavigateToSettings: () -> Unit,
+) {
+    var moreMenuExpanded by remember { mutableStateOf(false) }
+
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(R.string.app_name),
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.ExtraBold,
+            )
+        },
+        actions = {
+            Box {
+                IconButton(onClick = { moreMenuExpanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = stringResource(R.string.action_more),
+                    )
+                }
+                MoreMenu(
+                    expanded = moreMenuExpanded,
+                    onDismissRequest = { moreMenuExpanded = false },
+                    onNavigateToSettings = {
+                        moreMenuExpanded = false
+                        onNavigateToSettings()
+                    },
+                )
+            }
+        },
+    )
+}
+
+@Composable
 private fun AlarmsContent(
     notificationPermissionStatus: AlarmNotificationStatus,
     hasRequestedNotificationPermission: Boolean,
@@ -235,6 +267,8 @@ private fun AlarmsContent(
     onAlarmClick: (Alarm) -> Unit,
     onAlarmToggle: (Alarm, Boolean) -> Unit,
     onDelete: (Alarm) -> Unit,
+    onAddScore: () -> Unit,
+    onSubtractScore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -252,16 +286,22 @@ private fun AlarmsContent(
                 onOpenChannelSettings = onOpenChannelSettings,
             )
         }
-        Text("Score: $score")
+        if (BuildConfig.DEBUG) {
+            DebugScore(
+                score,
+                onMinus = onSubtractScore,
+                onPlus = onAddScore,
+            )
+        }
         LazyColumn(
             contentPadding = PaddingValues(vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(
                 alarms,
                 key = { alarm -> alarm.id },
             ) { alarm ->
-                AlarmItemCard(
+                AlarmListItem(
                     alarm,
                     onClick = {
                         onAlarmClick(alarm)
@@ -274,6 +314,33 @@ private fun AlarmsContent(
                     },
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun DebugScore(
+    score: Int,
+    onPlus: () -> Unit,
+    onMinus: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(
+            onClick = onMinus,
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Remove, contentDescription = null,
+            )
+        }
+        Text("Score: $score")
+        IconButton(
+            onClick = onPlus,
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add, contentDescription = null,
+            )
         }
     }
 }
@@ -305,6 +372,26 @@ private fun MoreMenu(
     }
 }
 
+@Preview(group = "Light")
+@Composable
+fun PreviewOndoriAppBarLight() {
+    OndoriPreview {
+        OndoriAppBar(
+            onNavigateToSettings = {},
+        )
+    }
+}
+
+@Preview(group = "Dark")
+@Composable
+fun PreviewOndoriAppBarDark() {
+    OndoriPreview(darkTheme = true) {
+        OndoriAppBar(
+            onNavigateToSettings = {},
+        )
+    }
+}
+
 @Preview
 @Composable
 fun PreviewAlarmsContent(
@@ -324,6 +411,8 @@ fun PreviewAlarmsContent(
                 onAlarmClick = {},
                 onAlarmToggle = { _, _ -> },
                 onDelete = {},
+                onAddScore = {},
+                onSubtractScore = {},
             )
         }
     }
@@ -348,6 +437,8 @@ fun PreviewAlarmsContentEmpty(
                 onAlarmClick = {},
                 onAlarmToggle = { _, _ -> },
                 onDelete = {},
+                onAddScore = {},
+                onSubtractScore = {},
             )
         }
     }

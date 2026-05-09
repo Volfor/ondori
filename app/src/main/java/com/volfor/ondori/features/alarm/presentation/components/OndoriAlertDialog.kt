@@ -1,7 +1,6 @@
 package com.volfor.ondori.features.alarm.presentation.components
 
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -17,8 +16,7 @@ fun OndoriAlertDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title, style = MaterialTheme.typography.labelMedium) },
-        containerColor = MaterialTheme.colorScheme.surface,
+        title = { Text(title) },
         text = content,
         confirmButton = {
             TextButton(onClick = onConfirm) { Text("OK") }
@@ -31,13 +29,26 @@ fun OndoriAlertDialog(
 
 @Preview
 @Composable
-fun PreviewOndoriAlertDialog() {
+fun PreviewOndoriAlertDialogLight() {
     OndoriPreview {
         OndoriAlertDialog(
             onConfirm = {},
             onDismiss = {},
-            title = "Title",
-            content = { Text("Content") },
+            title = "Dialog title",
+            content = { Text("A dialog is a type of modal window that appears in front of app content to provide critical information, or prompt for a decision to be made.") },
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewOndoriAlertDialogDark() {
+    OndoriPreview(darkTheme = true) {
+        OndoriAlertDialog(
+            onConfirm = {},
+            onDismiss = {},
+            title = "Dialog title",
+            content = { Text("A dialog is a type of modal window that appears in front of app content to provide critical information, or prompt for a decision to be made.") },
         )
     }
 }

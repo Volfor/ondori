@@ -29,8 +29,11 @@ class AlarmNotificationBuilder @Inject constructor(
         val weekday = DateFormat.format("EEE", date.time).toString()
         val time = DateFormat.getTimeFormat(context.applicationContext).format(date)
 
-        val tint =
-            PenaltyLevelColors.argb(PenaltyLevel.fromScore(score), context.applicationContext)
+        val tint = PenaltyLevelColors.argb(
+            level = PenaltyLevel.fromScore(score),
+            isNotification = true,
+            context = context.applicationContext,
+        )
 
         return NotificationCompat.Builder(
             context.applicationContext,

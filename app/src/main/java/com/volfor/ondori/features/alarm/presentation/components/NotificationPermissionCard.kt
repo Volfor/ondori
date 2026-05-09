@@ -1,6 +1,8 @@
 package com.volfor.ondori.features.alarm.presentation.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,21 +39,21 @@ fun NotificationPermissionCard(
         AlarmNotificationStatus.NeedsPostNotificationPermission -> {
             title = "Notifications permission required"
             body = "Without notification permission, your alarms won't ring or show on this device."
-            actionLabel = "Allow notifications"
+            actionLabel = "Allow"
             action = onRequestPermission
         }
 
         AlarmNotificationStatus.AppNotificationsDisabled -> {
             title = "Notifications are turned off"
             body = "Turn on notifications for Ondori so alarms can alert you."
-            actionLabel = "Open settings"
+            actionLabel = "Settings"
             action = onOpenNotificationSettings
         }
 
         AlarmNotificationStatus.AlarmChannelDisabled -> {
             title = "Alarm channel is off"
             body = "The Firing alarms channel is disabled. Turn it on so alarm alerts work."
-            actionLabel = "Open settings"
+            actionLabel = "Settings"
             action = onOpenChannelSettings
         }
 
@@ -59,7 +61,7 @@ fun NotificationPermissionCard(
             title = "Full-screen notifications are off"
             body =
                 "Ondori needs permission to show full-screen alarm alerts. Please \"Allow full-screen notifications\" for this app in the system settings."
-            actionLabel = "Open settings"
+            actionLabel = "Settings"
             action = onOpenNotificationSettings
         }
     }
@@ -74,22 +76,27 @@ fun NotificationPermissionCard(
                 title,
                 style = MaterialTheme.typography.titleMedium,
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = body,
                 style = MaterialTheme.typography.bodyMedium,
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            Button(onClick = action) {
-                Text(actionLabel)
+            Spacer(modifier = Modifier.height(32.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                Button(onClick = action) {
+                    Text(actionLabel)
+                }
             }
         }
     }
 }
 
-@Preview
+@Preview(group = "Light")
 @Composable
-fun PreviewNotificationPermissionCardPermissionMissing() {
+fun PreviewNotificationPermissionCardPermissionMissingLight() {
     OndoriPreview {
         NotificationPermissionCard(
             status = AlarmNotificationStatus.NeedsPostNotificationPermission,
@@ -100,9 +107,9 @@ fun PreviewNotificationPermissionCardPermissionMissing() {
     }
 }
 
-@Preview
+@Preview(group = "Light")
 @Composable
-fun PreviewNotificationPermissionCardDisabled() {
+fun PreviewNotificationPermissionCardDisabledLight() {
     OndoriPreview {
         NotificationPermissionCard(
             status = AlarmNotificationStatus.AppNotificationsDisabled,
@@ -113,9 +120,9 @@ fun PreviewNotificationPermissionCardDisabled() {
     }
 }
 
-@Preview
+@Preview(group = "Light")
 @Composable
-fun PreviewNotificationPermissionCardChannelDisabled() {
+fun PreviewNotificationPermissionCardChannelDisabledLight() {
     OndoriPreview {
         NotificationPermissionCard(
             status = AlarmNotificationStatus.AlarmChannelDisabled,
@@ -126,10 +133,62 @@ fun PreviewNotificationPermissionCardChannelDisabled() {
     }
 }
 
-@Preview
+@Preview(group = "Light")
 @Composable
-fun PreviewNotificationPermissionCardFullScreenDisabled() {
+fun PreviewNotificationPermissionCardFullScreenDisabledLight() {
     OndoriPreview {
+        NotificationPermissionCard(
+            status = AlarmNotificationStatus.FullScreenIntentsDisabled,
+            onOpenNotificationSettings = {},
+            onRequestPermission = {},
+            onOpenChannelSettings = {},
+        )
+    }
+}
+
+@Preview(group = "Dark")
+@Composable
+fun PreviewNotificationPermissionCardPermissionMissingDark() {
+    OndoriPreview(darkTheme = true) {
+        NotificationPermissionCard(
+            status = AlarmNotificationStatus.NeedsPostNotificationPermission,
+            onOpenNotificationSettings = {},
+            onRequestPermission = {},
+            onOpenChannelSettings = {},
+        )
+    }
+}
+
+@Preview(group = "Dark")
+@Composable
+fun PreviewNotificationPermissionCardDisabledDark() {
+    OndoriPreview(darkTheme = true) {
+        NotificationPermissionCard(
+            status = AlarmNotificationStatus.AppNotificationsDisabled,
+            onOpenNotificationSettings = {},
+            onRequestPermission = {},
+            onOpenChannelSettings = {},
+        )
+    }
+}
+
+@Preview(group = "Dark")
+@Composable
+fun PreviewNotificationPermissionCardChannelDisabledDark() {
+    OndoriPreview(darkTheme = true) {
+        NotificationPermissionCard(
+            status = AlarmNotificationStatus.AlarmChannelDisabled,
+            onOpenNotificationSettings = {},
+            onRequestPermission = {},
+            onOpenChannelSettings = {},
+        )
+    }
+}
+
+@Preview(group = "Dark")
+@Composable
+fun PreviewNotificationPermissionCardFullScreenDisabledDark() {
+    OndoriPreview(darkTheme = true) {
         NotificationPermissionCard(
             status = AlarmNotificationStatus.FullScreenIntentsDisabled,
             onOpenNotificationSettings = {},

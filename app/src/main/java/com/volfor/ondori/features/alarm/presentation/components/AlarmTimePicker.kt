@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccessTime
-import androidx.compose.material.icons.outlined.Keyboard
+import androidx.compose.material.icons.filled.AccessTimeFilled
+import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -81,12 +80,13 @@ private fun AlarmTimePickerContent(
     )
 
     val toggleIcon = if (showDial) {
-        Icons.Outlined.Keyboard
+        Icons.Filled.Keyboard
     } else {
-        Icons.Outlined.AccessTime
+        Icons.Filled.AccessTimeFilled
     }
 
     TimePickerDialog(
+        title = if (showDial) "Select time" else "Enter time",
         onDismiss = { onDismiss() },
         onConfirm = { onConfirm(timePickerState) },
         toggle = {
@@ -94,6 +94,7 @@ private fun AlarmTimePickerContent(
                 Icon(
                     imageVector = toggleIcon,
                     contentDescription = "Time picker type toggle",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         },
@@ -101,19 +102,10 @@ private fun AlarmTimePickerContent(
         if (showDial) {
             TimePicker(
                 state = timePickerState,
-                colors = TimePickerDefaults.colors(
-                    timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                ),
-
-                )
+            )
         } else {
             TimeInput(
                 state = timePickerState,
-                colors = TimePickerDefaults.colors(
-                    timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                ),
             )
         }
     }
@@ -121,7 +113,7 @@ private fun AlarmTimePickerContent(
 
 @Composable
 private fun TimePickerDialog(
-    title: String = "Select Time",
+    title: String = "Select time",
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     toggle: @Composable () -> Unit = {},
@@ -134,6 +126,7 @@ private fun TimePickerDialog(
     ) {
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
             modifier = Modifier
                 .width(IntrinsicSize.Min)
                 .height(IntrinsicSize.Min)
@@ -147,7 +140,8 @@ private fun TimePickerDialog(
                         .fillMaxWidth()
                         .padding(bottom = 20.dp),
                     text = title,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 content()
                 Row(

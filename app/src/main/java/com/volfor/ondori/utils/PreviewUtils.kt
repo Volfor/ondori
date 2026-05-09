@@ -3,8 +3,8 @@ package com.volfor.ondori.utils
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.app.theme.OndoriTheme
+import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import java.time.DayOfWeek
 
@@ -20,7 +20,7 @@ val previewAlarms = listOf(
         hour = 13,
         minute = 0,
         enabled = true,
-        label = "Lunch",
+        label = "Morning zazen",
     ),
     Alarm(
         id = 3,

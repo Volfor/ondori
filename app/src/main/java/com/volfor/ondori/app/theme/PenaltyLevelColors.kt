@@ -8,33 +8,28 @@ import com.volfor.ondori.features.punisher.domain.entities.PenaltyLevel
 
 object PenaltyLevelColors {
 
-    private val ZeroLight = BackgroundGray
-    private val LowLight = PaleYellow
-    private val MediumLight = SoftOrange
-    private val HighLight = WarmPeach
-    private val CriticalLight = LightCoral
-    private val ExtremeLight = MutedRed
+    fun color(level: PenaltyLevel, isNotification: Boolean = false, isDark: Boolean): Color =
+        when (level) {
+            PenaltyLevel.Zero -> {
+                if (isNotification) {
+                    if (isDark) surfaceDimDark else surfaceDimLight
+                } else {
+                    if (isDark) surfaceDark else surfaceLight
+                }
+            }
 
-    private val ZeroDark = Unknown
-    private val LowDark = AmberYellow
-    private val MediumDark = VividOrange
-    private val HighDark = DeepOrange
-    private val CriticalDark = WarningRed
-    private val ExtremeDark = DeepRed
+            PenaltyLevel.Low, PenaltyLevel.ModerateLow -> if (isDark) penaltyLowDark else penaltyLowLight
+            PenaltyLevel.ModerateHigh, PenaltyLevel.Medium -> if (isDark) penaltyMediumDark else penaltyMediumLight
+            PenaltyLevel.High -> if (isDark) penaltyHighDark else penaltyHighLight
+            PenaltyLevel.Critical -> if (isDark) penaltyCriticalDark else penaltyCriticalLight
+            PenaltyLevel.Extreme -> if (isDark) penaltyExtremeDark else penaltyExtremeLight
+        }
 
-    fun color(level: PenaltyLevel, isDark: Boolean): Color = when (level) {
-        PenaltyLevel.Zero -> if (isDark) ZeroDark else ZeroLight
-        PenaltyLevel.Low, PenaltyLevel.ModerateLow -> if (isDark) LowDark else LowLight
-        PenaltyLevel.ModerateHigh, PenaltyLevel.Medium -> if (isDark) MediumDark else MediumLight
-        PenaltyLevel.High -> if (isDark) HighDark else HighLight
-        PenaltyLevel.Critical -> if (isDark) CriticalDark else CriticalLight
-        PenaltyLevel.Extreme -> if (isDark) ExtremeDark else ExtremeLight
-    }
+    fun argb(level: PenaltyLevel, isNotification: Boolean, isDark: Boolean): Int =
+        color(level, isNotification, isDark).toArgb()
 
-    fun argb(level: PenaltyLevel, isDark: Boolean): Int = color(level, isDark).toArgb()
-
-    fun argb(level: PenaltyLevel, context: Context): Int =
-        argb(level, context.resources.configuration.isNightUiMode)
+    fun argb(level: PenaltyLevel, isNotification: Boolean, context: Context): Int =
+        argb(level, isNotification, context.resources.configuration.isNightUiMode)
 }
 
 private val Configuration.isNightUiMode: Boolean
