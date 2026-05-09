@@ -1,5 +1,6 @@
 package com.volfor.ondori.features.alarm.presentation.activities
 
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -10,8 +11,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.app.theme.OndoriTheme
+import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.app.time.TimeFormatStore
 import com.volfor.ondori.features.alarm.presentation.screens.AlarmRingingScreen
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
@@ -27,6 +28,7 @@ class AlarmRingingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        volumeControlStream = AudioManager.STREAM_ALARM
 
         val alarmId = intent.getLongExtra(EXTRA_ALARM_ID, -1L)
         Log.d("AlarmRingingActivity", "Alarm ringing: $alarmId")

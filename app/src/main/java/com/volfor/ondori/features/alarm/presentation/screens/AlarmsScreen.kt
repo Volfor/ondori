@@ -7,6 +7,11 @@ import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -278,7 +283,13 @@ private fun AlarmsContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if (hasRequestedNotificationPermission && notificationPermissionStatus != AlarmNotificationStatus.Allowed) {
+        val showNotificationsPermissionCard =
+            hasRequestedNotificationPermission && notificationPermissionStatus != AlarmNotificationStatus.Allowed
+        AnimatedVisibility(
+            visible = showNotificationsPermissionCard,
+            enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+            exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top),
+        ) {
             NotificationPermissionCard(
                 status = notificationPermissionStatus,
                 onRequestPermission = onRequestNotifPermission,
@@ -294,7 +305,7 @@ private fun AlarmsContent(
             )
         }
         LazyColumn(
-            contentPadding = PaddingValues(vertical = 16.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 112.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(
@@ -302,7 +313,8 @@ private fun AlarmsContent(
                 key = { alarm -> alarm.id },
             ) { alarm ->
                 AlarmListItem(
-                    alarm,
+                    modifier = Modifier.animateItem(),
+                    alarm = alarm,
                     onClick = {
                         onAlarmClick(alarm)
                     },

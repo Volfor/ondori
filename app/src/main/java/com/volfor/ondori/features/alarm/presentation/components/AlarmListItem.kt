@@ -44,6 +44,7 @@ import com.volfor.ondori.utils.previewAlarms
 
 @Composable
 fun AlarmListItem(
+    modifier: Modifier = Modifier,
     alarm: Alarm,
     onClick: () -> Unit,
     onCheckedChange: (Boolean) -> Unit,
@@ -52,6 +53,7 @@ fun AlarmListItem(
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
 
     SwipeContent(
+        modifier = modifier,
         swipeState = swipeToDismissBoxState,
         alarm = alarm,
         onClick = onClick,
@@ -62,13 +64,16 @@ fun AlarmListItem(
 
 @Composable
 private fun SwipeContent(
+    modifier: Modifier = Modifier,
     swipeState: SwipeToDismissBoxState,
     alarm: Alarm,
     onClick: () -> Unit,
     onCheckedChange: (Boolean) -> Unit,
-    onDelete: () -> Unit
-) {
+    onDelete: () -> Unit,
+
+    ) {
     SwipeToDismissBox(
+        modifier = modifier,
         state = swipeState,
         onDismiss = { dismissValue ->
             when (dismissValue) {
@@ -94,8 +99,8 @@ private fun SwipeContent(
 @Composable
 private fun BackgroundContent(dismissDirection: SwipeToDismissBoxValue) {
     val color = when (dismissDirection) {
-        SwipeToDismissBoxValue.StartToEnd ->  MaterialTheme.colorScheme.error
-        SwipeToDismissBoxValue.EndToStart ->  MaterialTheme.colorScheme.error
+        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.error
+        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error
         else -> Color.Transparent
     }
 
@@ -259,7 +264,7 @@ fun PreviewAlarmListItemSwipedRightLight(
 
     OndoriPreview {
         SwipeContent(
-            swipeToDismissBoxState,
+            swipeState = swipeToDismissBoxState,
             alarm = alarm,
             onClick = {},
             onCheckedChange = {},
@@ -279,7 +284,7 @@ fun PreviewAlarmListItemSwipedLeftLight(
 
     OndoriPreview {
         SwipeContent(
-            swipeToDismissBoxState,
+            swipeState = swipeToDismissBoxState,
             alarm = alarm,
             onClick = {},
             onCheckedChange = {},
@@ -333,7 +338,7 @@ fun PreviewAlarmListItemSwipedRightDark(
 
     OndoriPreview(darkTheme = true) {
         SwipeContent(
-            swipeToDismissBoxState,
+            swipeState = swipeToDismissBoxState,
             alarm = alarm,
             onClick = {},
             onCheckedChange = {},
@@ -353,7 +358,7 @@ fun PreviewAlarmListItemSwipedLeftDark(
 
     OndoriPreview(darkTheme = true) {
         SwipeContent(
-            swipeToDismissBoxState,
+            swipeState = swipeToDismissBoxState,
             alarm = alarm,
             onClick = {},
             onCheckedChange = {},

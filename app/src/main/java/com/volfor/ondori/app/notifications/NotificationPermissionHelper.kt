@@ -55,6 +55,7 @@ fun Context.hasPostNotificationPermission(): Boolean =
 fun Context.openAppNotificationSettings() {
     val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
         putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     if (intent.resolveActivity(packageManager) != null) {
         startActivity(intent)
@@ -67,6 +68,7 @@ fun Context.openAlarmChannelSettings() {
     val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
         putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
         putExtra(Settings.EXTRA_CHANNEL_ID, Notifications.FIRING_ALARMS_CHANNEL_ID)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     if (intent.resolveActivity(packageManager) != null) {
         startActivity(intent)
@@ -78,6 +80,7 @@ fun Context.openAlarmChannelSettings() {
 fun Context.openAppDetailsSettings() {
     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
         data = Uri.fromParts("package", packageName, null)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     startActivity(intent)
 }
