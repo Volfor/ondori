@@ -4,6 +4,8 @@ import com.volfor.ondori.features.alarm.domain.services.AlarmRinger
 import com.volfor.ondori.features.alarm.domain.services.AlarmScheduler
 import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
 import com.volfor.ondori.features.punisher.domain.usecases.ApplyPenaltyUseCase
+import com.volfor.ondori.features.settings.domain.usecases.GetSnoozeMinutesUseCase
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.coVerifyOrder
 import io.mockk.every
@@ -20,6 +22,7 @@ class SnoozeAlarmUseCaseTest {
     private lateinit var ringer: AlarmRinger
     private lateinit var applyPenalty: ApplyPenaltyUseCase
     private lateinit var rescheduleEnabledAlarms: RescheduleEnabledAlarmsUseCase
+    private lateinit var getSnoozeMinutes: GetSnoozeMinutesUseCase
 
     @Before
     fun setup() {
@@ -28,17 +31,25 @@ class SnoozeAlarmUseCaseTest {
         ringer = mockk(relaxed = true)
         applyPenalty = mockk(relaxed = true)
         rescheduleEnabledAlarms = mockk(relaxed = true)
+        getSnoozeMinutes = mockk()
+        coEvery { getSnoozeMinutes() } returns 9
     }
 
-    private fun useCase() =
-        SnoozeAlarmUseCase(timeCalculator, scheduler, ringer, applyPenalty, rescheduleEnabledAlarms)
+    private fun useCase() = SnoozeAlarmUseCase(
+        timeCalculator,
+        scheduler,
+        ringer,
+        applyPenalty,
+        rescheduleEnabledAlarms,
+        getSnoozeMinutes,
+    )
 
     @Test
     fun `stops ringing, applies penalty, reschedules, and schedules snooze`() = runBlocking {
         val id = 3L
         val trigger = 20_000L
 
-        every { timeCalculator.computeSnoozeTriggerTime() } returns trigger
+        every { timeCalculator.computeSnoozeTriggerTime(9) } returns trigger
 
         useCase()(id)
 
@@ -53,7 +64,7 @@ class SnoozeAlarmUseCaseTest {
         val id = 4L
         val trigger = 30_000L
 
-        every { timeCalculator.computeSnoozeTriggerTime() } returns trigger
+        every { timeCalculator.computeSnoozeTriggerTime(9) } returns trigger
 
         useCase()(id)
 

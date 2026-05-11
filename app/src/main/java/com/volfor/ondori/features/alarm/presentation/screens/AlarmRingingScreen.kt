@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
@@ -33,8 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.volfor.ondori.BuildConfig
+import com.volfor.ondori.R
 import com.volfor.ondori.app.time.LocalIs24HourFormat
-import com.volfor.ondori.features.alarm.data.services.AlarmTimeCalculatorImpl.Companion.SNOOZE_MINUTES
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.SwipeToStopSlider
 import com.volfor.ondori.features.alarm.presentation.components.penaltyLevelTint
@@ -69,6 +71,7 @@ fun AlarmRingingScreen(
             modifier = Modifier.padding(paddingValues),
             alarm = uiState.alarm,
             score = uiState.score,
+            snoozeMinutes = uiState.snoozeMinutes,
             onSnooze = viewModel::snooze,
             onDismiss = viewModel::dismiss,
         )
@@ -80,6 +83,7 @@ fun AlarmRingingContent(
     modifier: Modifier = Modifier,
     alarm: Alarm?,
     score: Int,
+    snoozeMinutes: Int?,
     onSnooze: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -127,11 +131,17 @@ fun AlarmRingingContent(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                     )
-                    Text(
-                        text = "$SNOOZE_MINUTES min",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                    )
+                    if (snoozeMinutes != null) {
+                        Text(
+                            text = pluralStringResource(
+                                R.plurals.minutes_short,
+                                snoozeMinutes,
+                                snoozeMinutes,
+                            ),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -139,11 +149,12 @@ fun AlarmRingingContent(
                 onStop = onDismiss,
             )
             Spacer(modifier = Modifier.height(64.dp))
-            Text("Score: $score", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(modifier = Modifier.height(12.dp))
+            if (BuildConfig.DEBUG) {
+                Text("Score: $score", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(modifier = Modifier.height(12.dp))
+            }
         }
     }
-
 }
 
 @Composable
@@ -187,6 +198,7 @@ fun PreviewAlarmRingingScreenLight(
                 modifier = Modifier.padding(paddingValues),
                 alarm = alarm,
                 score = score,
+                snoozeMinutes = 5,
                 onSnooze = {},
                 onDismiss = {},
             )
@@ -208,6 +220,7 @@ fun PreviewAlarmRingingScreenDark(
                 modifier = Modifier.padding(paddingValues),
                 alarm = alarm,
                 score = score,
+                snoozeMinutes = 5,
                 onSnooze = {},
                 onDismiss = {},
             )

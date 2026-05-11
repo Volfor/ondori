@@ -8,6 +8,7 @@ import com.volfor.ondori.features.alarm.domain.usecases.DismissAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.SnoozeAlarmUseCase
 import com.volfor.ondori.features.punisher.domain.usecases.GetScoreUseCase
+import com.volfor.ondori.features.settings.domain.usecases.ObserveSnoozeMinutesUseCase
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +28,7 @@ data class AlarmRingingUiState(
     val score: Int = 0,
     val isLoading: Boolean = false,
     val isAlarmHandled: Boolean = false,
+    val snoozeMinutes: Int? = null,
 )
 
 @HiltViewModel
@@ -35,6 +37,7 @@ class AlarmRingingViewModel @Inject constructor(
     private val getScore: GetScoreUseCase,
     private val snoozeAlarm: SnoozeAlarmUseCase,
     private val dismissAlarm: DismissAlarmUseCase,
+    observeSnoozeMinutes: ObserveSnoozeMinutesUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -46,13 +49,14 @@ class AlarmRingingViewModel @Inject constructor(
     private val isAlarmHandled = MutableStateFlow(false)
 
     val uiState: StateFlow<AlarmRingingUiState> = combine(
-        alarm, score, isLoading, isAlarmHandled,
-    ) { alarm, score, isLoading, isHandled ->
+        alarm, score, isLoading, isAlarmHandled, observeSnoozeMinutes(),
+    ) { alarm, score, isLoading, isHandled, snoozeMinutes ->
         AlarmRingingUiState(
             alarm = alarm,
             score = score,
             isLoading = isLoading,
             isAlarmHandled = isHandled,
+            snoozeMinutes = snoozeMinutes,
         )
     }.stateIn(
         scope = viewModelScope, started = WhileUiSubscribed, initialValue = AlarmRingingUiState()

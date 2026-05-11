@@ -1,6 +1,15 @@
 <resources>
     <string name="app_name">Ondori</string>
     <string name="action_settings">Settings</string>
+    <string name="settings_snooze_duration_title">Snooze length</string>
+    <plurals name="minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="minutes_short">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d mins</item>
+    </plurals>
     <string name="action_more">More</string>
     <string name="navigate_up">Navigate up</string>
     <string name="alarm_sound_dialog_title">Alarm sound</string>

@@ -6,7 +6,7 @@ interface AlarmTimeCalculator {
 
     fun computeNextTriggerTime(hour: Int, minute: Int, repeatDays: Set<DayOfWeek>): Long
 
-    fun computeSnoozeTriggerTime(): Long
+    fun computeSnoozeTriggerTime(snoozeMinutes: Int): Long
 
     fun pickSafeTriggerTime(preferred: Long, fallback: Long): Long
 }

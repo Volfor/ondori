@@ -78,8 +78,7 @@ class AlarmTimeCalculatorImplTest {
 
         testTimes.forEach {
             val clock = Clock.fixed(Instant.parse(it), zone)
-            val calculator =
-                AlarmTimeCalculatorImpl(clock)
+            val calculator = AlarmTimeCalculatorImpl(clock)
 
             val result = calculator.computeNextTriggerTime(0, 0, emptySet())
             val expected = Instant.parse("2026-03-12T00:00:00Z").toEpochMilli()
@@ -155,14 +154,13 @@ class AlarmTimeCalculatorImplTest {
     }
 
     @Test
-    fun `snooze adds one minute to current time`() {
+    fun `snooze adds requested minutes`() {
         val base = Instant.parse("2026-03-11T10:00:00Z")
         val clock = Clock.fixed(base, zone)
         val calculator = AlarmTimeCalculatorImpl(clock)
 
-        val result = calculator.computeSnoozeTriggerTime()
-        val expected = base.plus(AlarmTimeCalculatorImpl.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES)
-            .toEpochMilli()
+        val result = calculator.computeSnoozeTriggerTime(15)
+        val expected = base.plus(15L, ChronoUnit.MINUTES).toEpochMilli()
 
         assertEquals(expected, result)
     }
@@ -173,9 +171,8 @@ class AlarmTimeCalculatorImplTest {
         val clock = Clock.fixed(base, zone)
         val calculator = AlarmTimeCalculatorImpl(clock)
 
-        val result = calculator.computeSnoozeTriggerTime()
-        val expected = base.plus(AlarmTimeCalculatorImpl.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES)
-            .toEpochMilli()
+        val result = calculator.computeSnoozeTriggerTime(1)
+        val expected = base.plus(1L, ChronoUnit.MINUTES).toEpochMilli()
 
         assertEquals(expected, result)
     }
@@ -186,9 +183,9 @@ class AlarmTimeCalculatorImplTest {
         val clock = Clock.fixed(base, zone)
         val calculator = AlarmTimeCalculatorImpl(clock)
 
-        val result = calculator.computeSnoozeTriggerTime()
-        val expected = base.plus(AlarmTimeCalculatorImpl.SNOOZE_MINUTES.toLong(), ChronoUnit.MINUTES)
-            .truncatedTo(ChronoUnit.MINUTES).toEpochMilli()
+        val result = calculator.computeSnoozeTriggerTime(1)
+        val expected =
+            base.plus(1L, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.MINUTES).toEpochMilli()
 
         assertEquals(expected, result)
     }
