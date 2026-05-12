@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.volfor.ondori.utils.OndoriPreview
+import com.volfor.ondori.utils.SetDialogAlarmVolumeControl
 
 @Composable
 fun OndoriAlertDialog(
@@ -18,7 +19,10 @@ fun OndoriAlertDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
-        text = content,
+        text = {
+            SetDialogAlarmVolumeControl()
+            content()
+        },
         confirmButton = {
             TextButton(onClick = onConfirm) { Text("OK") }
         },

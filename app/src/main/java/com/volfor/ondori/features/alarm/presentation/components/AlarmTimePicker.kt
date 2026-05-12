@@ -37,6 +37,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.volfor.ondori.app.time.LocalIs24HourFormat
 import com.volfor.ondori.utils.OndoriPreview
+import com.volfor.ondori.utils.SetDialogAlarmVolumeControl
 import java.util.Calendar
 
 @Composable
@@ -124,6 +125,7 @@ private fun TimePickerDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
+        SetDialogAlarmVolumeControl()
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
             color = MaterialTheme.colorScheme.surfaceContainerHigh,

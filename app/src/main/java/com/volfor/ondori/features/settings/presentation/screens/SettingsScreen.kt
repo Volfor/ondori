@@ -106,7 +106,9 @@ private fun SnoozeLength(
     }
 
     ListItem(
-        modifier = Modifier.clickable { showPicker = true },
+        modifier = Modifier
+            .clickable { showPicker = true }
+            .padding(horizontal = 8.dp),
         headlineContent = {
             Text("Snooze length")
         },

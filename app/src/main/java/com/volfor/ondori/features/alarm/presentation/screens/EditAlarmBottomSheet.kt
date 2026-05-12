@@ -80,6 +80,7 @@ import com.volfor.ondori.features.alarm.presentation.components.AlarmTimeText
 import com.volfor.ondori.features.alarm.presentation.components.OndoriAlertDialog
 import com.volfor.ondori.features.alarm.presentation.formatters.soundLabel
 import com.volfor.ondori.utils.OndoriPreview
+import com.volfor.ondori.utils.SetDialogAlarmVolumeControl
 import com.volfor.ondori.utils.previewAlarms
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -101,6 +102,7 @@ fun EditAlarmBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
     ) {
+        SetDialogAlarmVolumeControl()
         EditAlarmContent(alarm = alarm, onDelete = {
             onDelete()
             scope.launch { sheetState.hide() }.invokeOnCompletion {

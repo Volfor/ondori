@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.volfor.ondori.R
 import com.volfor.ondori.features.settings.domain.repositories.SettingsRepository
 import com.volfor.ondori.utils.OndoriPreview
+import com.volfor.ondori.utils.SetDialogAlarmVolumeControl
 
 @Composable
 fun SnoozeMinutesPickerDialog(
@@ -47,6 +48,7 @@ fun SnoozeMinutesPickerDialog(
     BasicAlertDialog(
         onDismissRequest = onDismiss,
     ) {
+        SetDialogAlarmVolumeControl()
         SnoozeMinutesContent(
             selectedValue = selectedValue,
             onSelect = onSelect,
