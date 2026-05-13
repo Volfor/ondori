@@ -4,8 +4,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.volfor.ondori.data.local.datastore.AppPreferencesKeys.HAS_REQUESTED_NOTIFICATION_PERMISSION
+import com.volfor.ondori.data.local.datastore.AppPreferencesKeys.INCREASING_VOLUME_ENABLED
 import com.volfor.ondori.data.local.datastore.AppPreferencesKeys.SNOOZE_DURATION_MINUTES
 import com.volfor.ondori.features.settings.domain.repositories.SettingsRepository
+import com.volfor.ondori.features.settings.domain.repositories.SettingsRepository.Companion.DEFAULT_INCREASING_VOLUME_ENABLED
 import com.volfor.ondori.features.settings.domain.repositories.SettingsRepository.Companion.DEFAULT_SNOOZE_MINUTES
 import com.volfor.ondori.features.settings.domain.repositories.SettingsRepository.Companion.SNOOZE_MINUTES_RANGE
 import kotlinx.coroutines.flow.Flow
@@ -37,5 +39,19 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setSnoozeMinutes(minutes: Int) {
         dataStore.edit { it[SNOOZE_DURATION_MINUTES] = minutes.coerceIn(SNOOZE_MINUTES_RANGE) }
+    }
+
+    override fun observeIncreasingVolumeEnabled(): Flow<Boolean> {
+        return dataStore.data.map {
+            it[INCREASING_VOLUME_ENABLED] ?: DEFAULT_INCREASING_VOLUME_ENABLED
+        }
+    }
+
+    override suspend fun getIncreasingVolumeEnabled(): Boolean {
+        return observeIncreasingVolumeEnabled().first()
+    }
+
+    override suspend fun setIncreasingVolumeEnabled(enabled: Boolean) {
+        dataStore.edit { it[INCREASING_VOLUME_ENABLED] = enabled }
     }
 }

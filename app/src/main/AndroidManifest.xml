@@ -75,4 +75,8 @@
         </intent>
     </queries>
 
+    <attribution
+        android:label="@string/attribution_alarm_playback"
+        android:tag="alarm_playback" />
+
 </manifest>

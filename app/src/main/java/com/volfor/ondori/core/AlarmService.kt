@@ -11,6 +11,7 @@ import com.volfor.ondori.di.ApplicationScope
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.MissAlarmUseCase
 import com.volfor.ondori.features.punisher.domain.usecases.GetScoreUseCase
+import com.volfor.ondori.features.settings.domain.usecases.GetIncreasingVolumeEnabledUseCase
 import com.volfor.ondori.utils.Constants
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import com.volfor.ondori.utils.Constants.Notifications
@@ -38,6 +39,9 @@ class AlarmService : LifecycleService() {
     lateinit var missAlarm: MissAlarmUseCase
 
     @Inject
+    lateinit var getIncreasingVolumeEnabled: GetIncreasingVolumeEnabledUseCase
+
+    @Inject
     lateinit var alarmSoundPlayer: AlarmSoundPlayer
 
     @Inject
@@ -56,7 +60,7 @@ class AlarmService : LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
-        Log.d("AlarmService", "Alarm service started")
+        Log.d("AlarmService", "Alarm service started: action=${intent?.action}")
         val alarmId = intent?.getLongExtra(EXTRA_ALARM_ID, -1L) ?: -1L
 
         if (alarmId == -1L) {
@@ -100,7 +104,8 @@ class AlarmService : LifecycleService() {
             }
 
             alarmVibrator.vibrate()
-            alarmSoundPlayer.play(alarm.sound)
+            val increasingVolume = getIncreasingVolumeEnabled()
+            alarmSoundPlayer.play(alarm.sound, gradualVolumeIncrease = increasingVolume)
 
             missTimeoutJob = launch {
                 delay(Constants.Alarm.MISSED_TIMEOUT_MILLIS)

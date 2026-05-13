@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,6 +46,8 @@ fun SettingsScreen(
         loading = uiState.isLoading,
         snoozeMinutes = uiState.snoozeMinutes,
         onSnoozeMinutesChange = viewModel::setSnoozeMinutes,
+        increasingVolumeEnabled = uiState.increasingVolumeEnabled,
+        onIncreasingVolumeChange = viewModel::setIncreasingVolumeEnabled,
     )
 }
 
@@ -54,6 +57,8 @@ private fun SettingsContent(
     loading: Boolean,
     snoozeMinutes: Int,
     onSnoozeMinutesChange: (Int) -> Unit,
+    increasingVolumeEnabled: Boolean,
+    onIncreasingVolumeChange: (Boolean) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -81,6 +86,10 @@ private fun SettingsContent(
                 SnoozeLength(
                     value = snoozeMinutes,
                     onValueChange = onSnoozeMinutesChange,
+                )
+                IncreasingVolume(
+                    enabled = increasingVolumeEnabled,
+                    onEnabledChange = onIncreasingVolumeChange,
                 )
             }
         }
@@ -110,7 +119,7 @@ private fun SnoozeLength(
             .clickable { showPicker = true }
             .padding(horizontal = 8.dp),
         headlineContent = {
-            Text("Snooze length")
+            Text(stringResource(R.string.settings_snooze_duration_title))
         },
         supportingContent = {
             Text(
@@ -124,6 +133,31 @@ private fun SnoozeLength(
     )
 }
 
+@Composable
+private fun IncreasingVolume(
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit,
+) {
+    ListItem(
+        modifier = Modifier
+            .clickable {
+                onEnabledChange(!enabled)
+            }
+            .padding(horizontal = 8.dp),
+        headlineContent = {
+            Text(stringResource(R.string.settings_gradual_alarm_volume_title))
+        },
+        supportingContent = {
+            Text(stringResource(R.string.settings_gradual_alarm_volume_subtitle))
+        },
+        trailingContent = {
+            Switch(
+                checked = enabled,
+                onCheckedChange = onEnabledChange,
+            )
+        },
+    )
+}
 
 @Preview
 @Composable
@@ -134,6 +168,8 @@ private fun SettingsScreenPreview() {
             loading = false,
             snoozeMinutes = 9,
             onSnoozeMinutesChange = {},
+            increasingVolumeEnabled = true,
+            onIncreasingVolumeChange = {},
         )
     }
 }

@@ -20,5 +20,7 @@ object Constants {
 
     object Alarm {
         const val MISSED_TIMEOUT_MILLIS: Long = 15 * 60 * 1000
+
+        const val GRADUAL_VOLUME_RAMP_MILLIS: Long = 30 * 1000
     }
 }

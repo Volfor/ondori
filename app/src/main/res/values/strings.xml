@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">Ondori</string>
+    <string name="attribution_alarm_playback">Alarm sound playback</string>
     <string name="action_settings">Settings</string>
     <string name="settings_snooze_duration_title">Snooze length</string>
+    <string name="settings_gradual_alarm_volume_title">Increasing volume</string>
+    <string name="settings_gradual_alarm_volume_subtitle">Alarm volume increases gradually</string>
     <plurals name="minutes">
         <item quantity="one">%d minute</item>
         <item quantity="other">%d minutes</item>

@@ -17,4 +17,7 @@ object AppPreferencesKeys {
         booleanPreferencesKey("has_requested_notification_permission")
 
     val SNOOZE_DURATION_MINUTES = intPreferencesKey("snooze_duration_minutes")
+
+    val INCREASING_VOLUME_ENABLED =
+        booleanPreferencesKey("increasing_volume_enabled")
 }
