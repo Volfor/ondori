@@ -1,7 +1,6 @@
 package com.volfor.ondori.app.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
@@ -103,9 +102,7 @@ private val LightExtraColors = OndoriExtraColors()
 private val DarkExtraColors = OndoriExtraColors()
 
 private val shapes: Shapes
-    @Composable get() = MaterialTheme.shapes.copy(
-        large = CircleShape, //TODO:
-    )
+    @Composable get() = MaterialTheme.shapes
 
 @Composable
 fun OndoriTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
