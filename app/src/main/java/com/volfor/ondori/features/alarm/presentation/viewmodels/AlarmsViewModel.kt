@@ -8,6 +8,7 @@ import com.volfor.ondori.features.alarm.domain.usecases.DeleteAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.ObserveAlarmsUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.RescheduleEnabledAlarmsUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.UpdateAlarmUseCase
 import com.volfor.ondori.features.punisher.domain.usecases.ObserveScoreUseCase
 import com.volfor.ondori.features.punisher.domain.usecases.UpdateScoreUseCase
@@ -15,6 +16,8 @@ import com.volfor.ondori.features.settings.domain.usecases.MarkNotificationPermi
 import com.volfor.ondori.features.settings.domain.usecases.ObserveNotificationPermissionRequestedUseCase
 import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -45,7 +48,10 @@ class AlarmsViewModel @Inject constructor(
     observeNotificationPermissionRequested: ObserveNotificationPermissionRequestedUseCase,
     private val _markNotificationPermissionAsRequested: MarkNotificationPermissionAsRequestedUseCase,
     private val _updateScore: UpdateScoreUseCase,
+    private val _rescheduleEnabledAlarms: RescheduleEnabledAlarmsUseCase,
 ) : ViewModel() {
+
+    private var rescheduleDebounceJob: Job? = null
 
     private val _selectedAlarm = MutableStateFlow<Alarm?>(null)
 
@@ -105,5 +111,10 @@ class AlarmsViewModel @Inject constructor(
 
     fun updateScore(score: Int) = viewModelScope.launch {
         _updateScore(score)
+        rescheduleDebounceJob?.cancel()
+        rescheduleDebounceJob = viewModelScope.launch {
+            delay(500L)
+            _rescheduleEnabledAlarms()
+        }
     }
 }

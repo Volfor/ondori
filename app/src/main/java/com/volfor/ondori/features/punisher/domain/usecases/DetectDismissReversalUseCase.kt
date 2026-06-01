@@ -10,12 +10,13 @@ class DetectDismissReversalUseCase @Inject constructor(
     private val policy: PunisherPolicy,
     private val clock: Clock,
 ) {
-    suspend operator fun invoke(newAlarmTriggerTime: Long) {
-        val lastDismissedAt = repo.getLastDismissedAlarmTime() ?: return
+    suspend operator fun invoke(newAlarmTriggerTime: Long): Boolean {
+        val lastDismissedAt = repo.getLastDismissedAlarmTime() ?: return false
         val now = clock.millis()
-        if (!policy.isDismissReversal(lastDismissedAt, now, newAlarmTriggerTime)) return
+        if (!policy.isDismissReversal(lastDismissedAt, now, newAlarmTriggerTime)) return false
 
         repo.applyDismissReversalPenalty()
         repo.setLastDismissedAlarmTime(null)
+        return true
     }
 }

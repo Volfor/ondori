@@ -7,6 +7,8 @@ import io.mockk.coVerify
 import io.mockk.coVerifyOrder
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.time.Clock
@@ -32,8 +34,9 @@ class DetectDismissReversalUseCaseTest {
         coEvery { repo.getLastDismissedAlarmTime() } returns null
 
         val useCase = DetectDismissReversalUseCase(repo, policy, fixedClockAt(1_000L))
-        useCase(newAlarmTriggerTime = 2_000L)
+        val result = useCase(newAlarmTriggerTime = 2_000L)
 
+        assertFalse(result)
         coVerify(exactly = 0) { repo.applyDismissReversalPenalty() }
         coVerify(exactly = 0) { repo.setLastDismissedAlarmTime(any()) }
     }
@@ -46,8 +49,9 @@ class DetectDismissReversalUseCaseTest {
         coEvery { repo.getLastDismissedAlarmTime() } returns dismissed
 
         val useCase = DetectDismissReversalUseCase(repo, policy, fixedClockAt(now))
-        useCase(newTrigger)
+        val result = useCase(newTrigger)
 
+        assertTrue(result)
         coVerifyOrder {
             repo.applyDismissReversalPenalty()
             repo.setLastDismissedAlarmTime(null)
@@ -62,8 +66,9 @@ class DetectDismissReversalUseCaseTest {
         coEvery { repo.getLastDismissedAlarmTime() } returns dismissed
 
         val useCase = DetectDismissReversalUseCase(repo, policy, fixedClockAt(now))
-        useCase(newTrigger)
+        val result = useCase(newTrigger)
 
+        assertFalse(result)
         coVerify(exactly = 0) { repo.applyDismissReversalPenalty() }
         coVerify(exactly = 0) { repo.setLastDismissedAlarmTime(any()) }
     }
@@ -76,8 +81,9 @@ class DetectDismissReversalUseCaseTest {
         coEvery { repo.getLastDismissedAlarmTime() } returns dismissed
 
         val useCase = DetectDismissReversalUseCase(repo, policy, fixedClockAt(now))
-        useCase(newTrigger)
+        val result = useCase(newTrigger)
 
+        assertFalse(result)
         coVerify(exactly = 0) { repo.applyDismissReversalPenalty() }
         coVerify(exactly = 0) { repo.setLastDismissedAlarmTime(any()) }
     }
