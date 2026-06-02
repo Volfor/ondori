@@ -53,7 +53,7 @@ class AlarmsViewModel @Inject constructor(
         observeAlarms(), observeScore(), _selectedAlarm, observeNotificationPermissionRequested(),
     ) { alarms, score, selectedAlarm, hasRequestedNotificationPermission ->
         AlarmsUiState(
-            items = alarms.map { it },
+            items = alarms.sortedWith(compareBy({ it.hour }, { it.minute }, { it.id })),
             score = score,
             isLoading = false,
             selectedAlarm = selectedAlarm,
