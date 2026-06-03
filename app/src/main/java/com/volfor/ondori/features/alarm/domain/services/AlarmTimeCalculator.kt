@@ -9,4 +9,6 @@ interface AlarmTimeCalculator {
     fun computeSnoozeTriggerTime(snoozeMinutes: Int): Long
 
     fun pickSafeTriggerTime(preferred: Long, fallback: Long): Long
+
+    fun computeRemainingTime(triggerTimeMillis: Long): Long
 }

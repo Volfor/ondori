@@ -4,7 +4,6 @@ package com.volfor.ondori.features.alarm.presentation.screens
 
 import android.Manifest
 import android.os.Build
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -92,7 +91,6 @@ fun AlarmsScreen(
         viewModel.markNotificationPermissionAsRequested()
         if (granted) return@rememberLauncherForActivityResult
         scope.launch {
-
             val result = snackbarHostState.showSnackbar(
                 message = "Turn on notifications so alarms can go off.",
                 actionLabel = "Settings",
@@ -105,6 +103,7 @@ fun AlarmsScreen(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarMessages by viewModel.snackbarMessages.collectAsStateWithLifecycle()
 
     var showTimePicker by remember { mutableStateOf(false) }
 
@@ -122,6 +121,23 @@ fun AlarmsScreen(
         }
     }
 
+    // Check for user messages to display on the screen
+    snackbarMessages.let { currentMessages ->
+        if (currentMessages.isNotEmpty()) {
+            val message = currentMessages[0]
+            val text = if (message.formatArgs.isNotEmpty()) {
+                stringResource(message.messageTextId, *message.formatArgs.toTypedArray())
+            } else {
+                stringResource(message.messageTextId)
+            }
+
+            LaunchedEffect(snackbarHostState, viewModel, message, text) {
+                snackbarHostState.showSnackbar(text)
+                viewModel.onSnackbarShown(message.id)
+            }
+        }
+    }
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
@@ -133,20 +149,7 @@ fun AlarmsScreen(
         },
         floatingActionButton = {
             MediumFloatingActionButton(
-                onClick = {
-                    showTimePicker = true
-
-//                    scope.launch {
-//                        val result = snackbarHostState.showSnackbar(
-//                            message = "Replace with your own action",
-//                            actionLabel = "Action",
-//                            duration = SnackbarDuration.Long
-//                        )
-//                        if (result == SnackbarResult.ActionPerformed) {
-//                            // handle action click
-//                        }
-//                    }
-                },
+                onClick = { showTimePicker = true },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary,
             ) {
@@ -200,7 +203,6 @@ fun AlarmsScreen(
                 },
                 onConfirm = { time ->
                     showTimePicker = false
-                    Log.d("AlarmScreen", "Selected time: ${time.hour}:${time.minute}")
                     viewModel.createAlarm(time.hour, time.minute)
                 },
             )

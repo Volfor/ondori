@@ -21,9 +21,21 @@
     <string name="alarm_sound_choose_system">System sounds</string>
     <string name="alarm_sound_picker_title">Choose alarm sound</string>
     <string name="alarm_sound_unknown">Custom sound</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="alarm_set_less_than_one_minute">Alarm set for less than 1 minute from now.</string>
+    <string name="alarm_set_for_duration">Alarm set for %1$s from now.</string>
+    <plurals name="alarm_set_duration_days">
+        <item quantity="one">1 day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <plurals name="alarm_set_duration_hours">
+        <item quantity="one">1 hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="alarm_set_duration_minutes">
+        <item quantity="one">1 minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 

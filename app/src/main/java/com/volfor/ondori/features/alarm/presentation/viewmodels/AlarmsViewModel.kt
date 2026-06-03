@@ -2,13 +2,17 @@ package com.volfor.ondori.features.alarm.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.volfor.ondori.app.ui.Message
+import com.volfor.ondori.app.ui.SnackbarManager
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
+import com.volfor.ondori.features.alarm.domain.usecases.ComputeAlarmRemainingTimeUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.CreateAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.DeleteAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.EnableAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.ObserveAlarmsUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.UpdateAlarmUseCase
+import com.volfor.ondori.features.alarm.presentation.formatters.AlarmScheduledMessageFormatter
 import com.volfor.ondori.features.punisher.domain.usecases.ObserveScoreUseCase
 import com.volfor.ondori.features.punisher.domain.usecases.UpdateScoreUseCase
 import com.volfor.ondori.features.settings.domain.usecases.MarkNotificationPermissionAsRequestedUseCase
@@ -35,6 +39,7 @@ data class AlarmsUiState(
 
 @HiltViewModel
 class AlarmsViewModel @Inject constructor(
+    private val snackbarManager: SnackbarManager,
     observeAlarms: ObserveAlarmsUseCase,
     observeScore: ObserveScoreUseCase,
     private val _createAlarm: CreateAlarmUseCase,
@@ -44,10 +49,14 @@ class AlarmsViewModel @Inject constructor(
     private val _disableAlarm: DisableAlarmUseCase,
     observeNotificationPermissionRequested: ObserveNotificationPermissionRequestedUseCase,
     private val _markNotificationPermissionAsRequested: MarkNotificationPermissionAsRequestedUseCase,
+    private val computeAlarmRemainingTime: ComputeAlarmRemainingTimeUseCase,
+    private val alarmScheduledMessageFormatter: AlarmScheduledMessageFormatter,
     private val _updateScore: UpdateScoreUseCase,
 ) : ViewModel() {
 
     private val _selectedAlarm = MutableStateFlow<Alarm?>(null)
+
+    val snackbarMessages: StateFlow<List<Message>> = snackbarManager.messages
 
     val uiState: StateFlow<AlarmsUiState> = combine(
         observeAlarms(), observeScore(), _selectedAlarm, observeNotificationPermissionRequested(),
@@ -74,25 +83,39 @@ class AlarmsViewModel @Inject constructor(
     }
 
     fun createAlarm(hour: Int, minute: Int) = viewModelScope.launch {
-        _createAlarm(
-            alarm = Alarm(
-                hour = hour,
-                minute = minute,
-                enabled = true,
-            )
+        val alarm = Alarm(
+            hour = hour,
+            minute = minute,
+            enabled = true,
         )
+        _createAlarm(alarm = alarm)
+        showAlarmScheduledMessage(alarm)
     }
 
     fun updateAlarm(alarm: Alarm) = viewModelScope.launch {
         _updateAlarm(alarm)
+        if (alarm.enabled) {
+            showAlarmScheduledMessage(alarm)
+        }
     }
 
     fun setAlarmEnabled(alarm: Alarm, enabled: Boolean) = viewModelScope.launch {
         if (enabled) {
             _enableAlarm(alarmId = alarm.id)
+            showAlarmScheduledMessage(alarm)
         } else {
             _disableAlarm(alarmId = alarm.id)
         }
+    }
+
+    private suspend fun showAlarmScheduledMessage(alarm: Alarm) {
+        val remainingTime = computeAlarmRemainingTime(alarm)
+        val (messageTextId, args) = alarmScheduledMessageFormatter.format(remainingTime)
+        snackbarManager.showMessage(messageTextId, args)
+    }
+
+    fun onSnackbarShown(messageId: Long) {
+        snackbarManager.setMessageShown(messageId)
     }
 
     fun deleteAlarm(alarm: Alarm) = viewModelScope.launch {
