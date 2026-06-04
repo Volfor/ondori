@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * UiState for the alarm list screen.
@@ -113,7 +114,7 @@ class AlarmsViewModel @Inject constructor(
         _updateScore(score)
         rescheduleDebounceJob?.cancel()
         rescheduleDebounceJob = viewModelScope.launch {
-            delay(500L)
+            delay(500L.milliseconds)
             _rescheduleEnabledAlarms()
         }
     }

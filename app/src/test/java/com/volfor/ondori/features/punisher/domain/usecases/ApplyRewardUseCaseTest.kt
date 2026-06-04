@@ -10,7 +10,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
-class RecordCleanDismissUseCaseTest {
+class ApplyRewardUseCaseTest {
 
     private lateinit var repo: PunisherRepository
 
@@ -26,7 +26,7 @@ class RecordCleanDismissUseCaseTest {
     fun `applies reward then stamps current time as last dismiss`() = runBlocking {
         val now = 1_700_000_000_000L
 
-        val useCase = RecordCleanDismissUseCase(repo, fixedClockAt(now))
+        val useCase = ApplyRewardUseCase(repo, fixedClockAt(now))
         useCase()
 
         coVerifyOrder {

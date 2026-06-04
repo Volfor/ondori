@@ -5,16 +5,19 @@ import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
 import com.volfor.ondori.features.punisher.domain.usecases.DetectDismissReversalUseCase
 import javax.inject.Inject
 
-class CheckDismissReversalForAlarmUseCase @Inject constructor(
+class CheckDismissReversalAndRescheduleEnabledAlarmsUseCase @Inject constructor(
     private val timeCalculator: AlarmTimeCalculator,
     private val detectDismissReversal: DetectDismissReversalUseCase,
+    private val rescheduleEnabledAlarms: RescheduleEnabledAlarmsUseCase,
 ) {
-    suspend operator fun invoke(alarm: Alarm): Boolean {
+    suspend operator fun invoke(alarm: Alarm) {
         val triggerTime = timeCalculator.computeNextTriggerTime(
             hour = alarm.hour,
             minute = alarm.minute,
             repeatDays = alarm.repeatDays,
         )
-        return detectDismissReversal(triggerTime)
+        if (detectDismissReversal(triggerTime)) {
+            rescheduleEnabledAlarms()
+        }
     }
 }

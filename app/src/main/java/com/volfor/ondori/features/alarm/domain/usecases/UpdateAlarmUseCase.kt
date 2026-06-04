@@ -8,17 +8,14 @@ class UpdateAlarmUseCase @Inject constructor(
     private val repo: AlarmRepository,
     private val scheduleAlarm: ScheduleAlarmUseCase,
     private val cancelAlarm: CancelAlarmUseCase,
-    private val checkDismissReversalForAlarm: CheckDismissReversalForAlarmUseCase,
-    private val rescheduleEnabledAlarms: RescheduleEnabledAlarmsUseCase,
+    private val checkDismissReversalAndRescheduleEnabledAlarms: CheckDismissReversalAndRescheduleEnabledAlarmsUseCase,
 ) {
     suspend operator fun invoke(alarm: Alarm) {
         val previous = repo.getAlarm(alarm.id)
         repo.updateAlarm(alarm)
         if (alarm.enabled) {
             if (previous != null && isTimeChanged(previous, alarm)) {
-                if (checkDismissReversalForAlarm(alarm)) {
-                    rescheduleEnabledAlarms()
-                }
+                checkDismissReversalAndRescheduleEnabledAlarms(alarm)
             }
             scheduleAlarm(alarm)
         } else {

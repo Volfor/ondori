@@ -18,22 +18,20 @@ class CreateAlarmUseCaseTest {
 
     private lateinit var repo: AlarmRepository
     private lateinit var scheduleAlarm: ScheduleAlarmUseCase
-    private lateinit var checkDismissReversalForAlarm: CheckDismissReversalForAlarmUseCase
-    private lateinit var rescheduleEnabledAlarms: RescheduleEnabledAlarmsUseCase
+    private lateinit var checkDismissReversalAndRescheduleEnabledAlarms: CheckDismissReversalAndRescheduleEnabledAlarmsUseCase
 
     @Before
     fun setup() {
         repo = mockk()
         scheduleAlarm = mockk()
-        checkDismissReversalForAlarm = mockk()
-        rescheduleEnabledAlarms = mockk(relaxed = true)
+        checkDismissReversalAndRescheduleEnabledAlarms = mockk(relaxed = true)
     }
 
     private fun useCase() =
-        CreateAlarmUseCase(repo, scheduleAlarm, checkDismissReversalForAlarm, rescheduleEnabledAlarms)
+        CreateAlarmUseCase(repo, scheduleAlarm, checkDismissReversalAndRescheduleEnabledAlarms)
 
     @Test
-    fun `creates alarm in repository, detects recreation, then schedules`() = runBlocking {
+    fun `creates alarm in repository, checks dismiss reversal, then schedules`() = runBlocking {
         val alarm = Alarm(
             id = 0L,
             hour = 6,
@@ -42,15 +40,13 @@ class CreateAlarmUseCaseTest {
         )
 
         coEvery { repo.createAlarm(alarm) } returns 1L
-        coEvery { checkDismissReversalForAlarm(alarm) } returns true
         coEvery { scheduleAlarm(any()) } just runs
 
         useCase()(alarm)
 
         coVerifyOrder {
             repo.createAlarm(alarm)
-            checkDismissReversalForAlarm(alarm)
-            rescheduleEnabledAlarms()
+            checkDismissReversalAndRescheduleEnabledAlarms(alarm)
             scheduleAlarm(any())
         }
     }
@@ -65,7 +61,6 @@ class CreateAlarmUseCaseTest {
         )
         val assignedId = 69L
         coEvery { repo.createAlarm(alarm) } returns assignedId
-        coEvery { checkDismissReversalForAlarm(any()) } returns false
         val scheduled = slot<Alarm>()
         coEvery { scheduleAlarm(capture(scheduled)) } just runs
 
@@ -73,6 +68,6 @@ class CreateAlarmUseCaseTest {
 
         assertEquals(alarm.copy(id = assignedId), scheduled.captured)
         coVerify(exactly = 1) { scheduleAlarm(any()) }
-        coVerify(exactly = 0) { rescheduleEnabledAlarms() }
+        coVerify(exactly = 1) { checkDismissReversalAndRescheduleEnabledAlarms(alarm) }
     }
 }

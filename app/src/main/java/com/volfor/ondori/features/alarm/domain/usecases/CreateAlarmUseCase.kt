@@ -7,14 +7,11 @@ import javax.inject.Inject
 class CreateAlarmUseCase @Inject constructor(
     private val repo: AlarmRepository,
     private val scheduleAlarm: ScheduleAlarmUseCase,
-    private val checkDismissReversalForAlarm: CheckDismissReversalForAlarmUseCase,
-    private val rescheduleEnabledAlarms: RescheduleEnabledAlarmsUseCase,
+    private val checkDismissReversalAndRescheduleEnabledAlarms: CheckDismissReversalAndRescheduleEnabledAlarmsUseCase,
 ) {
     suspend operator fun invoke(alarm: Alarm) {
         val id = repo.createAlarm(alarm)
-        if (checkDismissReversalForAlarm(alarm)) {
-            rescheduleEnabledAlarms()
-        }
+        checkDismissReversalAndRescheduleEnabledAlarms(alarm)
         scheduleAlarm(alarm.copy(id = id))
     }
 }
