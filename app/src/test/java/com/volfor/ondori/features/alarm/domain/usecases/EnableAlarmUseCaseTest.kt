@@ -8,6 +8,8 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.time.DayOfWeek
@@ -30,8 +32,9 @@ class EnableAlarmUseCaseTest {
         val id = -1L
         coEvery { repo.getAlarm(id) } returns null
 
-        useCase()(id)
+        val result = useCase()(id)
 
+        assertFalse(result)
         coVerify(exactly = 0) { repo.enableAlarm(any()) }
         coVerify(exactly = 0) { scheduleAlarm(any()) }
     }
@@ -51,8 +54,9 @@ class EnableAlarmUseCaseTest {
         coEvery { repo.enableAlarm(id) } just runs
         coEvery { scheduleAlarm(any()) } just runs
 
-        useCase()(id)
+        val result = useCase()(id)
 
+        assertTrue(result)
         coVerify(exactly = 1) { repo.getAlarm(id) }
         coVerify(exactly = 1) { repo.enableAlarm(fromRepo.id) }
         coVerify(exactly = 1) { scheduleAlarm(fromRepo) }

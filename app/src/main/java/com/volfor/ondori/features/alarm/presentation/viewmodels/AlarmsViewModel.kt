@@ -101,8 +101,10 @@ class AlarmsViewModel @Inject constructor(
 
     fun setAlarmEnabled(alarm: Alarm, enabled: Boolean) = viewModelScope.launch {
         if (enabled) {
-            _enableAlarm(alarmId = alarm.id)
-            showAlarmScheduledMessage(alarm)
+            val isScheduled = _enableAlarm(alarmId = alarm.id)
+            if (isScheduled) {
+                showAlarmScheduledMessage(alarm)
+            }
         } else {
             _disableAlarm(alarmId = alarm.id)
         }

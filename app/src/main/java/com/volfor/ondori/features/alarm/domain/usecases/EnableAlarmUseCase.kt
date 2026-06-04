@@ -7,9 +7,10 @@ class EnableAlarmUseCase @Inject constructor(
     private val repo: AlarmRepository,
     private val scheduleAlarm: ScheduleAlarmUseCase,
 ) {
-    suspend operator fun invoke(alarmId: Long) {
-        val alarm = repo.getAlarm(alarmId) ?: return
+    suspend operator fun invoke(alarmId: Long): Boolean {
+        val alarm = repo.getAlarm(alarmId) ?: return false
         repo.enableAlarm(alarm.id)
         scheduleAlarm(alarm)
+        return true
     }
 }
