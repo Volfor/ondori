@@ -60,4 +60,8 @@ class AlarmTimeCalculatorImpl @Inject constructor(
             fallback
         }
     }
+
+    override fun computeRemainingTime(triggerTimeMillis: Long): Long {
+        return (triggerTimeMillis - clock.millis()).coerceAtLeast(0)
+    }
 }
