@@ -2,12 +2,9 @@ package com.volfor.ondori.features.alarm.domain.usecases
 
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
-import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
-import com.volfor.ondori.features.punisher.domain.usecases.DetectDismissReversalUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.coVerifyOrder
-import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
@@ -21,25 +18,25 @@ class UpdateAlarmUseCaseTest {
     private lateinit var repo: AlarmRepository
     private lateinit var scheduleAlarm: ScheduleAlarmUseCase
     private lateinit var cancelAlarm: CancelAlarmUseCase
-    private lateinit var timeCalculator: AlarmTimeCalculator
-    private lateinit var detectDismissReversal: DetectDismissReversalUseCase
+    private lateinit var checkDismissReversalAndRescheduleEnabledAlarms: CheckDismissReversalAndRescheduleEnabledAlarmsUseCase
 
     @Before
     fun setup() {
         repo = mockk()
         scheduleAlarm = mockk()
         cancelAlarm = mockk()
-        timeCalculator = mockk()
-        detectDismissReversal = mockk(relaxed = true)
+        checkDismissReversalAndRescheduleEnabledAlarms = mockk(relaxed = true)
         coEvery { repo.updateAlarm(any()) } just runs
-        coEvery { repo.getAlarm(any()) } returns null
         coEvery { scheduleAlarm(any()) } just runs
         coEvery { cancelAlarm(any()) } just runs
-        every { timeCalculator.computeNextTriggerTime(any(), any(), any()) } returns 0L
     }
 
-    private fun useCase() =
-        UpdateAlarmUseCase(repo, scheduleAlarm, cancelAlarm, timeCalculator, detectDismissReversal)
+    private fun useCase() = UpdateAlarmUseCase(
+        repo,
+        scheduleAlarm,
+        cancelAlarm,
+        checkDismissReversalAndRescheduleEnabledAlarms,
+    )
 
     @Test
     fun `persists then schedules when alarm is enabled`() = runBlocking {
@@ -59,7 +56,7 @@ class UpdateAlarmUseCaseTest {
             scheduleAlarm(alarm)
         }
         coVerify(exactly = 0) { cancelAlarm(any()) }
-        coVerify(exactly = 0) { detectDismissReversal(any()) }
+        coVerify(exactly = 0) { checkDismissReversalAndRescheduleEnabledAlarms(any()) }
     }
 
     @Test
@@ -80,30 +77,26 @@ class UpdateAlarmUseCaseTest {
             cancelAlarm(8L)
         }
         coVerify(exactly = 0) { scheduleAlarm(any()) }
-        coVerify(exactly = 0) { detectDismissReversal(any()) }
+        coVerify(exactly = 0) { checkDismissReversalAndRescheduleEnabledAlarms(any()) }
     }
 
     @Test
-    fun `detects rescheduling when hour or minute changes`() = runBlocking {
+    fun `checks dismiss reversal when hour or minute changes`() = runBlocking {
         val previous = Alarm(id = 5L, hour = 7, minute = 0, enabled = true)
         val updated = previous.copy(hour = 7, minute = 30)
-        val triggerTime = 1_700_000_000_000L
         coEvery { repo.getAlarm(5L) } returns previous
-        every {
-            timeCalculator.computeNextTriggerTime(7, 30, emptySet())
-        } returns triggerTime
 
         useCase()(updated)
 
         coVerifyOrder {
             repo.updateAlarm(updated)
-            detectDismissReversal(triggerTime)
+            checkDismissReversalAndRescheduleEnabledAlarms(updated)
             scheduleAlarm(updated)
         }
     }
 
     @Test
-    fun `detects rescheduling when repeatDays change`() = runBlocking {
+    fun `checks dismiss reversal when repeatDays change`() = runBlocking {
         val previous = Alarm(
             id = 5L,
             hour = 7,
@@ -112,49 +105,57 @@ class UpdateAlarmUseCaseTest {
             repeatDays = setOf(DayOfWeek.MONDAY),
         )
         val updated = previous.copy(repeatDays = setOf(DayOfWeek.TUESDAY))
-        val triggerTime = 1_700_000_000_000L
         coEvery { repo.getAlarm(5L) } returns previous
-        every {
-            timeCalculator.computeNextTriggerTime(7, 0, setOf(DayOfWeek.TUESDAY))
-        } returns triggerTime
 
         useCase()(updated)
 
-        coVerify(exactly = 1) { detectDismissReversal(triggerTime) }
+        coVerify(exactly = 1) { checkDismissReversalAndRescheduleEnabledAlarms(updated) }
     }
 
     @Test
-    fun `does not detect rescheduling when only label changes`() = runBlocking {
+    fun `does not check dismiss reversal when only label changes`() = runBlocking {
         val previous = Alarm(id = 5L, hour = 7, minute = 0, enabled = true, label = "old")
         val updated = previous.copy(label = "new")
         coEvery { repo.getAlarm(5L) } returns previous
 
         useCase()(updated)
 
-        coVerify(exactly = 0) { detectDismissReversal(any()) }
+        coVerify(exactly = 0) { checkDismissReversalAndRescheduleEnabledAlarms(any()) }
         coVerify(exactly = 1) { scheduleAlarm(updated) }
     }
 
     @Test
-    fun `does not detect rescheduling when alarm is disabled`() = runBlocking {
+    fun `does not check dismiss reversal when alarm is disabled`() = runBlocking {
         val previous = Alarm(id = 5L, hour = 7, minute = 0, enabled = true)
         val updated = previous.copy(hour = 8, enabled = false)
         coEvery { repo.getAlarm(5L) } returns previous
 
         useCase()(updated)
 
-        coVerify(exactly = 0) { detectDismissReversal(any()) }
+        coVerify(exactly = 0) { checkDismissReversalAndRescheduleEnabledAlarms(any()) }
         coVerify(exactly = 1) { cancelAlarm(5L) }
     }
 
     @Test
-    fun `does not detect rescheduling when previous alarm not found`() = runBlocking {
+    fun `does not check dismiss reversal when previous alarm not found`() = runBlocking {
         val updated = Alarm(id = 5L, hour = 8, minute = 0, enabled = true)
         coEvery { repo.getAlarm(5L) } returns null
 
         useCase()(updated)
 
-        coVerify(exactly = 0) { detectDismissReversal(any()) }
+        coVerify(exactly = 0) { checkDismissReversalAndRescheduleEnabledAlarms(any()) }
+        coVerify(exactly = 1) { scheduleAlarm(updated) }
+    }
+
+    @Test
+    fun `checks dismiss reversal when time changes`() = runBlocking {
+        val previous = Alarm(id = 5L, hour = 7, minute = 0, enabled = true)
+        val updated = previous.copy(hour = 8)
+        coEvery { repo.getAlarm(5L) } returns previous
+
+        useCase()(updated)
+
+        coVerify(exactly = 1) { checkDismissReversalAndRescheduleEnabledAlarms(updated) }
         coVerify(exactly = 1) { scheduleAlarm(updated) }
     }
 }

@@ -3,7 +3,6 @@ package com.volfor.ondori.features.alarm.domain.usecases
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
 import com.volfor.ondori.features.alarm.domain.services.AlarmRinger
-import com.volfor.ondori.features.punisher.domain.usecases.RecordCleanDismissUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
@@ -19,19 +18,17 @@ class DismissAlarmUseCaseTest {
 
     private lateinit var repo: AlarmRepository
     private lateinit var ringer: AlarmRinger
-    private lateinit var recordCleanDismiss: RecordCleanDismissUseCase
-    private lateinit var rescheduleEnabledAlarms: RescheduleEnabledAlarmsUseCase
+    private lateinit var applyRewardAndRescheduleEnabledAlarms: ApplyRewardAndRescheduleEnabledAlarmsUseCase
 
     @Before
     fun setup() {
         repo = mockk()
         ringer = mockk(relaxed = true)
-        recordCleanDismiss = mockk(relaxed = true)
-        rescheduleEnabledAlarms = mockk(relaxed = true)
+        applyRewardAndRescheduleEnabledAlarms = mockk(relaxed = true)
     }
 
     private fun useCase() =
-        DismissAlarmUseCase(repo, ringer, recordCleanDismiss, rescheduleEnabledAlarms)
+        DismissAlarmUseCase(repo, ringer, applyRewardAndRescheduleEnabledAlarms)
 
     @Test
     fun `missing alarm only stops ringing`() = runBlocking {
@@ -40,13 +37,12 @@ class DismissAlarmUseCaseTest {
         useCase()(-1L)
 
         verify { ringer.stopRinging(-1L) }
-        coVerify(exactly = 0) { recordCleanDismiss() }
+        coVerify(exactly = 0) { applyRewardAndRescheduleEnabledAlarms() }
         coVerify(exactly = 0) { repo.disableAlarm(any()) }
-        coVerify(exactly = 0) { rescheduleEnabledAlarms() }
     }
 
     @Test
-    fun `one shot alarm disables, records dismiss, and reschedules enabled alarms`() = runBlocking {
+    fun `one shot alarm disables then applies reward and reschedules enabled alarms`() = runBlocking {
         val alarm = Alarm(
             id = 1L,
             hour = 9,
@@ -60,13 +56,12 @@ class DismissAlarmUseCaseTest {
         useCase()(1L)
 
         verify { ringer.stopRinging(1L) }
-        coVerify(exactly = 1) { recordCleanDismiss() }
         coVerify(exactly = 1) { repo.disableAlarm(1L) }
-        coVerify(exactly = 1) { rescheduleEnabledAlarms() }
+        coVerify(exactly = 1) { applyRewardAndRescheduleEnabledAlarms() }
     }
 
     @Test
-    fun `repeating alarm records dismiss and reschedules without disabling`() = runBlocking {
+    fun `repeating alarm applies reward and reschedules without disabling`() = runBlocking {
         val alarm = Alarm(
             id = 2L,
             hour = 8,
@@ -79,8 +74,7 @@ class DismissAlarmUseCaseTest {
         useCase()(2L)
 
         verify { ringer.stopRinging(2L) }
-        coVerify(exactly = 1) { recordCleanDismiss() }
         coVerify(exactly = 0) { repo.disableAlarm(any()) }
-        coVerify(exactly = 1) { rescheduleEnabledAlarms() }
+        coVerify(exactly = 1) { applyRewardAndRescheduleEnabledAlarms() }
     }
 }

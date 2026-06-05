@@ -4,6 +4,7 @@ import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.coVerifyOrder
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
@@ -16,14 +17,17 @@ class EnableAlarmUseCaseTest {
 
     private lateinit var repo: AlarmRepository
     private lateinit var scheduleAlarm: ScheduleAlarmUseCase
+    private lateinit var checkDismissReversalAndRescheduleEnabledAlarms: CheckDismissReversalAndRescheduleEnabledAlarmsUseCase
 
     @Before
     fun setup() {
         repo = mockk()
         scheduleAlarm = mockk()
+        checkDismissReversalAndRescheduleEnabledAlarms = mockk(relaxed = true)
     }
 
-    private fun useCase() = EnableAlarmUseCase(repo, scheduleAlarm)
+    private fun useCase() =
+        EnableAlarmUseCase(repo, scheduleAlarm, checkDismissReversalAndRescheduleEnabledAlarms)
 
     @Test
     fun `does nothing when alarm is missing`() = runBlocking {
@@ -34,6 +38,7 @@ class EnableAlarmUseCaseTest {
 
         coVerify(exactly = 0) { repo.enableAlarm(any()) }
         coVerify(exactly = 0) { scheduleAlarm(any()) }
+        coVerify(exactly = 0) { checkDismissReversalAndRescheduleEnabledAlarms(any()) }
     }
 
     @Test
@@ -55,6 +60,7 @@ class EnableAlarmUseCaseTest {
 
         coVerify(exactly = 1) { repo.getAlarm(id) }
         coVerify(exactly = 1) { repo.enableAlarm(fromRepo.id) }
+        coVerify(exactly = 1) { checkDismissReversalAndRescheduleEnabledAlarms(fromRepo) }
         coVerify(exactly = 1) { scheduleAlarm(fromRepo) }
     }
 }

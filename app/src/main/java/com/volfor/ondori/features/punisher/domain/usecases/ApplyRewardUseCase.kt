@@ -4,7 +4,7 @@ import com.volfor.ondori.features.punisher.domain.repositories.PunisherRepositor
 import java.time.Clock
 import javax.inject.Inject
 
-class RecordCleanDismissUseCase @Inject constructor(
+class ApplyRewardUseCase @Inject constructor(
     private val repo: PunisherRepository,
     private val clock: Clock,
 ) {
