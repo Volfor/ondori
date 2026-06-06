@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.google.devtools.kps)
     alias(libs.plugins.android.hilt)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -84,6 +85,9 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+
+    val firebaseBom = platform(libs.google.firebase.bom)
+    implementation(firebaseBom)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
