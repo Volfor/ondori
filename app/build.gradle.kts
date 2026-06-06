@@ -1,3 +1,7 @@
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+import org.gradle.kotlin.dsl.resolver.SourceDistributionResolver.Companion.artifactType
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
@@ -5,6 +9,15 @@ plugins {
     alias(libs.plugins.google.devtools.kps)
     alias(libs.plugins.android.hilt)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.google.firebase.appdistribution)
+}
+
+val signingProperties = Properties().apply {
+    val signingPropertiesFile = rootProject.file("signing.properties")
+    if (signingPropertiesFile.exists()) {
+        load(signingPropertiesFile.inputStream())
+    }
 }
 
 android {
@@ -25,6 +38,22 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("KEYSTORE_PATH")
+                ?: signingProperties.getProperty("storeFile")
+            if (keystorePath != null) {
+                storeFile = rootProject.file(keystorePath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                    ?: signingProperties.getProperty("storePassword")
+                keyAlias = System.getenv("KEY_ALIAS")
+                    ?: signingProperties.getProperty("keyAlias")
+                keyPassword = System.getenv("KEY_PASSWORD")
+                    ?: signingProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -34,6 +63,13 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
+            signingConfigs.findByName("release")?.takeIf { it.storeFile?.exists() == true }?.let {
+                signingConfig = it
+            }
+            firebaseAppDistribution {
+                artifactType = "APK"
+                groups = System.getenv("FIREBASE_DISTRIBUTION_GROUPS") ?: "testers"
+            }
         }
     }
     compileOptions {
@@ -84,6 +120,9 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+
+    val firebaseBom = platform(libs.google.firebase.bom)
+    implementation(firebaseBom)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
