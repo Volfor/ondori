@@ -27,6 +27,7 @@ fun NotificationPermissionCard(
     onRequestPermission: () -> Unit,
     onOpenNotificationSettings: () -> Unit,
     onOpenChannelSettings: () -> Unit,
+    onOpenFullScreenNotificationsSettings: () -> Unit,
 ) {
     lateinit var title: String
     lateinit var body: String
@@ -64,7 +65,7 @@ fun NotificationPermissionCard(
             body =
                 "Ondori needs permission to show full-screen alarm alerts. Please \"Allow full-screen notifications\" for this app in the system settings."
             actionLabel = "Settings"
-            action = onOpenNotificationSettings
+            action = onOpenFullScreenNotificationsSettings
         }
     }
     Card(
@@ -105,6 +106,7 @@ fun PreviewNotificationPermissionCardPermissionMissingLight() {
             onOpenNotificationSettings = {},
             onRequestPermission = {},
             onOpenChannelSettings = {},
+            onOpenFullScreenNotificationsSettings = {},
         )
     }
 }
@@ -118,6 +120,7 @@ fun PreviewNotificationPermissionCardDisabledLight() {
             onOpenNotificationSettings = {},
             onRequestPermission = {},
             onOpenChannelSettings = {},
+            onOpenFullScreenNotificationsSettings = {},
         )
     }
 }
@@ -131,6 +134,7 @@ fun PreviewNotificationPermissionCardChannelDisabledLight() {
             onOpenNotificationSettings = {},
             onRequestPermission = {},
             onOpenChannelSettings = {},
+            onOpenFullScreenNotificationsSettings = {},
         )
     }
 }
@@ -144,6 +148,7 @@ fun PreviewNotificationPermissionCardFullScreenDisabledLight() {
             onOpenNotificationSettings = {},
             onRequestPermission = {},
             onOpenChannelSettings = {},
+            onOpenFullScreenNotificationsSettings = {},
         )
     }
 }
@@ -157,6 +162,7 @@ fun PreviewNotificationPermissionCardPermissionMissingDark() {
             onOpenNotificationSettings = {},
             onRequestPermission = {},
             onOpenChannelSettings = {},
+            onOpenFullScreenNotificationsSettings = {},
         )
     }
 }
@@ -170,6 +176,7 @@ fun PreviewNotificationPermissionCardDisabledDark() {
             onOpenNotificationSettings = {},
             onRequestPermission = {},
             onOpenChannelSettings = {},
+            onOpenFullScreenNotificationsSettings = {},
         )
     }
 }
@@ -183,6 +190,7 @@ fun PreviewNotificationPermissionCardChannelDisabledDark() {
             onOpenNotificationSettings = {},
             onRequestPermission = {},
             onOpenChannelSettings = {},
+            onOpenFullScreenNotificationsSettings = {},
         )
     }
 }
@@ -196,6 +204,7 @@ fun PreviewNotificationPermissionCardFullScreenDisabledDark() {
             onOpenNotificationSettings = {},
             onRequestPermission = {},
             onOpenChannelSettings = {},
+            onOpenFullScreenNotificationsSettings = {},
         )
     }
 }

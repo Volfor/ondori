@@ -65,6 +65,7 @@ import com.volfor.ondori.app.notifications.AlarmNotificationStatus
 import com.volfor.ondori.app.notifications.hasPostNotificationPermission
 import com.volfor.ondori.app.notifications.openAlarmChannelSettings
 import com.volfor.ondori.app.notifications.openAppNotificationSettings
+import com.volfor.ondori.app.notifications.openFullScreenNotificationsSettings
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.presentation.components.AlarmListItem
 import com.volfor.ondori.features.alarm.presentation.components.AlarmTimePicker
@@ -175,6 +176,9 @@ fun AlarmsScreen(
             onOpenAppNotificationSettings = {
                 context.openAppNotificationSettings()
             },
+            onOpenFullScreenNotificationsSettings = {
+                context.openFullScreenNotificationsSettings()
+            },
             loading = uiState.isLoading,
             alarms = uiState.items,
             score = uiState.score,
@@ -268,6 +272,7 @@ private fun AlarmsContent(
     onRequestNotifPermission: () -> Unit,
     onOpenChannelSettings: () -> Unit,
     onOpenAppNotificationSettings: () -> Unit,
+    onOpenFullScreenNotificationsSettings: () -> Unit,
     loading: Boolean,
     alarms: List<Alarm>,
     score: Int,
@@ -297,6 +302,7 @@ private fun AlarmsContent(
                 onRequestPermission = onRequestNotifPermission,
                 onOpenNotificationSettings = onOpenAppNotificationSettings,
                 onOpenChannelSettings = onOpenChannelSettings,
+                onOpenFullScreenNotificationsSettings = onOpenFullScreenNotificationsSettings,
             )
         }
         if (BuildConfig.DEBUG) {
@@ -419,6 +425,7 @@ fun PreviewAlarmsContent(
                 onRequestNotifPermission = {},
                 onOpenChannelSettings = {},
                 onOpenAppNotificationSettings = {},
+                onOpenFullScreenNotificationsSettings = {},
                 loading = false,
                 alarms = alarms,
                 score = 0,
@@ -445,6 +452,7 @@ fun PreviewAlarmsContentEmpty(
                 onRequestNotifPermission = {},
                 onOpenChannelSettings = {},
                 onOpenAppNotificationSettings = {},
+                onOpenFullScreenNotificationsSettings = {},
                 loading = false,
                 alarms = alarms,
                 score = 0,
