@@ -16,11 +16,13 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -91,6 +93,28 @@ class AlarmRingingViewModelTest {
         assertEquals(3, vm.uiState.score)
         assertEquals(10, vm.uiState.snoozeMinutes)
         assertFalse(vm.uiState.isLoading)
+    }
+
+    @Test
+    fun `stale load result does not overwrite current alarm`() = runTest {
+        val load1Started = CompletableDeferred<Unit>()
+        val load1Continue = CompletableDeferred<Unit>()
+        coEvery { getAlarm(1L) } coAnswers {
+            load1Started.complete(Unit)
+            load1Continue.await()
+            alarm
+        }
+        coEvery { getAlarm(2L) } returns alarm.copy(id = 2L)
+
+        val vm = viewModel()
+        load1Started.await()
+        vm.onNewAlarm(2L)
+        assertEquals(2L, vm.uiState.alarm?.id)
+
+        load1Continue.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals(2L, vm.uiState.alarm?.id)
     }
 
     @Test

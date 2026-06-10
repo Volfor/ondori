@@ -15,6 +15,7 @@ import com.volfor.ondori.features.punisher.domain.usecases.GetScoreUseCase
 import com.volfor.ondori.features.settings.domain.usecases.GetSnoozeMinutesUseCase
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -50,9 +51,9 @@ class AlarmRingingViewModel @Inject constructor(
 
     init {
         loadInfo()
-        alarmId.filterNotNull().onEach {
-            loadAlarm(it)
-        }.launchIn(viewModelScope)
+        viewModelScope.launch {
+            alarmId.filterNotNull().collectLatest { loadAlarm(it) }
+        }
 
         ringingAlarmStore.ringingAlarmId.filterNotNull().onEach {
             onNewAlarm(it)
@@ -82,7 +83,7 @@ class AlarmRingingViewModel @Inject constructor(
         uiState = uiState.copy(isAlarmHandled = true)
     }
 
-    private fun loadAlarm(alarmId: Long) = viewModelScope.launch {
+    private suspend fun loadAlarm(alarmId: Long) {
         uiState = uiState.copy(isLoading = true)
         val alarm = getAlarm(alarmId)
         uiState = uiState.copy(alarm = alarm, isLoading = false)
