@@ -1,9 +1,12 @@
 package com.volfor.ondori.app.notifications
 
 import android.app.Notification
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.text.format.DateFormat
 import androidx.core.app.NotificationCompat
+import com.volfor.ondori.MainActivity
 import com.volfor.ondori.R
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.utils.Constants
@@ -30,12 +33,25 @@ class MissedAlarmNotificationBuilder @Inject constructor(
             Constants.Notifications.MISSED_ALARMS_CHANNEL_ID,
         ).apply {
             setSmallIcon(R.drawable.ic_launcher_foreground)
-            setContentTitle(alarm.label ?: "Missed alarm")
+            setContentTitle("Missed alarm${if (alarm.label != null) " • ${alarm.label}" else ""}")
             setContentText("Alarm was scheduled for $time")
             setPriority(NotificationCompat.PRIORITY_DEFAULT)
             setCategory(NotificationCompat.CATEGORY_EVENT)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setAutoCancel(true)
+            setContentIntent(createContentIntent())
         }.build()
+    }
+
+    private fun createContentIntent(): PendingIntent {
+        val intent = Intent(context.applicationContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        return PendingIntent.getActivity(
+            context.applicationContext,
+            Constants.RequestCodes.ALARM_NOTIFICATION_MISSED,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 }

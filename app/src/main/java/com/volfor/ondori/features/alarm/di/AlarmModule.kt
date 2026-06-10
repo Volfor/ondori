@@ -9,11 +9,13 @@ import com.volfor.ondori.features.alarm.data.services.AlarmRingerImpl
 import com.volfor.ondori.features.alarm.data.services.AlarmSchedulerImpl
 import com.volfor.ondori.features.alarm.data.services.AlarmTimeCalculatorImpl
 import com.volfor.ondori.features.alarm.data.services.MissedAlarmNotifierImpl
+import com.volfor.ondori.features.alarm.data.services.RingingAlarmStoreImpl
 import com.volfor.ondori.features.alarm.domain.repositories.AlarmRepository
 import com.volfor.ondori.features.alarm.domain.services.AlarmRinger
 import com.volfor.ondori.features.alarm.domain.services.AlarmScheduler
 import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
 import com.volfor.ondori.features.alarm.domain.services.MissedAlarmNotifier
+import com.volfor.ondori.features.alarm.domain.services.RingingAlarmStore
 import com.volfor.ondori.features.alarm.presentation.formatters.AlarmScheduledMessageFormatter
 import com.volfor.ondori.features.alarm.presentation.formatters.AlarmScheduledMessageFormatterImpl
 import dagger.Binds
@@ -50,6 +52,10 @@ abstract class AlarmModule {
     @Singleton
     @Binds
     abstract fun bindAlarmScheduledMessageFormatter(formatter: AlarmScheduledMessageFormatterImpl): AlarmScheduledMessageFormatter
+
+    @Singleton
+    @Binds
+    abstract fun bindRingingAlarmStore(store: RingingAlarmStoreImpl): RingingAlarmStore
 
     companion object {
         @Provides

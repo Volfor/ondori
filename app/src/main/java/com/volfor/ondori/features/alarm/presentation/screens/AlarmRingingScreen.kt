@@ -33,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.volfor.ondori.BuildConfig
 import com.volfor.ondori.R
 import com.volfor.ondori.app.time.LocalIs24HourFormat
@@ -48,14 +47,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun AlarmRingingScreen(
     viewModel: AlarmRingingViewModel = hiltViewModel(),
     onAlarmHandled: () -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
+    val uiState = viewModel.uiState
     val tint = penaltyLevelTint(PenaltyLevel.fromScore(uiState.score))
 
     Scaffold(
@@ -171,7 +170,7 @@ private fun Clock() {
     LaunchedEffect(Unit) {
         while (isActive) {
             now = ZonedDateTime.now()
-            delay(1_000L)
+            delay(1_000L.milliseconds)
         }
     }
 
