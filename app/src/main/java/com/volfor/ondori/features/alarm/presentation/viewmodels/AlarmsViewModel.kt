@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.volfor.ondori.app.ui.Message
 import com.volfor.ondori.app.ui.SnackbarManager
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
-import com.volfor.ondori.features.alarm.domain.usecases.ComputeAlarmRemainingTimeUseCase
+import com.volfor.ondori.features.alarm.domain.usecases.ComputeTimeUntilAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.CreateAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.DeleteAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.DisableAlarmUseCase
@@ -53,7 +53,7 @@ class AlarmsViewModel @Inject constructor(
     private val _disableAlarm: DisableAlarmUseCase,
     observeNotificationPermissionRequested: ObserveNotificationPermissionRequestedUseCase,
     private val _markNotificationPermissionAsRequested: MarkNotificationPermissionAsRequestedUseCase,
-    private val computeAlarmRemainingTime: ComputeAlarmRemainingTimeUseCase,
+    private val computeTimeUntilAlarm: ComputeTimeUntilAlarmUseCase,
     private val alarmScheduledMessageFormatter: AlarmScheduledMessageFormatter,
     private val _updateScore: UpdateScoreUseCase,
     private val _rescheduleEnabledAlarms: RescheduleEnabledAlarmsUseCase,
@@ -116,8 +116,8 @@ class AlarmsViewModel @Inject constructor(
     }
 
     private suspend fun showAlarmScheduledMessage(alarm: Alarm) {
-        val remainingTime = computeAlarmRemainingTime(alarm)
-        val (messageTextId, args) = alarmScheduledMessageFormatter.format(remainingTime)
+        val timeUntilAlarm = computeTimeUntilAlarm(alarm)
+        val (messageTextId, args) = alarmScheduledMessageFormatter.format(timeUntilAlarm)
         snackbarManager.showMessage(messageTextId, args)
     }
 

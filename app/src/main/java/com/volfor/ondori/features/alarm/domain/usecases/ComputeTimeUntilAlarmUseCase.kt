@@ -4,12 +4,15 @@ import com.volfor.ondori.features.alarm.domain.entities.Alarm
 import com.volfor.ondori.features.alarm.domain.services.AlarmTimeCalculator
 import javax.inject.Inject
 
-class ComputeAlarmRemainingTimeUseCase @Inject constructor(
+class ComputeTimeUntilAlarmUseCase @Inject constructor(
     private val timeCalculator: AlarmTimeCalculator,
-    private val computeAlarmTriggerTime: ComputeAlarmTriggerTimeUseCase,
 ) {
     suspend operator fun invoke(alarm: Alarm): Long {
-        val triggerTime = computeAlarmTriggerTime(alarm)
-        return timeCalculator.computeRemainingTime(triggerTime)
+        val baseTime = timeCalculator.computeNextTriggerTime(
+            hour = alarm.hour,
+            minute = alarm.minute,
+            repeatDays = alarm.repeatDays,
+        )
+        return timeCalculator.computeTimeUntilTrigger(baseTime)
     }
 }

@@ -10,5 +10,5 @@ interface AlarmTimeCalculator {
 
     fun pickSafeTriggerTime(preferred: Long, fallback: Long): Long
 
-    fun computeRemainingTime(triggerTimeMillis: Long): Long
+    fun computeTimeUntilTrigger(triggerTimeMillis: Long): Long
 }
