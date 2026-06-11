@@ -52,4 +52,14 @@ class RingingAlarmStoreImplTest {
 
         assertEquals(3L, store.stoppedAlarmId.first())
     }
+
+    @Test
+    fun `setRingingAlarm clears replayed stopped alarm id`() {
+        store.setRingingAlarm(3L)
+        store.clear()
+
+        store.setRingingAlarm(3L)
+
+        assertEquals(emptyList<Long>(), store.stoppedAlarmId.replayCache)
+    }
 }

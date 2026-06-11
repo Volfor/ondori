@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.volfor.ondori.features.alarm.data.services
 
 import com.volfor.ondori.features.alarm.domain.services.RingingAlarmStore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -19,6 +22,7 @@ class RingingAlarmStoreImpl @Inject constructor() : RingingAlarmStore {
     override val stoppedAlarmId: SharedFlow<Long> = _stoppedAlarmId.asSharedFlow()
 
     override fun setRingingAlarm(alarmId: Long) {
+        _stoppedAlarmId.resetReplayCache()
         _ringingAlarmId.value = alarmId
     }
 

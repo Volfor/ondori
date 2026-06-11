@@ -175,6 +175,17 @@ class AlarmRingingViewModelTest {
     }
 
     @Test
+    fun `replayed stop from previous ring does not mark new ring handled`() = runTest {
+        ringingAlarmStore.setRingingAlarm(1L)
+        ringingAlarmStore.clear()
+        ringingAlarmStore.setRingingAlarm(1L)
+
+        val vm = viewModel()
+
+        assertFalse(vm.uiState.isAlarmHandled)
+    }
+
+    @Test
     fun `snooze marks alarm handled`() = runTest {
         coEvery { snoozeAlarm(1L) } just runs
         val vm = viewModel()
