@@ -16,11 +16,10 @@ import com.volfor.ondori.features.punisher.domain.usecases.GetScoreUseCase
 import com.volfor.ondori.features.settings.domain.usecases.GetIncreasingVolumeEnabledUseCase
 import com.volfor.ondori.utils.Constants
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
-import com.volfor.ondori.utils.Constants.Notifications
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -63,7 +62,20 @@ class AlarmService : LifecycleService() {
     @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
-    private var missTimeoutJob: Job? = null
+    override fun onCreate() {
+        super.onCreate()
+        lifecycleScope.launch {
+            var wasRinging = false
+            ringingAlarmStore.ringingAlarmId.collectLatest { alarmId ->
+                if (alarmId == null) {
+                    if (wasRinging) stopSelf()
+                } else {
+                    wasRinging = true
+                    ringAlarm(alarmId)
+                }
+            }
+        }
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
@@ -80,76 +92,55 @@ class AlarmService : LifecycleService() {
         val previousAlarmId = ringingAlarmStore.ringingAlarmId.value
 
         if (intent?.action == ACTION_STOP_RINGING_FOR_ALARM) {
-            if (alarmId == previousAlarmId || previousAlarmId == null) {
+            if (alarmId == previousAlarmId) {
                 ringingAlarmStore.clear()
-                missTimeoutJob?.cancel()
-                missTimeoutJob = null
+            } else if (previousAlarmId == null) {
                 stopSelf()
             }
             return START_NOT_STICKY
         }
 
-        if (previousAlarmId == alarmId) {
-            Log.d("AlarmService", "Alarm $alarmId already ringing, ignoring duplicate start")
-            return START_NOT_STICKY
+        ringingAlarmStore.setRingingAlarm(alarmId)
+        if (previousAlarmId != null && previousAlarmId != alarmId) {
+            applicationScope.launch { missAlarm(previousAlarmId) }
         }
-
-        lifecycleScope.launch {
-            val alarm = getAlarm(alarmId) ?: run {
-                stopSelf()
-                return@launch
-            }
-            val score = getScore()
-
-            ringingAlarmStore.setRingingAlarm(alarmId)
-
-            if (previousAlarmId != null) {
-                Log.d(
-                    "AlarmService",
-                    "Alarm $previousAlarmId already ringing, replacing it with newest alarm $alarmId"
-                )
-
-                missTimeoutJob?.cancel()
-                missTimeoutJob = null
-                applicationScope.launch { missAlarm(previousAlarmId) }
-            }
-
-            val notification = notificationBuilder.build(alarm, score)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(
-                    Notifications.FIRING_ALARM_NOTIFICATION_ID,
-                    notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
-                )
-            } else {
-                startForeground(
-                    Notifications.FIRING_ALARM_NOTIFICATION_ID,
-                    notification,
-                )
-            }
-
-            alarmVibrator.vibrate()
-            val increasingVolume = getIncreasingVolumeEnabled()
-            alarmSoundPlayer.play(alarm.sound, gradualVolumeIncrease = increasingVolume)
-
-            missTimeoutJob = launch {
-                delay(Constants.Alarm.MISSED_TIMEOUT_MILLIS.milliseconds)
-                Log.d("AlarmService", "Alarm missed after timeout: $alarmId")
-                applicationScope.launch {
-                    missAlarm(alarmId)
-                    applyPenaltyAndRescheduleEnabledAlarms()
-                }
-            }
-        }
-
         return START_NOT_STICKY
+    }
+
+    private suspend fun ringAlarm(alarmId: Long) {
+        val alarm = getAlarm(alarmId) ?: run {
+            ringingAlarmStore.clear()
+            return
+        }
+        val score = getScore()
+
+        val notification = notificationBuilder.build(alarm, score)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(
+                Constants.Notifications.FIRING_ALARM_NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
+            )
+        } else {
+            startForeground(
+                Constants.Notifications.FIRING_ALARM_NOTIFICATION_ID,
+                notification,
+            )
+        }
+
+        alarmVibrator.vibrate()
+        alarmSoundPlayer.play(alarm.sound, gradualVolumeIncrease = getIncreasingVolumeEnabled())
+
+        delay(Constants.Alarm.MISSED_TIMEOUT_MILLIS.milliseconds)
+        applicationScope.launch {
+            missAlarm(alarmId)
+            applyPenaltyAndRescheduleEnabledAlarms()
+        }
     }
 
     override fun onDestroy() {
         ringingAlarmStore.clear()
-        missTimeoutJob?.cancel()
-        missTimeoutJob = null
         alarmVibrator.stop()
         alarmSoundPlayer.stop()
         super.onDestroy()
