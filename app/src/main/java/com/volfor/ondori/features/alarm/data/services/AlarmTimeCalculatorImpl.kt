@@ -61,7 +61,7 @@ class AlarmTimeCalculatorImpl @Inject constructor(
         }
     }
 
-    override fun computeRemainingTime(triggerTimeMillis: Long): Long {
-        return (triggerTimeMillis - clock.millis()).coerceAtLeast(0)
+    override fun computeTimeUntilTrigger(triggerTimeMillis: Long): Long {
+        return (triggerTimeMillis - clock.millis()).coerceAtLeast(0) //TODO: why 1 minute off?
     }
 }

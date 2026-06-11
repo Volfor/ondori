@@ -27,7 +27,7 @@ class AlarmScheduledMessageFormatterImplTest {
 
     @Test
     fun `returns less than one minute message when under 60 seconds`() {
-        val (stringRes, args) = formatter.format(remainingTimeMillis = 30_000)
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = 30_000)
 
         assertEquals(R.string.alarm_set_less_than_one_minute, stringRes)
         assertNull(args)
@@ -35,7 +35,7 @@ class AlarmScheduledMessageFormatterImplTest {
 
     @Test
     fun `returns less than one minute message at upper boundary`() {
-        val (stringRes, args) = formatter.format(remainingTimeMillis = 59_999)
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = 59_999)
 
         assertEquals(R.string.alarm_set_less_than_one_minute, stringRes)
         assertNull(args)
@@ -43,7 +43,7 @@ class AlarmScheduledMessageFormatterImplTest {
 
     @Test
     fun `returns less than one minute message for zero remaining time`() {
-        val (stringRes, args) = formatter.format(remainingTimeMillis = 0)
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = 0)
 
         assertEquals(R.string.alarm_set_less_than_one_minute, stringRes)
         assertNull(args)
@@ -51,7 +51,7 @@ class AlarmScheduledMessageFormatterImplTest {
 
     @Test
     fun `returns duration message for one day`() {
-        val (stringRes, args) = formatter.format(remainingTimeMillis = 24 * 60 * 60_000L)
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = 24 * 60 * 60_000L)
 
         assertEquals(R.string.alarm_set_for_duration, stringRes)
         assertEquals(listOf("1 day"), args)
@@ -59,7 +59,7 @@ class AlarmScheduledMessageFormatterImplTest {
 
     @Test
     fun `returns duration message for two minutes`() {
-        val (stringRes, args) = formatter.format(remainingTimeMillis = 2 * 60_000)
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = 2 * 60_000)
 
         assertEquals(R.string.alarm_set_for_duration, stringRes)
         assertEquals(listOf("2 minutes"), args)
@@ -67,23 +67,37 @@ class AlarmScheduledMessageFormatterImplTest {
 
     @Test
     fun `returns duration message for one hour`() {
-        val (stringRes, args) = formatter.format(remainingTimeMillis = 60 * 60_000)
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = 60 * 60_000)
 
         assertEquals(R.string.alarm_set_for_duration, stringRes)
         assertEquals(listOf("1 hour"), args)
     }
 
     @Test
-    fun `floors partial minutes to whole minutes`() {
-        val (stringRes, args) = formatter.format(remainingTimeMillis = (2 * 60_000L) + 45_000L)
+    fun `rounds partial minutes up to next whole minute`() {
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = (2 * 60_000L) + 45_000L)
 
+        assertEquals(R.string.alarm_set_for_duration, stringRes)
+        assertEquals(listOf("3 minutes"), args)
+    }
+
+    @Test
+    fun `shows two hours when trigger is two hours minus elapsed seconds away`() {
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = (2 * 60 * 60_000L) - 27_000L)
+        assertEquals(R.string.alarm_set_for_duration, stringRes)
+        assertEquals(listOf("2 hours"), args)
+    }
+
+    @Test
+    fun `shows two minutes when now is one millisecond before minute boundary`() {
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = 60_001)
         assertEquals(R.string.alarm_set_for_duration, stringRes)
         assertEquals(listOf("2 minutes"), args)
     }
 
     @Test
     fun `does not treat exactly one minute as less than one minute`() {
-        val (stringRes, args) = formatter.format(remainingTimeMillis = 60_000)
+        val (stringRes, args) = formatter.format(timeUntilAlarmMillis = 60_000)
 
         assertEquals(R.string.alarm_set_for_duration, stringRes)
         assertEquals(listOf("1 minute"), args)
@@ -111,5 +125,11 @@ class AlarmScheduledMessageFormatterImplTest {
         every {
             resources.getQuantityString(R.plurals.alarm_set_duration_minutes, 7, 7)
         } returns "7 minutes"
+        every {
+            resources.getQuantityString(R.plurals.alarm_set_duration_hours, 2, 2)
+        } returns "2 hours"
+        every {
+            resources.getQuantityString(R.plurals.alarm_set_duration_minutes, 3, 3)
+        } returns "3 minutes"
     }
 }

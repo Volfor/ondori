@@ -10,31 +10,35 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class ComputeAlarmRemainingTimeUseCaseTest {
+class ComputeTimeUntilAlarmUseCaseTest {
 
     private lateinit var timeCalculator: AlarmTimeCalculator
-    private lateinit var computeAlarmTriggerTime: ComputeAlarmTriggerTimeUseCase
 
     private val alarm = Alarm(id = 1L, hour = 7, minute = 30, enabled = true)
 
     @Before
     fun setup() {
         timeCalculator = mockk()
-        computeAlarmTriggerTime = mockk()
     }
 
-    private fun useCase() = ComputeAlarmRemainingTimeUseCase(timeCalculator, computeAlarmTriggerTime)
+    private fun useCase() = ComputeTimeUntilAlarmUseCase(timeCalculator)
 
     @Test
     fun `returns remaining time until computed trigger time`() = runBlocking {
         val triggerTime = 10_000_000L
-        val remainingTime = 3_600_000L
+        val timeUntilAlarm = 3_600_000L
 
-        coEvery { computeAlarmTriggerTime(alarm) } returns triggerTime
-        every { timeCalculator.computeRemainingTime(triggerTime) } returns remainingTime
+        coEvery {
+            timeCalculator.computeNextTriggerTime(
+                alarm.hour,
+                alarm.minute,
+                alarm.repeatDays
+            )
+        } returns triggerTime
+        every { timeCalculator.computeTimeUntilTrigger(triggerTime) } returns timeUntilAlarm
 
         val result = useCase()(alarm)
 
-        assertEquals(remainingTime, result)
+        assertEquals(timeUntilAlarm, result)
     }
 }

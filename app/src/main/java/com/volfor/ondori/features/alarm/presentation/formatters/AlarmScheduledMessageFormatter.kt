@@ -8,7 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 interface AlarmScheduledMessageFormatter {
-    fun format(remainingTimeMillis: Long): Pair<Int, List<Any>?>
+    fun format(timeUntilAlarmMillis: Long): Pair<Int, List<Any>?>
 }
 
 class AlarmScheduledMessageFormatterImpl @Inject constructor(
@@ -17,12 +17,12 @@ class AlarmScheduledMessageFormatterImpl @Inject constructor(
 
     private val resources: Resources = context.applicationContext.resources
 
-    override fun format(remainingTimeMillis: Long): Pair<Int, List<Any>?> {
-        if (isLessThanOneMinute(remainingTimeMillis)) {
+    override fun format(timeUntilAlarmMillis: Long): Pair<Int, List<Any>?> {
+        if (isLessThanOneMinute(timeUntilAlarmMillis)) {
             return R.string.alarm_set_less_than_one_minute to null
         }
 
-        val labels = durationLabels(remainingTimeMillis)
+        val labels = durationLabels(timeUntilAlarmMillis)
         val duration = joinDurationLabels(labels.ifEmpty {
             listOf(
                 resources.getQuantityString(R.plurals.alarm_set_duration_minutes, 1, 1),
@@ -32,13 +32,14 @@ class AlarmScheduledMessageFormatterImpl @Inject constructor(
         return R.string.alarm_set_for_duration to listOf(duration)
     }
 
-    private fun isLessThanOneMinute(remainingMillis: Long): Boolean = remainingMillis < 60_000
+    private fun isLessThanOneMinute(timeUntilAlarmMillis: Long): Boolean =
+        timeUntilAlarmMillis < 60_000
 
-    private fun durationLabels(remainingTimeMillis: Long): List<String> {
-        val remainingMinutes = remainingTimeMillis / 60_000
-        val days = (remainingMinutes / (24 * 60)).toInt()
-        val hours = ((remainingMinutes % (24 * 60)) / 60).toInt()
-        val minutes = (remainingMinutes % 60).toInt()
+    private fun durationLabels(timeUntilAlarmMillis: Long): List<String> {
+        val minutesUntilAlarm = (timeUntilAlarmMillis + 59_999) / 60_000
+        val days = (minutesUntilAlarm / (24 * 60)).toInt()
+        val hours = ((minutesUntilAlarm % (24 * 60)) / 60).toInt()
+        val minutes = (minutesUntilAlarm % 60).toInt()
 
         return buildList {
             if (days > 0) add(

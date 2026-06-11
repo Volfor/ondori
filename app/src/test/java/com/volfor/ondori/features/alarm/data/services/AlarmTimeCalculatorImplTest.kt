@@ -358,37 +358,37 @@ class AlarmTimeCalculatorImplTest {
     }
 
     @Test
-    fun `computeRemainingTime returns millis until trigger when trigger is in the future`() {
+    fun `computeTimeUntilTrigger returns millis until trigger when trigger is in the future`() {
         val now = Instant.parse("2026-03-11T10:00:00Z")
         val clock = Clock.fixed(now, zone)
         val calculator = AlarmTimeCalculatorImpl(clock)
 
         val trigger = now.plus(2, ChronoUnit.HOURS).toEpochMilli()
-        val result = calculator.computeRemainingTime(trigger)
+        val result = calculator.computeTimeUntilTrigger(trigger)
 
         assertEquals(2 * 60 * 60 * 1000L, result)
     }
 
     @Test
-    fun `computeRemainingTime returns zero when trigger is in the past`() {
+    fun `computeTimeUntilTrigger returns zero when trigger is in the past`() {
         val now = Instant.parse("2026-03-11T10:00:00Z")
         val clock = Clock.fixed(now, zone)
         val calculator = AlarmTimeCalculatorImpl(clock)
 
         val trigger = now.minus(10, ChronoUnit.MINUTES).toEpochMilli()
-        val result = calculator.computeRemainingTime(trigger)
+        val result = calculator.computeTimeUntilTrigger(trigger)
 
         assertEquals(0L, result)
     }
 
     @Test
-    fun `computeRemainingTime returns zero when trigger equals now`() {
+    fun `computeTimeUntilTrigger returns zero when trigger equals now`() {
         val now = Instant.parse("2026-03-11T10:00:00Z")
         val clock = Clock.fixed(now, zone)
         val calculator = AlarmTimeCalculatorImpl(clock)
 
         val trigger = now.toEpochMilli()
-        val result = calculator.computeRemainingTime(trigger)
+        val result = calculator.computeTimeUntilTrigger(trigger)
 
         assertEquals(0L, result)
     }
