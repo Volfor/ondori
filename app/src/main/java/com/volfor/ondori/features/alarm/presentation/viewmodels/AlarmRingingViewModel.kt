@@ -1,22 +1,24 @@
 package com.volfor.ondori.features.alarm.presentation.viewmodels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.volfor.ondori.features.alarm.domain.entities.Alarm
+import com.volfor.ondori.features.alarm.domain.services.RingingAlarmStore
 import com.volfor.ondori.features.alarm.domain.usecases.DismissAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.GetAlarmUseCase
 import com.volfor.ondori.features.alarm.domain.usecases.SnoozeAlarmUseCase
 import com.volfor.ondori.features.punisher.domain.usecases.GetScoreUseCase
-import com.volfor.ondori.features.settings.domain.usecases.ObserveSnoozeMinutesUseCase
+import com.volfor.ondori.features.settings.domain.usecases.GetSnoozeMinutesUseCase
 import com.volfor.ondori.utils.Constants.EXTRA_ALARM_ID
-import com.volfor.ondori.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,62 +36,62 @@ data class AlarmRingingUiState(
 @HiltViewModel
 class AlarmRingingViewModel @Inject constructor(
     private val getAlarm: GetAlarmUseCase,
+    private val getSnoozeMinutes: GetSnoozeMinutesUseCase,
     private val getScore: GetScoreUseCase,
     private val snoozeAlarm: SnoozeAlarmUseCase,
     private val dismissAlarm: DismissAlarmUseCase,
-    observeSnoozeMinutes: ObserveSnoozeMinutesUseCase,
-    savedStateHandle: SavedStateHandle,
+    ringingAlarmStore: RingingAlarmStore,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val alarmId: Long? = savedStateHandle[EXTRA_ALARM_ID]
+    private val alarmId = savedStateHandle.getStateFlow(EXTRA_ALARM_ID, null as Long?)
 
-    private val alarm = MutableStateFlow<Alarm?>(null)
-    private val score = MutableStateFlow(0)
-    private val isLoading = MutableStateFlow(false)
-    private val isAlarmHandled = MutableStateFlow(false)
-
-    val uiState: StateFlow<AlarmRingingUiState> = combine(
-        alarm, score, isLoading, isAlarmHandled, observeSnoozeMinutes(),
-    ) { alarm, score, isLoading, isHandled, snoozeMinutes ->
-        AlarmRingingUiState(
-            alarm = alarm,
-            score = score,
-            isLoading = isLoading,
-            isAlarmHandled = isHandled,
-            snoozeMinutes = snoozeMinutes,
-        )
-    }.stateIn(
-        scope = viewModelScope, started = WhileUiSubscribed, initialValue = AlarmRingingUiState()
-    )
+    var uiState by mutableStateOf(AlarmRingingUiState())
+        private set
 
     init {
-        loadScore()
-        if (alarmId != null) {
-            loadAlarm(alarmId)
+        loadInfo()
+        viewModelScope.launch {
+            alarmId.filterNotNull().collectLatest { loadAlarm(it) }
         }
+
+        ringingAlarmStore.ringingAlarmId.filterNotNull().onEach {
+            onNewAlarm(it)
+        }.launchIn(viewModelScope)
+
+        ringingAlarmStore.stoppedAlarmId.onEach {
+            if (it == alarmId.value) {
+                uiState = uiState.copy(isAlarmHandled = true)
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun onNewAlarm(newAlarmId: Long) {
+        if (alarmId.value == newAlarmId) return
+        savedStateHandle[EXTRA_ALARM_ID] = newAlarmId
     }
 
     fun snooze() = viewModelScope.launch {
-        alarmId ?: return@launch
-        snoozeAlarm(alarmId)
-        isAlarmHandled.update { true }
+        val id = alarmId.value ?: return@launch
+        snoozeAlarm(id)
+        uiState = uiState.copy(isAlarmHandled = true)
     }
 
     fun dismiss() = viewModelScope.launch {
-        alarmId ?: return@launch
-        dismissAlarm(alarmId)
-        isAlarmHandled.update { true }
+        val id = alarmId.value ?: return@launch
+        dismissAlarm(id)
+        uiState = uiState.copy(isAlarmHandled = true)
     }
 
-    private fun loadAlarm(alarmId: Long) {
-        isLoading.update { true }
-        viewModelScope.launch {
-            alarm.value = getAlarm(alarmId)
-            isLoading.update { false }
-        }
+    private suspend fun loadAlarm(alarmId: Long) {
+        uiState = uiState.copy(isLoading = true)
+        val alarm = getAlarm(alarmId)
+        uiState = uiState.copy(alarm = alarm, isLoading = false)
     }
 
-    private fun loadScore() = viewModelScope.launch {
-        score.value = getScore()
+    private fun loadInfo() = viewModelScope.launch {
+        val score = getScore()
+        val snoozeMinutes = getSnoozeMinutes()
+        uiState = uiState.copy(score = score, snoozeMinutes = snoozeMinutes)
     }
 }

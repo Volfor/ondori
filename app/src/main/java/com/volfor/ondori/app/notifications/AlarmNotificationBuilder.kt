@@ -41,7 +41,7 @@ class AlarmNotificationBuilder @Inject constructor(
         ).apply {
             setSmallIcon(R.drawable.ic_launcher_foreground)
             setContentTitle(alarm.label ?: "Alarm")
-            setContentText("$weekday $time · Swipe to stop")
+            setContentText("$weekday $time • Swipe to stop")
             setColor(tint)
             setColorized(true)
             setPriority(NotificationCompat.PRIORITY_MAX)
@@ -67,10 +67,13 @@ class AlarmNotificationBuilder @Inject constructor(
     private fun createFullScreenIntent(alarmId: Long): PendingIntent {
         val intent = Intent(context.applicationContext, AlarmRingingActivity::class.java).apply {
             putExtra(Constants.EXTRA_ALARM_ID, alarmId)
+            addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP,
+            )
         }
         return PendingIntent.getActivity(
             context.applicationContext,
-            Constants.RequestCodes.ALARM_NOTIFICATION_FULL_SCREEN,
+            Constants.RequestCodes.ALARM_NOTIFICATION_FULL_SCREEN + alarmId.toInt(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )

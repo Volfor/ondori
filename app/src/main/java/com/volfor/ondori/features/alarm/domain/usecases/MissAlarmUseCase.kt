@@ -9,12 +9,13 @@ class MissAlarmUseCase @Inject constructor(
     private val ringer: AlarmRinger,
     private val repo: AlarmRepository,
     private val missedNotifier: MissedAlarmNotifier,
-    private val applyPenaltyAndRescheduleEnabledAlarms: ApplyPenaltyAndRescheduleEnabledAlarmsUseCase,
 ) {
     suspend operator fun invoke(alarmId: Long) {
         ringer.stopRinging(alarmId)
         val alarm = repo.getAlarm(alarmId) ?: return
+        if (alarm.repeatDays.isEmpty()) {
+            repo.disableAlarm(alarmId)
+        }
         missedNotifier.notifyMissed(alarm)
-        applyPenaltyAndRescheduleEnabledAlarms()
     }
 }

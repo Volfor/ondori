@@ -1,5 +1,4 @@
 import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
-import org.gradle.kotlin.dsl.resolver.SourceDistributionResolver.Companion.artifactType
 import java.util.Properties
 
 plugins {
@@ -72,14 +71,14 @@ android {
             }
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
     buildFeatures {
         compose = true
         buildConfig = true
     }
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 room {
@@ -126,6 +125,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
